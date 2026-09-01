@@ -50,12 +50,20 @@ This file records durable decisions, not routine implementation notes. New entri
 - **Rationale:** Direct database access bypasses ERP business rules and makes authorization, validation, and traceability unreliable.
 - **Consequence:** Agent, MCP, and multi-Agent implementation is out of scope until the ERP workflow and API boundaries are stable.
 
+## DEC-007 — Keep the repository public for Web GPT → GitHub → Codex coordination
+
+- **Status:** Accepted
+- **Date:** 2026-09-01
+- **Decision:** Keep `kekepepe/erpnext-agent` public during the current collaboration workflow so Web GPT can directly read GitHub project state and write task handoffs that Codex can consume from the same repository.
+- **Rationale:** GitHub is now the shared operational bridge between Web GPT and Codex. This removes the need for Obsidian to carry volatile per-task execution state and allows task plans, implementation evidence, and handoffs to remain version-controlled alongside the project.
+- **Consequence:** The public repository must contain only code, synthetic test data, sanitized examples, non-sensitive architecture notes, validation evidence, and project coordination documents. Production secrets, reusable credentials, real customer/supplier records, confidential pricing, contracts, personal information, production exports, and other non-public business data must never be committed.
+- **Revisit when:** Both Web GPT and Codex can reliably access an appropriately permissioned private repository, or the project reaches a stage where required implementation information cannot be safely represented with synthetic/sanitized artifacts.
+
 ## Open Decisions
 
 The following are intentionally undecided pending evidence:
 
 - Exact ERP MVP scope and rollout environment
-- Whether the repository's current public visibility is intentional or should return to private
 - Which Phase 0 gaps require `hardware_erp` customization
 - Business API surface and authentication model
 - First Agent pilot, model/provider, orchestration framework, and success metrics
