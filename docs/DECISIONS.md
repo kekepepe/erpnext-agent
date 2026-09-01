@@ -55,6 +55,7 @@ This file records durable decisions, not routine implementation notes. New entri
 The following are intentionally undecided pending evidence:
 
 - Exact ERP MVP scope and rollout environment
+- Whether the repository's current public visibility is intentional or should return to private
 - Which Phase 0 gaps require `hardware_erp` customization
 - Business API surface and authentication model
 - First Agent pilot, model/provider, orchestration framework, and success metrics
