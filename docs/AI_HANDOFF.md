@@ -2,24 +2,16 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Revalidate the Phase 0 runtime, initialize a representative synthetic validation dataset, and establish the Phase 0 evidence ledger
-last_updated: 2026-09-01
-updated_by: Web GPT
+current_task: Review the completed native stock-flow evidence before beginning sales validation
+last_updated: 2026-09-05
+updated_by: Codex
 ---
 
 # AI Project Handoff
 
 ## Current Objective
 
-Complete the first evidence-producing Phase 0 cycle for ERPNext v16 native-capability validation.
-
-The current task has three ordered parts:
-
-1. Re-establish and revalidate the disposable local ERPNext runtime.
-2. Initialize a representative, fully synthetic hardware-trading test company and master dataset.
-3. Establish a structured Phase 0 validation ledger for later purchase, stock, sales, returns, receivable/payable, permissions/approval, and reporting tests.
-
-Do not begin Custom App, Business API, MCP, Agent, or multi-Agent implementation in this task.
+Review the completed native stock-flow evidence. After review, the next implementation task is native sales validation beginning with `SAL-001`; later phases remain out of scope.
 
 ## Verified Current State
 
@@ -39,28 +31,47 @@ Do not begin Custom App, Business API, MCP, Agent, or multi-Agent implementation
   - required running services
   - ERPNext/Frappe 16.x versions
   - HTTP ping response
-- `docker compose -f phase0/compose.yaml config --quiet` was reported passing on 2026-09-01.
+- `docker compose -f phase0/compose.yaml config --quiet` passed on 2026-09-01.
+- Current runtime revalidation passed on 2026-09-01 23:39:52 +0800:
+  - `create-site` status `exited`, exit code `0`
+  - all nine required long-running services were running
+  - ERPNext 16.33.0
+  - Frappe 16.31.0
+  - HTTP ping `{"message":"pong"}`
+  - `./scripts/phase0-check.sh` exit code `0`
 - Historical evidence records a successful runtime baseline on 2026-08-30:
   - ERPNext 16.33.0
   - Frappe 16.31.0
   - `create-site` exit code 0
   - nine required services running
   - HTTP ping returning `pong`
-- The above historical runtime evidence is not a substitute for current revalidation.
-- On the latest 2026-09-01 runtime attempt, the Docker daemon was not running, so the current runtime state remains **not verified**.
-- No current repository evidence proves that the following have been completed:
-  - Phase 0 test company initialization
-  - approximately 20 representative SKUs
-  - 3 suppliers
-  - 3 customers
-  - representative warehouse/UOM setup
-  - native purchase-flow validation
-  - native stock-flow validation
-  - native sales-flow validation
-  - returns validation
-  - accounts receivable/payable validation
-  - permissions/approval validation
-  - reporting validation
+- The reproducible dataset is defined in `phase0/synthetic-data.json` and applied through `scripts/phase0-seed.py` using authenticated ERPNext REST APIs, not direct database access.
+- Current API readback proves the following synthetic dataset exists:
+  - company `Phase Zero Hardware Trading Demo` (`PZH`, China, CNY)
+  - two P0 warehouses
+  - four P0 item groups
+  - Piece, Box, and Carton UOM coverage
+  - three P0 suppliers
+  - three P0 customers
+  - 20 P0 stock items covering hand tools, power tools, consumables, accessories, zero stock, low stock, normal stock, and packaged items
+  - 40 Item Price records: one Standard Buying and one Standard Selling price per item
+  - submitted Opening Stock reconciliation `MAT-RECO-2026-00001` with 18 non-zero item rows; two items intentionally start at zero
+  - `P0-CO-SCREW` conversions Piece `1`, Box `50`, Carton `500`
+- A final rerun of `python3 scripts/phase0-seed.py` exited `0` and identified every entity plus the submitted opening-stock document as existing, without creating duplicates.
+- `docs/PHASE0_VALIDATION.md` now records runtime evidence, dataset assumptions and inventory, initialization failures and corrections, evidence rules, and seeded validation cases.
+- Native purchase-flow validation passed on 2026-09-05 through `scripts/phase0-validate-purchase.py`:
+  - three submitted Purchase Orders
+  - one full receipt and one order received through two partial receipts
+  - one 2-Box receipt converted to 100 Piece
+  - two submitted Purchase Invoices
+  - one full and one partial supplier Payment Entry
+  - one 1-Box purchase return converted to -50 Piece
+  - REST readback of document statuses, links, quantities, invoice outstanding amounts, and Bin balances
+  - GL readback proving supplier payable creation and full/partial settlement
+- Purchase cases `PUR-001` through `PUR-010`, stock cases `STK-001` through `STK-010`, return cases `RET-002` and `RET-004`, and payable cases `AP-001`, `AP-002`, `AP-003`, and `AP-005` are recorded as `Supported`.
+- Native stock validation passed on 2026-09-05 through `scripts/phase0-validate-stock.py`: all cases `STK-001` through `STK-010` are now recorded as `Supported`.
+- Stock evidence includes 18 matching opening balances, delivery quantity reduction, a main-to-secondary warehouse transfer, stock reconciliation, a zero-stock query, native insufficient-stock rejection, item-level queries, warehouse-level queries, and an idempotent rerun.
+- No execution evidence yet proves the sales, customer return, receivable, permissions/approval, or reporting cases; those remain `Not Tested`.
 - No `hardware_erp` Custom App implementation is currently proven.
 - No Business API layer is currently proven.
 - No MCP Server implementation is currently proven.
@@ -88,21 +99,31 @@ Do not begin Custom App, Business API, MCP, Agent, or multi-Agent implementation
 - [x] Established GitHub as the daily Web GPT ↔ Codex coordination channel.
 - [x] Established Obsidian as milestone knowledge storage rather than per-task coordination.
 - [x] Confirmed that repository public visibility is intentional for the current Web GPT → GitHub → Codex workflow.
+- [x] Revalidated the current Phase 0 runtime on 2026-09-01.
+- [x] Added and executed a reproducible REST API seed for a fully synthetic validation company and representative master data.
+- [x] Initialized and read back 20 items, 3 suppliers, 3 customers, 2 warehouses, 40 prices, UOM conversions, and submitted opening stock.
+- [x] Established `docs/PHASE0_VALIDATION.md` as the Phase 0 evidence ledger.
+- [x] Executed and recorded native purchase validation `PUR-001` through `PUR-010`.
+- [x] Verified full and partial receipt, alternate-UOM stock conversion, Purchase Invoice payable posting, full and partial supplier payment, and purchase return stock reversal.
+- [x] Executed and recorded native stock validation `STK-001` through `STK-010`.
+- [x] Verified opening balances, delivery reduction, warehouse transfer, reconciliation, zero/insufficient-stock behaviour, item queries, and warehouse queries.
 
 ## In Progress
 
-- [ ] Revalidate the disposable Phase 0 runtime.
-- [ ] Initialize a representative synthetic hardware-trading validation company.
-- [ ] Initialize representative master data.
-- [ ] Establish `docs/PHASE0_VALIDATION.md` as the evidence ledger for Phase 0.
+- [ ] Review the completed stock-flow evidence before starting sales validation.
 
 ## Problems / Risks
 
-### Runtime blocker
+### Runtime lifecycle
 
-- The Docker daemon was not running during the latest 2026-09-01 check.
-- Until Docker is running and `./scripts/phase0-check.sh` passes again, current runtime health must remain marked as unverified.
-- If Docker cannot be started without user interaction, record that exact blocker and stop. Do not switch to unrelated implementation work.
+- Docker Desktop was initially stopped on 2026-09-01. It was started and the runtime check then passed; this blocker is resolved for the current session.
+- The environment remains disposable. Future tasks must rerun `./scripts/phase0-check.sh` rather than infer health from this record.
+
+### Seed behaviour learned
+
+- ERPNext forbids list filtering on Stock Reconciliation `remarks`, and the submitted document did not retain the supplied remarks value.
+- Opening Stock requires an Asset/Liability difference account; the seed uses the standard generated `Temporary Opening - PZH` Asset account.
+- Idempotent opening-stock detection therefore compares company, purpose, submitted status, and the full item/warehouse/quantity set.
 
 ### Public repository boundary
 
@@ -145,30 +166,30 @@ Execute these items in order.
 
 #### P0.1 — Revalidate the runtime
 
-- [ ] Inspect the actual repository and Git state before making changes.
-- [ ] Check whether Docker daemon is running.
-- [ ] Run:
+- [x] Inspect the actual repository and Git state before making changes.
+- [x] Check whether Docker daemon is running.
+- [x] Run:
 
     docker compose -f phase0/compose.yaml up -d
 
-- [ ] Wait for Site initialization/readiness.
-- [ ] If necessary, inspect:
+- [x] Wait for Site initialization/readiness.
+- [x] If necessary, inspect:
 
     docker compose -f phase0/compose.yaml logs -f create-site
 
-- [ ] Run:
+- [x] Run:
 
     ./scripts/phase0-check.sh
 
-- [ ] Record the exact observed result, including:
+- [x] Record the exact observed result, including:
   - Compose validation
   - `create-site` status and exit code
   - required running services
   - ERPNext version
   - Frappe version
   - ping response
-- [ ] If the check fails, preserve the failure evidence and record the smallest concrete unblocking action.
-- [ ] Do not mark runtime revalidation complete unless the current check actually passes.
+- [x] If the check fails, preserve the failure evidence and record the smallest concrete unblocking action.
+- [x] Do not mark runtime revalidation complete unless the current check actually passes.
 
 #### P0.2 — Initialize the synthetic test company and representative master data
 
@@ -180,18 +201,18 @@ The dataset should be designed to exercise different ERPNext behaviours rather t
 
 Minimum target:
 
-- [ ] 1 synthetic hardware-trading company
-- [ ] approximately 20 representative SKUs
-- [ ] 3 synthetic suppliers
-- [ ] 3 synthetic customers
-- [ ] at least 2 warehouses
-- [ ] representative item groups/categories
-- [ ] representative Units of Measure
-- [ ] opening stock
-- [ ] synthetic purchase prices
-- [ ] synthetic selling prices
-- [ ] basic tax assumptions
-- [ ] opening receivable/payable assumptions only where required for later tests
+- [x] 1 synthetic hardware-trading company
+- [x] approximately 20 representative SKUs
+- [x] 3 synthetic suppliers
+- [x] 3 synthetic customers
+- [x] at least 2 warehouses
+- [x] representative item groups/categories
+- [x] representative Units of Measure
+- [x] opening stock
+- [x] synthetic purchase prices
+- [x] synthetic selling prices
+- [x] basic tax assumptions
+- [x] Opening receivable/payable assumptions were not added because they are not required until the later AR/AP transaction tests.
 
 Representative SKU coverage should include examples such as:
 
@@ -221,17 +242,17 @@ Prefer reproducible initialization where practical. If data is initialized manua
 
 #### P0.3 — Establish the Phase 0 validation evidence ledger
 
-- [ ] Create `docs/PHASE0_VALIDATION.md`.
-- [ ] Record environment/version evidence.
-- [ ] Record test-company assumptions.
-- [ ] Record dataset inventory.
-- [ ] Define evidence rules.
-- [ ] Use only these result states:
+- [x] Create `docs/PHASE0_VALIDATION.md`.
+- [x] Record environment/version evidence.
+- [x] Record test-company assumptions.
+- [x] Record dataset inventory.
+- [x] Define evidence rules.
+- [x] Use only these result states:
   - `Supported`
   - `Configurable`
   - `Gap`
   - `Not Tested`
-- [ ] Add structured validation sections for:
+- [x] Add structured validation sections for:
   - Purchase
   - Stock
   - Sales
@@ -261,11 +282,11 @@ Do not claim workflow success based only on setup, screenshots of configuration,
 
 Before handoff:
 
-- [ ] Review actual changed files.
-- [ ] Run appropriate validation.
-- [ ] Review `git diff`.
-- [ ] Review `git status`.
-- [ ] Update this `docs/AI_HANDOFF.md` with:
+- [x] Review actual changed files.
+- [x] Run appropriate validation.
+- [x] Review `git diff`.
+- [x] Review `git status`.
+- [x] Update this `docs/AI_HANDOFF.md` with:
   - what was actually completed
   - actual commands run
   - actual validation results
@@ -274,17 +295,58 @@ Before handoff:
   - unresolved failures
   - blockers
   - recommended next action
-- [ ] Do not change `docs/ROADMAP.md` unless phase scope, dependency, milestone, or exit criteria actually changed.
-- [ ] Do not change `docs/DECISIONS.md` unless a durable architecture/security/workflow decision actually changed.
-- [ ] Do not modify Obsidian during this routine development task.
-- [ ] Do not start transaction-flow validation unless the current task has been completed and handed back for review.
-- [ ] Do not start Phase 1, Custom App, API, MCP, or Agent work.
+- [x] Do not change `docs/ROADMAP.md` unless phase scope, dependency, milestone, or exit criteria actually changed.
+- [x] Do not change `docs/DECISIONS.md` unless a durable architecture/security/workflow decision actually changed.
+- [x] Do not modify Obsidian during this routine development task.
+- [x] Do not start transaction-flow validation unless the current task has been completed and handed back for review.
+- [x] Do not start Phase 1, Custom App, API, MCP, or Agent work.
+
+#### Current Task Execution Record
+
+Commands actually run included:
+
+```bash
+git pull --ff-only origin main
+docker info
+docker compose -f phase0/compose.yaml up -d
+docker compose -f phase0/compose.yaml ps -a
+./scripts/phase0-check.sh
+python3 -m json.tool phase0/synthetic-data.json
+python3 -m py_compile scripts/phase0-seed.py
+python3 scripts/phase0-seed.py
+```
+
+Actual validation results:
+
+- Runtime health check: passed, exit code `0`.
+- Dataset validation: JSON parse passed; Python compilation passed.
+- Final seed execution: passed, exit code `0`, with every expected entity reported as `EXISTS`.
+- REST API readback: company `1`, warehouses `2`, suppliers `3`, customers `3`, items `20`, Item Prices `40`.
+- Opening stock: `MAT-RECO-2026-00001`, `docstatus = 1`, purpose `Opening Stock`, item rows `18`.
+- Multi-level UOM: `P0-CO-SCREW` returned Piece `1`, Box `50`, Carton `500`.
+
+Changed files:
+
+- `README.md`
+- `phase0/synthetic-data.json`
+- `scripts/phase0-seed.py`
+- `docs/PHASE0_VALIDATION.md`
+- `docs/AI_HANDOFF.md`
+
+Failures preserved:
+
+- Initial unprivileged Docker access was denied; authorized host access showed Docker Desktop was stopped. Docker Desktop was started, resolving the blocker.
+- The first seed attempt stopped before opening stock because Stock Reconciliation `remarks` is not permitted in list filters.
+- The second seed attempt stopped before opening stock because ERPNext requires an Asset/Liability difference account for Opening Stock.
+- After submission, ERPNext did not retain the requested `remarks`; idempotency was corrected to match the complete submitted opening-stock content.
+
+Previous recommended action was to begin `PUR-001` after review. The user accepted that handoff on 2026-09-05, and the purchase sequence has now been executed.
 
 ### P0 — Next After Current Task
 
 These are the next Phase 0 activities, but they are not part of the current Codex task unless the handoff is explicitly updated after review.
 
-- [ ] Execute Purchase validation:
+- [x] Execute Purchase validation:
   - Purchase Order
   - full receipt
   - partial/multiple receipts
@@ -293,7 +355,7 @@ These are the next Phase 0 activities, but they are not part of the current Code
   - supplier payment
   - alternate UOM
   - purchase return
-- [ ] Execute Stock validation:
+- [x] Execute Stock validation:
   - opening stock
   - stock increase from receipt
   - stock decrease from delivery
@@ -317,6 +379,77 @@ These are the next Phase 0 activities, but they are not part of the current Code
 - [ ] Validate stock, purchase, sales, receivable, and payable reporting.
 - [ ] Record every tested requirement as `Supported`, `Configurable`, `Gap`, or `Not Tested`.
 - [ ] Build the evidence-based Gap Analysis.
+
+#### Purchase Flow Execution Record — 2026-09-05
+
+Commands actually run included:
+
+```bash
+git fetch --prune origin
+./scripts/phase0-check.sh
+python3 scripts/phase0-seed.py
+python3 scripts/phase0-validate-purchase.py
+```
+
+Actual document evidence:
+
+- Purchase Orders: `PUR-ORD-2026-00001`, `PUR-ORD-2026-00002`, `PUR-ORD-2026-00003`.
+- Purchase Receipts: `MAT-PRE-2026-00001` through `MAT-PRE-2026-00004`.
+- Purchase Return: `MAT-PRE-2026-00005`, linked to `MAT-PRE-2026-00004`.
+- Purchase Invoices: `ACC-PINV-2026-00001` for CNY 152 and `ACC-PINV-2026-00002` for CNY 120.
+- Payment Entries: `ACC-PAY-2026-00001` fully allocated CNY 152 and `ACC-PAY-2026-00002` partially allocated CNY 60.
+- Final invoice balances: CNY 0 and CNY 60.
+- Final main-warehouse stock: hammer 28, screwdriver 58, screw 650 Piece.
+- GL evidence: invoice credits to `Creditors - PZH` of CNY 152 and 120; payment debits of CNY 152 and 60 with equal Cash credits.
+
+Changed files for the purchase-validation task:
+
+- `.gitignore`
+- `README.md`
+- `phase0/purchase-validation.json`
+- `scripts/phase0_api.py`
+- `scripts/phase0-seed.py`
+- `scripts/phase0-validate-purchase.py`
+- `docs/PHASE0_VALIDATION.md`
+- `docs/AI_HANDOFF.md`
+
+Failure preserved:
+
+- The first return attempt used the non-whitelisted lower-level `erpnext.controllers.sales_and_purchase_return.make_return_doc` and received HTTP 403. The validated solution uses ERPNext's whitelisted `erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_return` wrapper.
+
+#### Stock Flow Execution Record — 2026-09-05
+
+Commands actually run included:
+
+```bash
+./scripts/phase0-check.sh
+python3 scripts/phase0-validate-stock.py
+python3 scripts/phase0-validate-stock.py
+```
+
+Actual document and balance evidence:
+
+- Opening Stock: `MAT-RECO-2026-00001`, 18 document rows and 18 matching Stock Ledger Entry balances.
+- Delivery Note: `MAT-DN-2026-00001`, reducing `P0-AC-BITSET` from 20 to 18 Piece.
+- Material Transfer: `MAT-STE-2026-00001`, moving 3 `P0-AC-GOGGLES` from the main warehouse to the secondary warehouse; final balances 12 and 3.
+- Stock Reconciliation: `MAT-RECO-2026-00002`, setting `P0-AC-TOOLBOX` from 6 to 5 Piece at CNY 95.
+- Insufficient-stock evidence: ERPNext rejected submission of draft `MAT-DN-2026-00002` for zero-stock `P0-PT-SAW`; quantity remained zero.
+- Final item queries matched the source-controlled expected balances exactly; warehouse query returned 18 non-zero main-warehouse items and 3 goggles in the secondary warehouse.
+- A second complete run reused the same documents and reproduced the same balances without duplicate stock movements.
+
+Changed files for the stock-validation task:
+
+- `README.md`
+- `phase0/stock-validation.json`
+- `scripts/phase0-validate-stock.py`
+- `docs/PHASE0_VALIDATION.md`
+- `docs/AI_HANDOFF.md`
+
+Failure preserved:
+
+- The first opening-ledger assertion incorrectly compared Stock Reconciliation `actual_qty` with the opening quantity. ERPNext v16 returned `actual_qty = 0` on those opening rows and stored the resulting balance in `qty_after_transaction`; the validator was corrected to use the observed native ledger field and also verify the warehouse and valuation rate.
+
+Recommended next action: review the stock evidence, then execute sales validation beginning with `SAL-001`. Preserve the CNY 60 open payable for AP-004/report testing.
 
 ### P1 — After Phase 0 Evidence Review
 
@@ -401,11 +534,8 @@ The current task is complete only when all applicable criteria below are satisfi
 - The current repository is intentionally public for Web GPT → GitHub → Codex coordination.
 - Use synthetic/sanitized data only.
 - Never commit secrets or private business information.
-- The current task ends after:
-  - runtime revalidation
-  - representative synthetic master-data initialization
-  - Phase 0 evidence-ledger creation
-- Do not begin transaction-flow testing until this task is completed and the handoff is reviewed.
+- The runtime, representative master data, evidence ledger, and native purchase/stock-flow validation are complete.
+- Review the stock evidence before beginning sales validation.
 - Do not begin Custom App, API, MCP, Agent, or multi-Agent work.
 - Preserve ERPNext Core.
 - Treat `ERP与AI智能体设计笔记.md` as project direction, not proof that any component exists.

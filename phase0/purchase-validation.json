@@ -1,0 +1,41 @@
+{
+  "company": "Phase Zero Hardware Trading Demo",
+  "warehouse": "P0 Main Warehouse - PZH",
+  "cash_account": "Cash - PZH",
+  "scenarios": {
+    "full": {
+      "supplier": "P0 General Hardware Supply",
+      "item_code": "P0-HT-HAMMER",
+      "qty": 4,
+      "uom": "Piece",
+      "conversion_factor": 1,
+      "rate": 38,
+      "supplier_invoice": "P0-PUR-FULL-001"
+    },
+    "partial": {
+      "supplier": "P0 Alternate Tool Supply",
+      "item_code": "P0-HT-SCREWDRIVER",
+      "qty": 10,
+      "receipt_quantities": [4, 6],
+      "uom": "Piece",
+      "conversion_factor": 1,
+      "rate": 12,
+      "supplier_invoice": "P0-PUR-PARTIAL-001",
+      "partial_payment": 60
+    },
+    "alternate_uom": {
+      "supplier": "P0 Specialty Consumables Supply",
+      "item_code": "P0-CO-SCREW",
+      "qty": 2,
+      "return_qty": 1,
+      "uom": "Box",
+      "conversion_factor": 50,
+      "rate": 17.5
+    }
+  },
+  "expected_final_stock": {
+    "P0-HT-HAMMER": 28,
+    "P0-HT-SCREWDRIVER": 58,
+    "P0-CO-SCREW": 650
+  }
+}

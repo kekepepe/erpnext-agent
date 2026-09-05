@@ -1,0 +1,57 @@
+{
+  "company": {
+    "company_name": "Phase Zero Hardware Trading Demo",
+    "abbr": "PZH",
+    "country": "China",
+    "default_currency": "CNY",
+    "valuation_method": "Moving Average",
+    "tax_assumption": "Prices exclude tax; no production tax identifiers or rates are used in Phase 0 master data."
+  },
+  "item_groups": [
+    "P0 Hand Tools",
+    "P0 Power Tools",
+    "P0 Consumables",
+    "P0 Accessories"
+  ],
+  "uoms": [
+    {"uom_name": "Piece", "must_be_whole_number": 1},
+    {"uom_name": "Box", "must_be_whole_number": 1},
+    {"uom_name": "Carton", "must_be_whole_number": 1}
+  ],
+  "warehouses": [
+    {"warehouse_name": "P0 Main Warehouse", "purpose": "Primary synthetic inventory"},
+    {"warehouse_name": "P0 Secondary Warehouse", "purpose": "Transfer and secondary-stock scenarios"}
+  ],
+  "suppliers": [
+    {"supplier_name": "P0 General Hardware Supply", "supplier_group": "Hardware", "scenario": "Primary general supplier"},
+    {"supplier_name": "P0 Alternate Tool Supply", "supplier_group": "Distributor", "scenario": "Alternate supplier and price comparison"},
+    {"supplier_name": "P0 Specialty Consumables Supply", "supplier_group": "Hardware", "scenario": "Specialty consumables supplier"}
+  ],
+  "customers": [
+    {"customer_name": "P0 Standard Retail Customer", "customer_group": "Commercial", "scenario": "Standard customer"},
+    {"customer_name": "P0 Repeat Trade Customer", "customer_group": "Commercial", "scenario": "Repeat-order and pricing scenario"},
+    {"customer_name": "P0 Credit Trade Customer", "customer_group": "Commercial", "scenario": "Receivable and partial-payment scenario"}
+  ],
+  "items": [
+    {"item_code": "P0-HT-HAMMER", "item_name": "P0 Claw Hammer", "item_group": "P0 Hand Tools", "opening_stock": 24, "purchase_price": 38, "selling_price": 58, "scenario": "Normally stocked hand tool"},
+    {"item_code": "P0-HT-SCREWDRIVER", "item_name": "P0 Phillips Screwdriver", "item_group": "P0 Hand Tools", "opening_stock": 48, "purchase_price": 12, "selling_price": 20, "scenario": "Normally stocked hand tool"},
+    {"item_code": "P0-HT-PLIERS", "item_name": "P0 Combination Pliers", "item_group": "P0 Hand Tools", "opening_stock": 18, "purchase_price": 26, "selling_price": 42, "scenario": "Low-stock hand tool"},
+    {"item_code": "P0-HT-WRENCH", "item_name": "P0 Adjustable Wrench", "item_group": "P0 Hand Tools", "opening_stock": 16, "purchase_price": 32, "selling_price": 49, "scenario": "Low-stock hand tool"},
+    {"item_code": "P0-HT-TAPE", "item_name": "P0 Measuring Tape", "item_group": "P0 Hand Tools", "opening_stock": 30, "purchase_price": 15, "selling_price": 25, "scenario": "Normally stocked hand tool"},
+    {"item_code": "P0-PT-DRILL", "item_name": "P0 Cordless Drill", "item_group": "P0 Power Tools", "opening_stock": 8, "purchase_price": 420, "selling_price": 599, "scenario": "Low-stock power tool"},
+    {"item_code": "P0-PT-GRINDER", "item_name": "P0 Angle Grinder", "item_group": "P0 Power Tools", "opening_stock": 5, "purchase_price": 310, "selling_price": 459, "scenario": "Low-stock power tool"},
+    {"item_code": "P0-PT-SAW", "item_name": "P0 Circular Saw", "item_group": "P0 Power Tools", "opening_stock": 0, "purchase_price": 530, "selling_price": 749, "scenario": "Zero-stock power tool"},
+    {"item_code": "P0-PT-HEATGUN", "item_name": "P0 Heat Gun", "item_group": "P0 Power Tools", "opening_stock": 3, "purchase_price": 185, "selling_price": 279, "scenario": "Very-low-stock power tool"},
+    {"item_code": "P0-PT-DRIVER", "item_name": "P0 Electric Screwdriver", "item_group": "P0 Power Tools", "opening_stock": 10, "purchase_price": 160, "selling_price": 239, "scenario": "Normally stocked power tool"},
+    {"item_code": "P0-CO-SCREW", "item_name": "P0 M4 Screw", "item_group": "P0 Consumables", "opening_stock": 600, "purchase_price": 0.35, "selling_price": 0.65, "scenario": "Packaged consumable with multi-level UOM", "uoms": [{"uom": "Piece", "conversion_factor": 1}, {"uom": "Box", "conversion_factor": 50}, {"uom": "Carton", "conversion_factor": 500}]},
+    {"item_code": "P0-CO-CABLETIE", "item_name": "P0 Cable Tie", "item_group": "P0 Consumables", "opening_stock": 240, "purchase_price": 0.18, "selling_price": 0.4, "scenario": "Packaged consumable", "uoms": [{"uom": "Piece", "conversion_factor": 1}, {"uom": "Box", "conversion_factor": 100}]},
+    {"item_code": "P0-CO-GLOVE", "item_name": "P0 Work Glove Pair", "item_group": "P0 Consumables", "opening_stock": 40, "purchase_price": 8, "selling_price": 14, "scenario": "Consumable safety item"},
+    {"item_code": "P0-CO-SEALANT", "item_name": "P0 Multi-purpose Sealant", "item_group": "P0 Consumables", "opening_stock": 12, "purchase_price": 16, "selling_price": 28, "scenario": "Low-stock consumable"},
+    {"item_code": "P0-CO-DISC", "item_name": "P0 Grinding Disc", "item_group": "P0 Consumables", "opening_stock": 100, "purchase_price": 4, "selling_price": 7, "scenario": "Box purchase and piece issue", "uoms": [{"uom": "Piece", "conversion_factor": 1}, {"uom": "Box", "conversion_factor": 20}]},
+    {"item_code": "P0-AC-BITSET", "item_name": "P0 Drill Bit Set", "item_group": "P0 Accessories", "opening_stock": 20, "purchase_price": 45, "selling_price": 72, "scenario": "Power-tool accessory"},
+    {"item_code": "P0-AC-GOGGLES", "item_name": "P0 Safety Goggles", "item_group": "P0 Accessories", "opening_stock": 15, "purchase_price": 18, "selling_price": 32, "scenario": "Low-stock safety accessory"},
+    {"item_code": "P0-AC-TOOLBOX", "item_name": "P0 Portable Toolbox", "item_group": "P0 Accessories", "opening_stock": 6, "purchase_price": 95, "selling_price": 148, "scenario": "Low-stock accessory"},
+    {"item_code": "P0-AC-EXTENSION", "item_name": "P0 Extension Cable", "item_group": "P0 Accessories", "opening_stock": 9, "purchase_price": 68, "selling_price": 105, "scenario": "Low-stock electrical accessory"},
+    {"item_code": "P0-AC-BLADE", "item_name": "P0 Replacement Saw Blade", "item_group": "P0 Accessories", "opening_stock": 0, "purchase_price": 55, "selling_price": 88, "scenario": "Zero-stock accessory"}
+  ]
+}

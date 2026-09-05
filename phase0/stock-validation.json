@@ -1,0 +1,45 @@
+{
+  "company": "Phase Zero Hardware Trading Demo",
+  "main_warehouse": "P0 Main Warehouse - PZH",
+  "secondary_warehouse": "P0 Secondary Warehouse - PZH",
+  "opening_stock_document": "MAT-RECO-2026-00001",
+  "stock_adjustment_account": "Stock Adjustment - PZH",
+  "delivery": {
+    "customer": "P0 Standard Retail Customer",
+    "item_code": "P0-AC-BITSET",
+    "qty": 2,
+    "uom": "Piece",
+    "rate": 72
+  },
+  "transfer": {
+    "item_code": "P0-AC-GOGGLES",
+    "qty": 3
+  },
+  "reconciliation": {
+    "item_code": "P0-AC-TOOLBOX",
+    "target_qty": 5,
+    "valuation_rate": 95
+  },
+  "zero_stock": {
+    "customer": "P0 Standard Retail Customer",
+    "item_code": "P0-PT-SAW",
+    "attempted_qty": 1,
+    "uom": "Piece",
+    "rate": 749
+  },
+  "expected_final_stock": {
+    "P0-AC-BITSET": {
+      "P0 Main Warehouse - PZH": 18
+    },
+    "P0-AC-GOGGLES": {
+      "P0 Main Warehouse - PZH": 12,
+      "P0 Secondary Warehouse - PZH": 3
+    },
+    "P0-AC-TOOLBOX": {
+      "P0 Main Warehouse - PZH": 5
+    },
+    "P0-PT-SAW": {
+      "P0 Main Warehouse - PZH": 0
+    }
+  }
+}
