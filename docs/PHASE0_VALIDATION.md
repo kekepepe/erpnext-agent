@@ -852,10 +852,10 @@ Each report was also read back as a standard ERPNext `Script Report`. The interf
 |---|---|---|
 | REP-001 | Report current stock by item | Supported |
 | REP-002 | Report current stock by warehouse | Supported |
-| REP-003 | Report purchase history by supplier | Not Tested |
-| REP-004 | Report purchase history by item | Not Tested |
-| REP-005 | Report sales history by customer | Not Tested |
-| REP-006 | Report sales history by item | Not Tested |
+| REP-003 | Report purchase history by supplier | Supported |
+| REP-004 | Report purchase history by item | Supported |
+| REP-005 | Report sales history by customer | Supported |
+| REP-006 | Report sales history by item | Supported |
 | REP-007 | Report outstanding Accounts Receivable | Not Tested |
 | REP-008 | Report outstanding Accounts Payable | Not Tested |
 | REP-009 | Report General Ledger postings for validated transactions and reversals | Not Tested |
@@ -882,6 +882,20 @@ The Stock Ledger report was reconciled row-for-row to REST-read `Stock Ledger En
 - Customer Return `MAT-DN-2026-00007`: 1 row
 
 For each voucher, the report and resource signatures matched on item, warehouse, resulting quantity, voucher type, and voucher number. This supports REP-001 and REP-002 and proves native traceability for the selected opening, receipt, delivery, transfer, reconciliation, and return movements.
+
+### Purchase and Sales Reporting Execution — 2026-10-03
+
+Two consecutive Purchase Analytics runs reproduced these submitted Purchase Order quantities:
+
+- by supplier: General Hardware Supply `4`, Alternate Tool Supply `10`, Specialty Consumables Supply `2`
+- by item: hammer `4`, screwdriver `10`, screws `100` Piece after UOM conversion
+
+Two consecutive Sales Analytics runs reproduced these submitted Sales Order quantities:
+
+- by customer: Standard Retail Customer `2`, Credit Trade Customer `5`, Repeat Trade Customer `1`
+- by item: pliers `2`, measuring tape `5`, screws `50` Piece after UOM conversion
+
+The expected maps are exact: no additional submitted P0 supplier, customer, or item row is accepted. The cancelled P0.6 Purchase Orders and Sales Order therefore do not inflate the reported totals. Purchase Receipt, Delivery Note, purchase-return, and customer-return movements remain separately traceable through the Stock Ledger evidence above; the order analytics are not misrepresented as return-netted stock reports.
 
 ## Gap Log
 

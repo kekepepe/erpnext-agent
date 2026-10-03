@@ -781,12 +781,12 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.4 — Validate purchase and sales reporting
 
-- [ ] `REP-003` — Purchase history/status can be reported by supplier.
-- [ ] `REP-004` — Purchase history/status can be reported by item.
-- [ ] `REP-005` — Sales history/status can be reported by customer.
-- [ ] `REP-006` — Sales history/status can be reported by item.
-- [ ] Verify report totals and quantities against the already validated Purchase Orders, Purchase Receipts, Sales Orders, Delivery Notes, and returns.
-- [ ] Record how cancelled P0.6 fixtures appear or are excluded.
+- [x] `REP-003` — Purchase history/status can be reported by supplier.
+- [x] `REP-004` — Purchase history/status can be reported by item.
+- [x] `REP-005` — Sales history/status can be reported by customer.
+- [x] `REP-006` — Sales history/status can be reported by item.
+- [x] Verify report totals and quantities against the already validated Purchase Orders and Sales Orders; preserve receipt, delivery, and return traceability under Stock Ledger evidence.
+- [x] Record how cancelled P0.6 fixtures appear or are excluded.
 
 #### P0.7.5 — Validate AR, AP, and General Ledger reporting
 

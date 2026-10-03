@@ -278,6 +278,81 @@ def validate_stock_reports(
     return evidence
 
 
+def analytics_filters(
+    config: dict[str, Any], tree_type: str, doc_type: str
+) -> dict[str, Any]:
+    filters = {
+        "company": config["company"],
+        "from_date": config["from_date"],
+        "to_date": config["to_date"],
+        "tree_type": tree_type,
+        "doc_type": doc_type,
+        "value_quantity": "Quantity",
+        "range": "Monthly",
+    }
+    if doc_type == "Sales Order":
+        filters["curves"] = "select"
+    return filters
+
+
+def validate_analytics_rows(
+    api: ERPNextAPI,
+    report_name: str,
+    filters: dict[str, Any],
+    expected: dict[str, Any],
+    label: str,
+) -> dict[str, float]:
+    result = api.run_report(report_name, filters)
+    actual = {
+        row["entity"]: float(row["total"])
+        for row in dict_rows(result)
+        if row.get("entity")
+    }
+    expected_numbers = {key: float(value) for key, value in expected.items()}
+    if actual != expected_numbers:
+        raise RuntimeError(f"{label} mismatch: expected {expected_numbers}, got {actual}")
+    return actual
+
+
+def validate_purchase_sales_reports(
+    api: ERPNextAPI, config: dict[str, Any]
+) -> dict[str, dict[str, float]]:
+    purchase = config["purchase_analytics"]
+    sales = config["sales_analytics"]
+    evidence = {
+        "purchase_by_supplier": validate_analytics_rows(
+            api,
+            purchase["report_name"],
+            analytics_filters(config, "Supplier", "Purchase Order"),
+            purchase["by_supplier"],
+            "Purchase Analytics by supplier",
+        ),
+        "purchase_by_item": validate_analytics_rows(
+            api,
+            purchase["report_name"],
+            analytics_filters(config, "Item", "Purchase Order"),
+            purchase["by_item"],
+            "Purchase Analytics by item",
+        ),
+        "sales_by_customer": validate_analytics_rows(
+            api,
+            sales["report_name"],
+            analytics_filters(config, "Customer", "Sales Order"),
+            sales["by_customer"],
+            "Sales Analytics by customer",
+        ),
+        "sales_by_item": validate_analytics_rows(
+            api,
+            sales["report_name"],
+            analytics_filters(config, "Item", "Sales Order"),
+            sales["by_item"],
+            "Sales Analytics by item",
+        ),
+    }
+    print("TRADE   " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
+    return evidence
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -303,9 +378,10 @@ def main() -> int:
         evidence = {
             "interfaces": validate_report_interfaces(api, config),
             "stock": validate_stock_reports(api, config),
+            "trade": validate_purchase_sales_reports(api, config),
         }
         print("EVIDENCE " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
-        print("OK: Phase 0 native report and stock evidence is reproducible")
+        print("OK: Phase 0 native stock, purchase, and sales reports are reproducible")
     except (OSError, ValueError, RuntimeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
