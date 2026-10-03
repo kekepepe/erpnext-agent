@@ -798,10 +798,10 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.6 — Close the remaining language/output boundary
 
-- [ ] `LANG-003` — Execute Chinese and English print/preview output for representative purchase and sales documents.
-- [ ] Distinguish interface translation, saved master/transaction data, standard print labels, and custom translated content.
-- [ ] Classify bilingual output as `Supported`, `Configurable`, `Gap`, or `Not Tested` from actual rendered evidence.
-- [ ] Do not build custom print formats merely to force a passing Phase 0 result.
+- [x] `LANG-003` — Execute Chinese and English print/preview output for representative purchase and sales documents.
+- [x] Distinguish interface translation, saved master/transaction data, standard print labels, and custom translated content.
+- [x] Classify bilingual output as `Configurable` from actual rendered evidence; record the mixed-language standard format and failed PDF generation separately.
+- [x] Do not build custom print formats merely to force a passing Phase 0 result.
 
 #### P0.7.7 — Produce the evidence-based Gap Analysis
 

@@ -726,7 +726,7 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 |---|---|---|
 | LANG-001 | Use Simplified Chinese as the site default | Configurable |
 | LANG-002 | Allow a user-level English override | Configurable |
-| LANG-003 | Validate bilingual business data and print output | Not Tested |
+| LANG-003 | Validate bilingual business data and print output | Configurable |
 
 ### Language Execution — 2026-10-03
 
@@ -737,7 +737,27 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 - **Actual Result:** System Settings persisted `language = zh`. Purchase, stock, finance, and approval sessions resolved to `<html lang="zh">`; the sales session resolved to `<html lang="en">`. A complete validator rerun reproduced the same result without creating users again.
 - **Evidence:** `phase0/access-validation.json`; `scripts/phase0-validate-access.py`; System Settings and User REST readback; authenticated Desk boot HTML.
 - **Result:** Configurable
-- **Notes:** Interface translation does not rewrite customer names, supplier names, item descriptions, or other saved business content. Bilingual print formats and customer/supplier-facing output remain `Not Tested` under LANG-003 and must not be inferred from the Desk language result.
+- **Notes:** Interface translation does not rewrite customer names, supplier names, item descriptions, or other saved business content. LANG-003 was tested separately below and must not be inferred from the Desk language result alone.
+
+### Bilingual Print Preview Execution — 2026-10-03
+
+The native Standard print format was executed for:
+
+- Purchase Order `PUR-ORD-2026-00001` in `zh` and `en`
+- Sales Invoice `ACC-SINV-2026-00002` in `zh` and `en`
+
+The read-only validator confirmed the requested `<html lang>` value, document number, party, and language-specific title/party/total labels on two consecutive runs. A headed Chromium session then rendered and captured all four complete previews:
+
+- `output/playwright/p0-purchase-order-zh.png`
+- `output/playwright/p0-purchase-order-en.png`
+- `output/playwright/p0-sales-invoice-zh.png`
+- `output/playwright/p0-sales-invoice-en.png`
+
+Visual inspection found legible tables, amounts, and identifiers without overlap, clipping, broken Chinese glyphs, or missing business rows. Native `_lang` switching therefore works for Standard HTML print previews.
+
+The Chinese previews are only partially localized. Examples that remained English include `Workflow State`, `Approved`, `Date`, `Time`, `Sr`, `Description`, `Piece`, `Total`, synthetic English master-data descriptions, and the English amount-in-words value. Saved supplier/customer/item data is not translated by switching the interface/print language.
+
+The native `Get PDF` endpoint was also executed. ERPNext reached `wkhtmltopdf`, but PDF generation failed with `ConnectionRefusedError` while the container attempted to load print resources. This is preserved as a deployment/environment configuration gap; no PDF was fabricated and no custom print format was added. LANG-003 is `Configurable`, not fully `Supported`.
 
 ## Permissions Validation
 
@@ -929,7 +949,8 @@ Only add entries after an executed test produces supporting evidence.
 
 | Gap ID | Test ID | Requirement | Business Impact | Native Workaround / Configuration | Proposed Classification | Status |
 |---|---|---|---|---|---|---|
-| — | — | — | — | — | — | No confirmed gaps yet |
+| GAP-001 | LANG-003 | Fully localized customer/supplier-facing output | Chinese Standard previews contain mixed Chinese/English labels and untranslated saved business content | Approve translated master data and a controlled bilingual Print Format only if required by release scope | configuration | Confirmed |
+| GAP-002 | LANG-003 | Downloadable PDF output | Native `Get PDF` fails in the disposable Compose environment because `wkhtmltopdf` cannot reach required print resources | Correct production-like site URL/container networking and revalidate native PDF before release | configuration | Confirmed |
 
 Allowed proposed classifications after review:
 

@@ -85,8 +85,24 @@
     "cancelled_payment": "ACC-PAY-2026-00005"
   },
   "print_output": {
-    "purchase_document": {"doctype": "Purchase Order", "name": "PUR-ORD-2026-00001"},
-    "sales_document": {"doctype": "Sales Invoice", "name": "ACC-SINV-2026-00002"},
+    "purchase_document": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00001",
+      "party": "P0 General Hardware Supply",
+      "expected_labels": {
+        "zh": ["\u91c7\u8d2d\u8ba2\u5355", "\u4f9b\u5e94\u5546\u540d\u79f0", "\u603b\u8ba1"],
+        "en": ["Purchase Order", "Supplier Name", "Grand Total"]
+      }
+    },
+    "sales_document": {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00002",
+      "party": "P0 Credit Trade Customer",
+      "expected_labels": {
+        "zh": ["\u9500\u552e\u53d1\u7968", "\u5ba2\u6237\u540d\u79f0", "\u603b\u8ba1"],
+        "en": ["Sales Invoice", "Customer Name", "Grand Total"]
+      }
+    },
     "languages": ["zh", "en"]
   }
 }

@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
+import urllib.parse
 from pathlib import Path
 from typing import Any
 
@@ -523,6 +525,51 @@ def validate_accounting_reports(
     return evidence
 
 
+def validate_print_previews(
+    api: ERPNextAPI, config: dict[str, Any]
+) -> dict[str, Any]:
+    print_config = config["print_output"]
+    evidence: dict[str, Any] = {}
+    for document_key in ["purchase_document", "sales_document"]:
+        document = print_config[document_key]
+        source = api.get_doc(document["doctype"], document["name"])
+        if not source or int(source.get("docstatus", 0)) != 1:
+            raise RuntimeError(
+                f"Missing submitted print source {document['doctype']} {document['name']}"
+            )
+        for language in print_config["languages"]:
+            query = urllib.parse.urlencode(
+                {
+                    "doctype": document["doctype"],
+                    "name": document["name"],
+                    "format": "Standard",
+                    "no_letterhead": 1,
+                    "_lang": language,
+                }
+            )
+            preview = api.get_text(f"/printview?{query}")
+            required = [
+                f'<html lang="{language}"',
+                document["name"],
+                document["party"],
+                *document["expected_labels"][language],
+            ]
+            missing = [marker for marker in required if marker not in preview]
+            if missing:
+                raise RuntimeError(
+                    f"Print preview {document['name']} {language} is missing {missing}"
+                )
+            key = f"{document['name']}:{language}"
+            evidence[key] = {
+                "doctype": document["doctype"],
+                "bytes": len(preview.encode("utf-8")),
+                "sha256": hashlib.sha256(preview.encode("utf-8")).hexdigest(),
+                "labels": document["expected_labels"][language],
+            }
+    print("PRINT   " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
+    return evidence
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -550,9 +597,10 @@ def main() -> int:
             "stock": validate_stock_reports(api, config),
             "trade": validate_purchase_sales_reports(api, config),
             "accounting": validate_accounting_reports(api, config),
+            "print_previews": validate_print_previews(api, config),
         }
         print("EVIDENCE " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
-        print("OK: Phase 0 native operational and accounting reports are reproducible")
+        print("OK: Phase 0 native reports and bilingual print previews are reproducible")
     except (OSError, ValueError, RuntimeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
