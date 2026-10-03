@@ -830,6 +830,24 @@ Actual results:
 
 ## Reporting Validation
 
+The source-controlled expectations are in `phase0/reporting-validation.json`. The read-only validator is `scripts/phase0-validate-reporting.py` and calls `frappe.desk.query_report.run` through the authenticated REST boundary with `ignore_prepared_report = true`; it does not query MariaDB.
+
+### Reporting Interface Execution — 2026-10-03
+
+The report scenario framework executed twice with identical row counts and required field sets:
+
+- Stock Balance: 20 rows
+- Stock Ledger: 32 rows
+- Purchase Analytics by supplier: 4 rows including the total row
+- Purchase Analytics by item: 4 rows including the total row
+- Sales Analytics by customer: 4 rows including the total row
+- Sales Analytics by item: 4 rows including the total row
+- Accounts Receivable: 4 rows
+- Accounts Payable: 2 rows including the total row
+- General Ledger: 47 rows
+
+Each report was also read back as a standard ERPNext `Script Report`. The interface check proved that the native reports execute reproducibly and expose the required stable field names. It does not by itself mark REP-001 through REP-010 as supported; those cases require the value and source-voucher assertions defined in the scenario file.
+
 | Test ID | Requirement | Result |
 |---|---|---|
 | REP-001 | Report current stock by item | Not Tested |

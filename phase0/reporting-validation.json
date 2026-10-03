@@ -1,0 +1,92 @@
+{
+  "company": "Phase Zero Hardware Trading Demo",
+  "from_date": "2026-01-01",
+  "to_date": "2026-10-03",
+  "report_date": "2026-10-03",
+  "stock_balance": {
+    "report_name": "Stock Balance",
+    "expected_balances": [
+      {"item_code": "P0-HT-HAMMER", "warehouse": "P0 Main Warehouse - PZH", "qty": 28},
+      {"item_code": "P0-HT-SCREWDRIVER", "warehouse": "P0 Main Warehouse - PZH", "qty": 58},
+      {"item_code": "P0-CO-SCREW", "warehouse": "P0 Main Warehouse - PZH", "qty": 650},
+      {"item_code": "P0-AC-GOGGLES", "warehouse": "P0 Main Warehouse - PZH", "qty": 12},
+      {"item_code": "P0-AC-GOGGLES", "warehouse": "P0 Secondary Warehouse - PZH", "qty": 3},
+      {"item_code": "P0-AC-TOOLBOX", "warehouse": "P0 Main Warehouse - PZH", "qty": 5}
+    ]
+  },
+  "stock_ledger": {
+    "report_name": "Stock Ledger",
+    "expected_vouchers": [
+      {"voucher_no": "MAT-RECO-2026-00001", "voucher_type": "Stock Reconciliation"},
+      {"voucher_no": "MAT-PRE-2026-00001", "voucher_type": "Purchase Receipt"},
+      {"voucher_no": "MAT-DN-2026-00001", "voucher_type": "Delivery Note"},
+      {"voucher_no": "MAT-STE-2026-00001", "voucher_type": "Stock Entry"},
+      {"voucher_no": "MAT-RECO-2026-00002", "voucher_type": "Stock Reconciliation"},
+      {"voucher_no": "MAT-PRE-2026-00005", "voucher_type": "Purchase Receipt"},
+      {"voucher_no": "MAT-DN-2026-00007", "voucher_type": "Delivery Note"}
+    ]
+  },
+  "purchase_analytics": {
+    "report_name": "Purchase Analytics",
+    "by_supplier": {
+      "P0 General Hardware Supply": 4,
+      "P0 Alternate Tool Supply": 10,
+      "P0 Specialty Consumables Supply": 2
+    },
+    "by_item": {
+      "P0-HT-HAMMER": 4,
+      "P0-HT-SCREWDRIVER": 10,
+      "P0-CO-SCREW": 100
+    }
+  },
+  "sales_analytics": {
+    "report_name": "Sales Analytics",
+    "by_customer": {
+      "P0 Standard Retail Customer": 2,
+      "P0 Credit Trade Customer": 5,
+      "P0 Repeat Trade Customer": 1
+    },
+    "by_item": {
+      "P0-HT-PLIERS": 2,
+      "P0-HT-TAPE": 5,
+      "P0-CO-SCREW": 50
+    }
+  },
+  "accounts_receivable": {
+    "report_name": "Accounts Receivable",
+    "voucher_no": "ACC-SINV-2026-00002",
+    "party": "P0 Credit Trade Customer",
+    "invoiced": 125,
+    "paid": 50,
+    "outstanding": 75
+  },
+  "accounts_payable": {
+    "report_name": "Accounts Payable",
+    "voucher_no": "ACC-PINV-2026-00002",
+    "party": "P0 Alternate Tool Supply",
+    "invoiced": 120,
+    "paid": 60,
+    "outstanding": 60
+  },
+  "general_ledger": {
+    "report_name": "General Ledger",
+    "required_vouchers": [
+      "ACC-PINV-2026-00001",
+      "ACC-PINV-2026-00002",
+      "ACC-PAY-2026-00001",
+      "ACC-PAY-2026-00002",
+      "ACC-SINV-2026-00001",
+      "ACC-SINV-2026-00002",
+      "ACC-SINV-2026-00003",
+      "ACC-SINV-2026-00004",
+      "ACC-PAY-2026-00003",
+      "ACC-PAY-2026-00004"
+    ],
+    "cancelled_payment": "ACC-PAY-2026-00005"
+  },
+  "print_output": {
+    "purchase_document": {"doctype": "Purchase Order", "name": "PUR-ORD-2026-00001"},
+    "sales_document": {"doctype": "Sales Invoice", "name": "ACC-SINV-2026-00002"},
+    "languages": ["zh", "en"]
+  }
+}

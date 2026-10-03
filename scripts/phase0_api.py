@@ -118,6 +118,22 @@ class ERPNextAPI:
         )
         return result.get("message")
 
+    def run_report(
+        self, report_name: str, filters: dict[str, Any]
+    ) -> dict[str, Any]:
+        result = self.call(
+            "frappe.desk.query_report.run",
+            {
+                "report_name": report_name,
+                "filters": filters,
+                "ignore_prepared_report": True,
+                "are_default_filters": True,
+            },
+        )
+        if not isinstance(result, dict) or not isinstance(result.get("result"), list):
+            raise RuntimeError(f"Report {report_name} returned an invalid result")
+        return result
+
     def submit(self, document: dict[str, Any]) -> dict[str, Any]:
         return self.call("frappe.client.submit", {"doc": document})
 

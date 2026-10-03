@@ -766,11 +766,11 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.2 — Define reproducible reporting scenarios
 
-- [ ] Add the smallest source-controlled reporting expectation file, expected to be `phase0/reporting-validation.json`.
-- [ ] Add an idempotent native-report validator, expected to be `scripts/phase0-validate-reporting.py`.
-- [ ] Use ERPNext report/query APIs and reviewed REST boundaries; do not query MariaDB directly.
-- [ ] Define expected rows, quantities, parties, vouchers, and balances before marking a report supported.
-- [ ] Treat a report name or visible menu item as insufficient evidence without executing and checking its output.
+- [x] Add the smallest source-controlled reporting expectation file, `phase0/reporting-validation.json`.
+- [x] Add an idempotent native-report validator, `scripts/phase0-validate-reporting.py`.
+- [x] Use ERPNext report/query APIs and reviewed REST boundaries; do not query MariaDB directly.
+- [x] Define expected rows, quantities, parties, vouchers, and balances before marking a report supported.
+- [x] Treat a report name or visible menu item as insufficient evidence without executing and checking its output.
 
 #### P0.7.3 — Validate stock reporting
 
