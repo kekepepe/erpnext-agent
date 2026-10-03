@@ -60,6 +60,26 @@ python3 scripts/phase0-validate-stock.py
 
 脚本读取 `phase0/stock-validation.json`，通过 ERPNext 原生 REST API 核验期初库存，并验证交货出库、跨仓调拨、库存盘点调整、零库存查询和负库存拦截。重复运行会读取并核验已有单据，不重复提交库存交易。
 
+## 验证销售与应收流程
+
+采购和库存验证完成后，运行：
+
+```bash
+python3 scripts/phase0-validate-sales.py
+```
+
+脚本读取 `phase0/sales-validation.json`，通过 ERPNext 原生 REST API 和白名单映射方法验证报价、销售订单、完整及分批交货、替代 UOM、销售发票、应收、全额及部分收款、销售退货和贷项通知单。重复运行会读取并严格核验已有单据、库存和总账结果，不重复提交交易。
+
+## 验证语言、权限、审批与审计
+
+交易验证完成后，运行：
+
+```bash
+python3 scripts/phase0-validate-access.py
+```
+
+脚本读取 `phase0/access-validation.json`，将站点默认语言配置为简体中文，为纯合成采购、销售、库存、财务和审批用户配置原生角色，并验证用户级英文覆盖、允许与拒绝访问、采购订单/销售订单/付款单 Workflow、自审批阻断、提交/撤销和 Version 审计记录。重复运行会复用用户、Workflow 和已撤销的验证单据。角色密码只用于本机 disposable 环境，可通过 `PHASE0_ROLE_PASSWORD` 覆盖，不得复用于其他环境。
+
 ## 停止
 
 保留测试数据：
@@ -85,7 +105,7 @@ docker compose -f phase0/compose.yaml down -v
 - 创建 Agent、MCP Server 或让 Agent 直接访问数据库；
 - 把本 Compose 文件当作生产部署方案。
 
-测试公司和代表性主数据已经初始化，采购和库存流程验证已经完成。后续应继续按 `docs/PHASE0_VALIDATION.md` 验证销售、应收、权限、审批和报表场景，并记录证据与 Gap。
+测试公司和代表性主数据已经初始化，采购、库存、销售、客户退货、交易级应收、语言、权限、审批和审计验证已经完成。后续应继续按 `docs/PHASE0_VALIDATION.md` 验证报表场景并形成证据化 Gap Analysis。
 
 ## 来源
 

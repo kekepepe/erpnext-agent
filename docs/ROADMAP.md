@@ -4,9 +4,9 @@
 
 This file describes phase goals and exit criteria, not daily task status. Daily priorities belong in `AI_HANDOFF.md`. A phase advances only when its exit criteria are supported by repository or validation evidence.
 
-## Phase 0 — ERPNext Native Capability Validation (Current)
+## Phase 0 — Development and Deployable Release Preparation (Current)
 
-**Goal:** determine how much of the hardware-trading workflow ERPNext v16 supports through native configuration.
+**Goal:** complete, validate, and package the full approved first ERP release before deployment begins.
 
 Scope:
 
@@ -15,6 +15,12 @@ Scope:
 - Purchase, receipt, stock, delivery, sales, returns, and receivable/payable flows
 - Permission, approval, auditability, and reporting checks relevant to the workflow
 - Evidence-based Gap Analysis
+- First-release scope freeze and requirement-to-evidence mapping
+- Required native ERPNext configuration and operating procedures
+- Only approved `hardware_erp` customization gaps
+- Deployment-required integrations and migration tooling
+- Full regression, UAT, backup/restore, rollback, and deployment rehearsal
+- Versioned, documented, deployable release candidate
 
 Exit criteria:
 
@@ -22,46 +28,58 @@ Exit criteria:
 - Representative master data and test assumptions are documented.
 - Critical end-to-end workflows have recorded expected and actual results.
 - Each gap is classified as configuration, process change, integration, customization, or unresolved.
-- Phase 1 scope is approved from the evidence.
+- The first-release scope and every release-blocking acceptance criterion are approved.
+- All approved functionality, configuration, customization, integration, and migration code is complete and tested.
+- A clean production-like environment can be built reproducibly from source and the release manifest.
+- Migration, backup/restore, deployment, smoke-test, rollback, and disaster-recovery procedures have been rehearsed.
+- Business UAT and deployment-readiness review approve an immutable release candidate for Phase 1.
 
-## Phase 1 — ERP MVP
+## Phase 1 — Deployment and Rollout
 
-**Goal:** deliver the minimum usable ERP workflow using native ERPNext first.
+**Goal:** deploy, cut over, and stabilize the accepted Phase 0 release candidate without adding planned product development.
 
-Planned scope, subject to Phase 0 evidence:
+Scope:
 
-- Core purchase, inventory, sales, and basic receivable/payable operations
-- Required organization, roles, permissions, and approval workflows
-- Minimum customer, supplier, item, pricing, and reporting setup
-- Operating procedures, acceptance tests, backup, and environment separation
-
-Exit criteria:
-
-- Agreed MVP workflows pass user acceptance testing.
-- Roles and approvals are enforced and auditable.
-- Deployment, backup, restore, and operating procedures are documented.
-- Remaining gaps are explicitly deferred or approved for Phase 2.
-
-## Phase 2 — `hardware_erp` Customization
-
-**Goal:** implement only the business gaps that cannot be acceptably handled by native configuration or process changes.
-
-Potential scope:
-
-- A version-controlled Frappe Custom App named `hardware_erp`
-- Approved custom fields, DocTypes, validations, reports, and integrations
-- Automated tests and migration/rollback notes for each customization
+- Provision and verify staging/production infrastructure and environment separation
+- Configure domains/TLS, secret management, logging, monitoring, access ownership, and scheduled backups
+- Install the exact accepted ERPNext/Frappe and custom-app release versions
+- Apply approved configuration and execute rehearsed data migration/import
+- Reconcile critical master, stock, AR, AP, accounting, permission, workflow, report, and integration results
+- Execute smoke tests, production UAT subset, go/no-go, cutover, rollback checkpoints, and stabilization support
+- Transfer operating, backup/restore, monitoring, and support ownership
 
 Exit criteria:
 
-- Every customization traces to an approved Phase 0/1 gap.
-- Core ERPNext is not modified directly.
-- Custom behaviour has tests and upgrade-impact documentation.
-- ERP MVP plus approved custom workflows pass acceptance testing.
+- The accepted release candidate is deployed without unreviewed code or product-scope changes.
+- Migration and financial/stock reconciliation are signed off.
+- Production smoke tests and agreed UAT checks pass.
+- Monitoring, backup, restore, access, operating, and support ownership are active.
+- Stabilization incidents are resolved or explicitly accepted with owners and dates.
+
+Any deployment finding that requires business-logic, schema, custom-app, report, integration-contract, or migration-code changes returns to Phase 0 for a new release candidate and affected revalidation. Phase 1 is not a development-completion phase.
+
+## Phase 2 — Post-deployment Product Evolution (Deferred)
+
+**Goal:** hold future release ideas without inserting them into the first deployment.
+
+Potential scope, only after explicit owner approval:
+
+- Enhancements explicitly deferred from the first release
+- New business requirements discovered after stabilization
+- Optional integrations or expansion of `hardware_erp`
+- A new development, validation, release-candidate, and deployment cycle
+
+Exit criteria:
+
+- Scope is separately approved and prioritized.
+- Work does not bypass the development and release gates established in Phase 0.
+- ERPNext Core remains unmodified.
 
 ## Phase 3 — Business API and MCP Foundation
 
 **Goal:** expose reviewed, permission-aware business operations for AI-assisted use without direct database access.
+
+This is deferred beyond the first Phase 1 deployment unless explicitly brought into a future approved release cycle.
 
 Planned scope:
 
@@ -80,6 +98,8 @@ Exit criteria:
 ## Phase 4 — Narrow Agent Pilots
 
 **Goal:** prove value with one or two bounded, measurable Agent use cases before considering multi-Agent orchestration.
+
+This is deferred beyond the first Phase 1 deployment and depends on approved, proven Business API/MCP boundaries.
 
 Candidate pilots:
 

@@ -1,0 +1,42 @@
+{
+  "company": "Phase Zero Hardware Trading Demo",
+  "warehouse": "P0 Main Warehouse - PZH",
+  "cash_account": "Cash - PZH",
+  "scenarios": {
+    "full": {
+      "customer": "P0 Standard Retail Customer",
+      "item_code": "P0-HT-PLIERS",
+      "qty": 2,
+      "delivery_quantities": [2],
+      "uom": "Piece",
+      "conversion_factor": 1,
+      "rate": 42,
+      "payment": 84
+    },
+    "partial": {
+      "customer": "P0 Credit Trade Customer",
+      "item_code": "P0-HT-TAPE",
+      "qty": 5,
+      "delivery_quantities": [2, 3],
+      "uom": "Piece",
+      "conversion_factor": 1,
+      "rate": 25,
+      "payment": 50
+    },
+    "alternate_uom": {
+      "customer": "P0 Repeat Trade Customer",
+      "item_code": "P0-CO-SCREW",
+      "qty": 1,
+      "delivery_quantities": [1],
+      "return_qty": 1,
+      "uom": "Box",
+      "conversion_factor": 50,
+      "rate": 32.5
+    }
+  },
+  "expected_final_stock": {
+    "P0-HT-PLIERS": 16,
+    "P0-HT-TAPE": 25,
+    "P0-CO-SCREW": 650
+  }
+}

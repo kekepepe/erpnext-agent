@@ -55,7 +55,7 @@ No valid execution evidence exists yet.
 
 | Field | Value |
 |---|---|
-| Latest runtime validation date | 2026-09-05 15:28:51 +0800 |
+| Latest runtime validation date | 2026-10-03 +0800 |
 | ERPNext version | 16.33.0 |
 | Frappe version | 16.31.0 |
 | Compose file | `phase0/compose.yaml` |
@@ -82,10 +82,10 @@ No valid execution evidence exists yet.
   - ERPNext is 16.x.
   - Frappe is 16.x.
   - HTTP ping returns `pong`.
-- **Actual Result:** `docker compose up -d` completed; `create-site` was `exited` with exit code `0`; the nine required services (`backend`, `db`, `frontend`, `queue-long`, `queue-short`, `redis-cache`, `redis-queue`, `scheduler`, and `websocket`) were running; ERPNext reported `16.33.0`; Frappe reported `16.31.0`; ping returned `{"message":"pong"}`; `./scripts/phase0-check.sh` exited `0`. The same health-check script passed again before purchase-flow testing on 2026-09-05.
-- **Evidence:** Commands run on 2026-09-01: `docker compose -f phase0/compose.yaml up -d`, `docker compose -f phase0/compose.yaml ps -a`, and `./scripts/phase0-check.sh`; latest `./scripts/phase0-check.sh` pass: 2026-09-05 15:28:51 +0800.
+- **Actual Result:** `docker compose up -d` completed; `create-site` was `exited` with exit code `0`; the nine required services (`backend`, `db`, `frontend`, `queue-long`, `queue-short`, `redis-cache`, `redis-queue`, `scheduler`, and `websocket`) were running; ERPNext reported `16.33.0`; Frappe reported `16.31.0`; ping returned `{"message":"pong"}`; `./scripts/phase0-check.sh` exited `0`. The same health-check script passed again during P0.5 closeout on 2026-10-03.
+- **Evidence:** Commands run on 2026-10-03: `docker compose -f phase0/compose.yaml up -d`, `docker compose -f phase0/compose.yaml ps -a`, `docker compose -f phase0/compose.yaml restart frontend`, and `./scripts/phase0-check.sh`.
 - **Result:** Supported
-- **Notes:** Docker Desktop was initially stopped. After it was started, current runtime revalidation passed. Historical success was not used as a substitute for this check.
+- **Notes:** Docker Desktop was initially stopped. After it was started, the first two ping checks returned HTTP 502 because the already-running frontend retained the backend container's previous address. Container state and logs showed the backend had started normally; restarting only `frontend` refreshed the upstream address, after which the complete health check passed. The failure and recovery are preserved rather than treating historical health as current evidence.
 
 ## Test Company Assumptions
 
@@ -472,26 +472,107 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| SAL-001 | Create Quotation | Not Tested |
-| SAL-002 | Create and submit Sales Order | Not Tested |
-| SAL-003 | Deliver full Sales Order quantity | Not Tested |
-| SAL-004 | Deliver one Sales Order through multiple partial deliveries | Not Tested |
-| SAL-005 | Sell an item using an alternate UOM with conversion | Not Tested |
-| SAL-006 | Delivery correctly reduces stock | Not Tested |
-| SAL-007 | Create Sales Invoice | Not Tested |
-| SAL-008 | Sales Invoice creates Accounts Receivable | Not Tested |
-| SAL-009 | Record full customer payment | Not Tested |
-| SAL-010 | Record partial customer payment | Not Tested |
+| SAL-001 | Create Quotation | Supported |
+| SAL-002 | Create and submit Sales Order | Supported |
+| SAL-003 | Deliver full Sales Order quantity | Supported |
+| SAL-004 | Deliver one Sales Order through multiple partial deliveries | Supported |
+| SAL-005 | Sell an item using an alternate UOM with conversion | Supported |
+| SAL-006 | Delivery correctly reduces stock | Supported |
+| SAL-007 | Create Sales Invoice | Supported |
+| SAL-008 | Sales Invoice creates Accounts Receivable | Supported |
+| SAL-009 | Record full customer payment | Supported |
+| SAL-010 | Record partial customer payment | Supported |
+
+### Sales Execution Evidence — 2026-09-06
+
+#### SAL-001 / SAL-002 — Quotation and Sales Order
+
+- **Requirement:** Create a native customer Quotation and submit traceable Sales Orders.
+- **Preconditions:** Phase 0 runtime and synthetic customer/item master data passed revalidation.
+- **Steps:** Create and submit a quotation for 2 `P0-HT-PLIERS`; map it with `quotation.make_sales_order`; create two further synthetic Sales Orders for partial-delivery and alternate-UOM scenarios; submit and read all documents.
+- **Expected Result:** Native submitted documents retain the configured customer, item, quantity, UOM, rate, and source linkage.
+- **Actual Result:** `SAL-QTN-2026-00001` mapped to `SAL-ORD-2026-00001`; `SAL-ORD-2026-00002` and `SAL-ORD-2026-00003` were also submitted with their source-controlled scenarios.
+- **Evidence:** REST readback of the Quotation and three Sales Orders.
+- **Result:** Supported
+- **Notes:** All names were reused and content-checked on two subsequent complete validator runs.
+
+#### SAL-003 / SAL-004 — Full and multiple partial deliveries
+
+- **Requirement:** Fully deliver one Sales Order and complete another through multiple partial deliveries.
+- **Preconditions:** Three submitted Sales Orders.
+- **Steps:** Use `sales_order.make_delivery_note`; submit one 2-Piece delivery for the full scenario and two deliveries of 2 and 3 Piece for the partial scenario; read final Sales Order state.
+- **Expected Result:** Each Delivery Note links to its Sales Order and the full and partial scenarios both reach 100% delivered.
+- **Actual Result:** `MAT-DN-2026-00003` fully delivered `SAL-ORD-2026-00001`; `MAT-DN-2026-00004` and `MAT-DN-2026-00005` delivered 2 then 3 Piece for `SAL-ORD-2026-00002`; both orders finished `Completed`, `per_delivered = 100`.
+- **Evidence:** Delivery Note rows and final Sales Order REST readback.
+- **Result:** Supported
+- **Notes:** The alternate-UOM order was also fully delivered before its complete return; ERPNext then reduced its net `per_delivered` to 0 and status to `To Deliver`.
+
+#### SAL-005 / SAL-006 — Alternate UOM and stock reduction
+
+- **Requirement:** Sell 1 Box of a Piece-stocked item and apply the converted stock movement.
+- **Preconditions:** `P0-CO-SCREW` conversion is 1 Box = 50 Piece and its starting validated balance was 650 Piece.
+- **Steps:** Submit a 1-Box Sales Order and Delivery Note; verify UOM, conversion factor, `stock_qty`, and Bin balance; later verify the linked return separately.
+- **Expected Result:** Delivery reduces stock by 50 Piece.
+- **Actual Result:** `MAT-DN-2026-00006` recorded 1 Box, conversion factor 50, and `stock_qty = 50`; stock fell by 50 before `MAT-DN-2026-00007` restored it to 650.
+- **Evidence:** Delivery Note and return rows plus Bin REST readback.
+- **Result:** Supported
+- **Notes:** The final balance includes the separately evidenced full customer return.
+
+#### SAL-007 / SAL-008 — Sales Invoices and receivable creation
+
+- **Requirement:** Create submitted Sales Invoices and prove customer receivable GL postings.
+- **Preconditions:** The three Sales Orders were delivered.
+- **Steps:** Map invoices with `sales_order.make_sales_invoice`; submit; read totals, outstanding amounts, source links, and GL Entries.
+- **Expected Result:** Each invoice links to its Sales Order and debits the matching customer's receivable by its grand total.
+- **Actual Result:** `ACC-SINV-2026-00001`, `00002`, and `00003` posted totals and customer receivable debits of CNY 84, 125, and 32.5 respectively.
+- **Evidence:** Sales Invoice rows and party-specific GL Entries keyed by voucher number.
+- **Result:** Supported
+- **Notes:** Invoice creation is not being treated as proof of the later Accounts Receivable report case.
+
+#### SAL-009 / SAL-010 — Full and partial customer payments
+
+- **Requirement:** Record a full customer payment and a partial customer payment.
+- **Preconditions:** Submitted invoices of CNY 84 and CNY 125.
+- **Steps:** Map native Payment Entries using `get_payment_entry`, allocate CNY 84 and CNY 50, submit, then read references, invoice balances, and GL Entries.
+- **Expected Result:** Full payment clears one invoice; partial payment leaves exactly CNY 75 outstanding; receivable GL credits match allocations.
+- **Actual Result:** `ACC-PAY-2026-00003` credited customer receivable CNY 84 and cleared `ACC-SINV-2026-00001`; `ACC-PAY-2026-00004` credited CNY 50 and left `ACC-SINV-2026-00002` outstanding CNY 75.
+- **Evidence:** Payment Entry references, final Sales Invoice readback, and GL Entries.
+- **Result:** Supported
+- **Notes:** The CNY 75 open receivable is intentionally preserved for later reporting validation.
 
 ## Returns Validation
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| RET-001 | Customer returns previously sold goods | Not Tested |
+| RET-001 | Customer returns previously sold goods | Supported |
 | RET-002 | Supplier receives returned purchased goods | Supported |
-| RET-003 | Sales return reverses stock effects correctly | Not Tested |
+| RET-003 | Sales return reverses stock effects correctly | Supported |
 | RET-004 | Purchase return reverses stock effects correctly | Supported |
-| RET-005 | Return-related accounting effects are traceable | Not Tested |
+| RET-005 | Return-related accounting effects are traceable | Supported |
+
+### Return Evidence from Sales Execution
+
+#### RET-001 / RET-003 — Customer return and stock reversal
+
+- **Requirement:** Return delivered alternate-UOM goods through the native sales-return path and restore stock.
+- **Preconditions:** `MAT-DN-2026-00006` delivered 1 Box / 50 Piece of `P0-CO-SCREW`.
+- **Steps:** Map with `delivery_note.make_sales_return`; submit; verify `return_against`, negative quantities, conversion, and final Bin balance.
+- **Expected Result:** The return links to the original Delivery Note and restores 50 Piece.
+- **Actual Result:** `MAT-DN-2026-00007` linked to `MAT-DN-2026-00006`, recorded -1 Box and `stock_qty = -50`, and restored the screw balance to 650 Piece.
+- **Evidence:** Original/return Delivery Notes and Bin REST readback.
+- **Result:** Supported
+- **Notes:** ERPNext expresses returned delivery as a negative row and returns the originating Sales Order to net `per_delivered = 0`.
+
+#### RET-005 — Return accounting traceability
+
+- **Requirement:** Trace the accounting reversal for a customer sales return.
+- **Preconditions:** `ACC-SINV-2026-00003` posted a CNY 32.5 customer receivable for the returned sale.
+- **Steps:** Map with `sales_invoice.make_sales_return`; submit; read return linkage, outstanding credit, and party GL Entries.
+- **Expected Result:** A native credit note links to the original invoice and credits customer receivable by CNY 32.5.
+- **Actual Result:** `ACC-SINV-2026-00004` linked to `ACC-SINV-2026-00003`, posted grand total -32.5, outstanding -32.5, and credited the same customer's receivable CNY 32.5.
+- **Evidence:** Original/return Sales Invoices and GL Entries keyed by both voucher numbers.
+- **Result:** Supported
+- **Notes:** Native stock return and accounting credit are separate linked documents; this validation records both rather than representing them as one document.
 
 ### Return Evidence from Purchase Execution
 
@@ -521,11 +602,53 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| AR-001 | Sales Invoice creates customer receivable | Not Tested |
-| AR-002 | Full payment clears customer outstanding balance | Not Tested |
-| AR-003 | Partial payment reduces outstanding balance correctly | Not Tested |
+| AR-001 | Sales Invoice creates customer receivable | Supported |
+| AR-002 | Full payment clears customer outstanding balance | Supported |
+| AR-003 | Partial payment reduces outstanding balance correctly | Supported |
 | AR-004 | Outstanding receivables can be reported | Not Tested |
-| AR-005 | Receivable history is traceable to source documents | Not Tested |
+| AR-005 | Receivable history is traceable to source documents | Supported |
+
+### Accounts Receivable Evidence from Sales Execution
+
+#### AR-001 — Invoice creates customer receivable
+
+- **Requirement:** Submitted Sales Invoices post customer receivables.
+- **Preconditions:** Three native Sales Invoices were submitted.
+- **Steps:** Read invoice GL Entries and customer parties.
+- **Expected Result:** Receivable is debited for each invoice total against the correct customer.
+- **Actual Result:** Party-specific receivable GL debits were CNY 84, 125, and 32.5 for the full, partial, and alternate-UOM scenarios.
+- **Evidence:** GL Entries for `ACC-SINV-2026-00001` through `ACC-SINV-2026-00003`.
+- **Result:** Supported
+- **Notes:** The alternate-UOM invoice's separate credit note is recorded under RET-005.
+
+#### AR-002 / AR-003 — Full and partial settlement
+
+- **Requirement:** Full payment clears one receivable and partial payment reduces another by the exact allocation.
+- **Preconditions:** Invoices of CNY 84 and CNY 125 were outstanding.
+- **Steps:** Submit payments of CNY 84 and CNY 50; read allocations, receivable GL credits, and invoice outstanding balances.
+- **Expected Result:** Outstanding balances become CNY 0 and CNY 75.
+- **Actual Result:** `ACC-PAY-2026-00003` cleared `ACC-SINV-2026-00001`; `ACC-PAY-2026-00004` reduced `ACC-SINV-2026-00002` to CNY 75. GL credits exactly matched CNY 84 and CNY 50.
+- **Evidence:** Payment Entry references, Sales Invoice readback, and party-specific GL Entries.
+- **Result:** Supported
+- **Notes:** The open CNY 75 remains available for AR-004 reporting validation.
+
+#### AR-005 — Receivable history traceability
+
+- **Requirement:** Receivable, payment, and return history trace back to native source documents and customers.
+- **Preconditions:** AR-001 through AR-003 and RET-005 completed.
+- **Steps:** Read Sales Invoice item source links, Payment Entry references, return links, and GL voucher/party fields.
+- **Expected Result:** Orders, invoices, payments, customer parties, and the credit note remain linked by native identifiers.
+- **Actual Result:** All three invoice rows reference their Sales Orders; both payments reference their exact Sales Invoice and allocation; the credit note references its original invoice; GL rows identify each voucher and customer.
+- **Evidence:** `SAL-ORD-2026-00001` through `00003`, `ACC-SINV-2026-00001` through `00004`, and `ACC-PAY-2026-00003` / `00004`.
+- **Result:** Supported
+- **Notes:** `AR-004` remains `Not Tested` because no Accounts Receivable report was executed in this task.
+
+### Sales Validator Idempotency
+
+- The first transaction-producing run created one Quotation, three Sales Orders, four outbound Delivery Notes, three Sales Invoices, two Payment Entries, one return Delivery Note, and one credit note. Its final assertion initially failed because it incorrectly expected the fully returned Sales Order to retain `per_delivered = 100`.
+- Observed ERPNext v16 behaviour set the fully returned order to net `per_delivered = 0` and status `To Deliver`; the assertion was corrected without recreating or altering the transaction evidence.
+- Two following complete runs exited `0`, reported every transaction as `EXISTS`, and reproduced the same final stock, invoice outstanding amounts, payment allocations, and party GL totals without duplicate stock or accounting movement.
+- P0.5 closeout on 2026-10-03 repeated the complete validator twice after a fresh health check and seed revalidation. Both runs again exited `0`, reported every transaction as `EXISTS`, and reproduced final stock `16` pliers, `25` measuring tapes, and `650` screws; full/partial invoice outstanding `0` and `75`; payment receivable credits `84` and `50`; and credit-note receivable credit `32.5`.
 
 ## Accounts Payable Validation
 
@@ -583,25 +706,93 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 - **Result:** Supported
 - **Notes:** The dedicated Accounts Payable report itself remains `Not Tested` under AP-004.
 
+## Language and Localisation Validation
+
+| Test ID | Requirement | Result |
+|---|---|---|
+| LANG-001 | Use Simplified Chinese as the site default | Configurable |
+| LANG-002 | Allow a user-level English override | Configurable |
+| LANG-003 | Validate bilingual business data and print output | Not Tested |
+
+### Language Execution — 2026-10-03
+
+- **Requirement:** Use native ERPNext language configuration rather than a custom language switcher.
+- **Preconditions:** Healthy Phase 0 runtime; native Language records include `zh` for 中文 and `en` for English.
+- **Steps:** Update the native System Settings language to `zh`; create/update five synthetic System Users; set four users to `zh` and the sales user to `en`; authenticate each user; request the Desk `/app` boot page and inspect its resolved HTML language.
+- **Expected Result:** Users without an English override resolve to Chinese; the English user resolves to English; preferences persist across fresh authenticated sessions.
+- **Actual Result:** System Settings persisted `language = zh`. Purchase, stock, finance, and approval sessions resolved to `<html lang="zh">`; the sales session resolved to `<html lang="en">`. A complete validator rerun reproduced the same result without creating users again.
+- **Evidence:** `phase0/access-validation.json`; `scripts/phase0-validate-access.py`; System Settings and User REST readback; authenticated Desk boot HTML.
+- **Result:** Configurable
+- **Notes:** Interface translation does not rewrite customer names, supplier names, item descriptions, or other saved business content. Bilingual print formats and customer/supplier-facing output remain `Not Tested` under LANG-003 and must not be inferred from the Desk language result.
+
 ## Permissions Validation
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| PER-001 | Purchasing user can access required purchase functions | Not Tested |
-| PER-002 | Purchasing user cannot access unrelated restricted functions | Not Tested |
-| PER-003 | Sales user can access required sales functions | Not Tested |
-| PER-004 | Sales user cannot access unrelated restricted functions | Not Tested |
-| PER-005 | Finance-related access can be separated where required | Not Tested |
-| PER-006 | Important actions are attributable to a user | Not Tested |
+| PER-001 | Purchasing user can access required purchase functions | Supported |
+| PER-002 | Purchasing user cannot access unrelated restricted functions | Supported |
+| PER-003 | Sales user can access required sales functions | Supported |
+| PER-004 | Sales user cannot access unrelated restricted functions | Supported |
+| PER-005 | Finance-related access can be separated where required | Supported |
+| PER-006 | Important actions are attributable to a user | Supported |
+
+### Permission Execution — 2026-10-03
+
+Five synthetic System Users were created with native roles:
+
+- purchase: `Purchase User`
+- sales: `Sales User`
+- stock: `Stock User`
+- finance: `Accounts User`
+- approver: the corresponding Purchase, Sales, and Accounts User/Manager roles required to read the business document and execute its manager transition
+
+Authenticated REST checks produced these results:
+
+- purchase user: Purchase Order allowed; Payment Entry and Stock Entry denied
+- sales user: Sales Order allowed; Purchase Order, Payment Entry, and Stock Entry denied
+- stock user: Stock Entry allowed; Payment Entry denied
+- finance user: Payment Entry, Purchase Invoice, and Sales Invoice allowed; Stock Entry denied
+- the purchase, sales, and finance creators could create their respective Workflow fixtures but could not execute the manager-only `Approve` transition
+- final documents retained the creator as `owner` and the approval manager as `modified_by`
+
+All six cases are `Supported` by native role permissions and document attribution. This evidence does not claim that the current role combination is the final organization design; Phase 1 must approve the production role matrix.
 
 ## Approval Validation
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| APR-001 | Determine native workflow/approval support for Purchase Orders | Not Tested |
-| APR-002 | Determine native workflow/approval support for Sales Orders | Not Tested |
-| APR-003 | Determine native workflow/approval support for consequential financial documents | Not Tested |
-| APR-004 | Approval history is visible and auditable | Not Tested |
+| APR-001 | Determine native workflow/approval support for Purchase Orders | Configurable |
+| APR-002 | Determine native workflow/approval support for Sales Orders | Configurable |
+| APR-003 | Determine native workflow/approval support for consequential financial documents | Configurable |
+| APR-004 | Approval history is visible and auditable | Configurable |
+
+### Approval and Audit Execution — 2026-10-03
+
+Three active native Workflows were configured without modifying ERPNext Core:
+
+- `P0 Purchase Order Approval`
+- `P0 Sales Order Approval`
+- `P0 Payment Entry Approval`
+
+Each Workflow uses `Pending` (`docstatus = 0`), `Approved` (`docstatus = 1`), and `Rejected` (`docstatus = 2`). The creator role cannot execute `Approve`; the corresponding manager role approves and submits the document, then the manager `Reject` transition cancels the synthetic validation document so it leaves no live stock or accounting effect.
+
+Executed evidence:
+
+- Purchase Orders `PUR-ORD-2026-00004` and `PUR-ORD-2026-00005` were created by the synthetic purchase user, approved by the synthetic approval manager, and cancelled after validation. `00004` was the draft left by the preserved first permission failure and was subsequently recovered through the same Workflow.
+- Sales Order `SAL-ORD-2026-00004` was created by the synthetic sales user, approved, and cancelled.
+- Payment Entry `ACC-PAY-2026-00005` for CNY 1 was created by the synthetic finance user, approved, and cancelled. The cancellation reversed the temporary accounting effect.
+- Each selected validation document had two Version records and retained its business creator as `owner` and the approval manager as `modified_by`.
+- A complete rerun reused all users, Workflows, and cancelled documents; no additional transaction or accounting effect was created.
+- P0.5 sales/AR regression passed afterward with unchanged final stock and invoice outstanding balances.
+
+The result is `Configurable`, not default `Supported`, because the approval gates require explicit native Workflow configuration and an approved user/manager role design.
+
+### Failed P0.6 Attempts Preserved
+
+1. The first document lookup filtered Purchase Order by `supplier_order_info`; ERPNext rejected the list query because that field is not permitted in REST list filters. The validator was changed to query by an allowed party field and inspect candidate documents individually.
+2. The first Purchase Order approval attempt failed because a manager-only test user did not have the base business-document access required to read linked Item data. The synthetic approver was corrected to combine the relevant User and Manager roles.
+3. That failed attempt left `PUR-ORD-2026-00004` in `Pending`. The corrected idempotent validator detected it, applied the manager approval, and cancelled it; it was not silently deleted.
+4. Direct REST invocation of non-whitelisted `frappe.boot.get_bootinfo` was rejected. Session language was instead verified through each authenticated Desk `/app` boot page, without bypassing the whitelist.
 
 ## Reporting Validation
 
@@ -615,6 +806,8 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 | REP-006 | Report sales history by item | Not Tested |
 | REP-007 | Report outstanding Accounts Receivable | Not Tested |
 | REP-008 | Report outstanding Accounts Payable | Not Tested |
+| REP-009 | Report General Ledger postings for validated transactions and reversals | Not Tested |
+| REP-010 | Trace selected report balances to native source vouchers | Not Tested |
 
 ## Gap Log
 

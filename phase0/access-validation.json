@@ -1,0 +1,91 @@
+{
+  "site_language": "zh",
+  "users": {
+    "purchase": {
+      "email": "p0.purchase@example.invalid",
+      "first_name": "P0 Purchase User",
+      "language": "zh",
+      "roles": ["Purchase User"]
+    },
+    "sales": {
+      "email": "p0.sales@example.invalid",
+      "first_name": "P0 Sales User",
+      "language": "en",
+      "roles": ["Sales User"]
+    },
+    "stock": {
+      "email": "p0.stock@example.invalid",
+      "first_name": "P0 Stock User",
+      "language": "zh",
+      "roles": ["Stock User"]
+    },
+    "finance": {
+      "email": "p0.finance@example.invalid",
+      "first_name": "P0 Finance User",
+      "language": "zh",
+      "roles": ["Accounts User"]
+    },
+    "approver": {
+      "email": "p0.approver@example.invalid",
+      "first_name": "P0 Approval Manager",
+      "language": "zh",
+      "roles": [
+        "Purchase User",
+        "Purchase Manager",
+        "Sales User",
+        "Sales Manager",
+        "Accounts User",
+        "Accounts Manager"
+      ]
+    }
+  },
+  "permission_checks": {
+    "purchase": {
+      "allowed": ["Purchase Order"],
+      "denied": ["Payment Entry", "Stock Entry"]
+    },
+    "sales": {
+      "allowed": ["Sales Order"],
+      "denied": ["Purchase Order", "Payment Entry", "Stock Entry"]
+    },
+    "stock": {
+      "allowed": ["Stock Entry"],
+      "denied": ["Payment Entry"]
+    },
+    "finance": {
+      "allowed": ["Payment Entry", "Purchase Invoice", "Sales Invoice"],
+      "denied": ["Stock Entry"]
+    }
+  },
+  "workflows": [
+    {
+      "workflow_name": "P0 Purchase Order Approval",
+      "document_type": "Purchase Order",
+      "creator_role": "Purchase User",
+      "approver_role": "Purchase Manager"
+    },
+    {
+      "workflow_name": "P0 Sales Order Approval",
+      "document_type": "Sales Order",
+      "creator_role": "Sales User",
+      "approver_role": "Sales Manager"
+    },
+    {
+      "workflow_name": "P0 Payment Entry Approval",
+      "document_type": "Payment Entry",
+      "creator_role": "Accounts User",
+      "approver_role": "Accounts Manager"
+    }
+  ],
+  "transaction_fixtures": {
+    "company": "Phase Zero Hardware Trading Demo",
+    "warehouse": "P0 Main Warehouse - PZH",
+    "supplier": "P0 Specialty Consumables Supply",
+    "customer": "P0 Standard Retail Customer",
+    "purchase_item": "P0-CO-CABLETIE",
+    "sales_item": "P0-HT-WRENCH",
+    "purchase_rate": 4,
+    "sales_rate": 68,
+    "quantity": 1
+  }
+}

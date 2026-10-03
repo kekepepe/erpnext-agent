@@ -2,55 +2,44 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Execute native sales and accounts-receivable validation for SAL-001 through SAL-010, including customer sales-return evidence, while keeping later Phase 0 areas and all Phase 1+ implementation out of scope
-last_updated: 2026-09-05
-updated_by: Web GPT
+current_task: Execute P0.7 reporting validation and Gap Analysis as the first gate in the Phase 0 development-closeout plan
+last_updated: 2026-10-03
+updated_by: Codex
 ---
 
 # AI Project Handoff
 
 ## Current Objective
 
-The completed native purchase and stock evidence has been reviewed and accepted as sufficient to advance to the next Phase 0 validation task.
+Native Quote-to-Cash validation is complete for `SAL-001` through `SAL-010`, including customer stock return, Sales Invoice credit-note evidence, full and partial customer payments, and transaction-level Accounts Receivable evidence.
 
-The current implementation task is now:
+The implementation used source-controlled synthetic scenarios and an idempotent REST validator. Two complete post-correction runs reused every matching document and reproduced identical stock, outstanding-balance, payment-allocation, and party-GL results.
 
-**Validate ERPNext v16 native Quote-to-Cash behaviour using reproducible synthetic scenarios, beginning with `SAL-001`, and record actual execution evidence for sales, customer payment, Accounts Receivable, alternate-UOM sales, and customer sales returns.**
+P0.5 and P0.6 were revalidated and completed on 2026-10-03. The current implementation task is now:
 
-Target transaction path:
+**Execute P0.7 native stock, purchase, sales, Accounts Payable, Accounts Receivable, and General Ledger reporting validation, then build the evidence-based Phase 0 Gap Analysis.**
 
-Quotation → Sales Order → Delivery Note → Sales Invoice → Accounts Receivable → Customer Payment → Sales Return
+### Phase boundary directive — 2026-10-03
 
-Primary validation IDs already defined in `docs/PHASE0_VALIDATION.md`:
+The project owner has reset the delivery boundary:
 
-- `SAL-001` — Create Quotation
-- `SAL-002` — Create and submit Sales Order
-- `SAL-003` — Deliver full Sales Order quantity
-- `SAL-004` — Deliver one Sales Order through multiple partial deliveries
-- `SAL-005` — Sell an item using an alternate UOM with conversion
-- `SAL-006` — Delivery correctly reduces stock
-- `SAL-007` — Create Sales Invoice
-- `SAL-008` — Sales Invoice creates Accounts Receivable
-- `SAL-009` — Record full customer payment
-- `SAL-010` — Record partial customer payment
+- **Phase 0 is the complete development and release-candidate preparation phase.** All functionality, native configuration, approved customization, deployment-required integration, migration tooling, automated validation, and release-readiness work for the first deployable ERP release must be completed and accepted here.
+- **Phase 1 is the deployment and rollout phase.** It may provision environments, apply the accepted release, migrate approved data, execute deployment/UAT/cutover procedures, and stabilize operations. It must not be used to finish planned product development.
+- P0.7 is only the first remaining Phase 0 gate. Passing P0.7 authorizes scope freeze and implementation planning, not progression to Phase 1.
+- A Phase 1 deployment defect that requires a business-logic, schema, custom-app, report, integration-contract, or migration-code change must return to Phase 0, produce a new release candidate, and repeat the affected acceptance gates.
+- Future Agent, MCP, and multi-Agent work is not silently pulled into the first ERP release. It remains deferred unless the project owner explicitly adds it to the Phase 0 release scope.
 
-Related return cases:
+`docs/ROADMAP.md` and `docs/DECISIONS.md` now record this phase boundary at milestone level. This handoff remains the source for the ordered daily execution plan; P0.8 must refine the approved first-release scope without moving development into Phase 1.
 
-- `RET-001` — Customer returns previously sold goods
-- `RET-003` — Sales return reverses stock effects correctly
-- `RET-005` — Return-related accounting effects are traceable
+Simplified Chinese is now the native site default, with an English per-user override proven through authenticated Desk boot sessions. Native role separation and configurable approval/audit workflows passed for Purchase Order, Sales Order, and Payment Entry. `AR-004`, `AP-004`, reporting, bilingual print output, Gap Analysis, Phase 1, `hardware_erp`, Business API, MCP, Agent, and multi-Agent work remain incomplete.
 
-Related receivable cases:
+## Review Decision — 2026-10-03
 
-- `AR-001` — Sales Invoice creates customer receivable
-- `AR-002` — Full payment clears customer outstanding balance
-- `AR-003` — Partial payment reduces outstanding balance correctly
-- `AR-004` — Outstanding receivables can be reported
-- `AR-005` — Receivable history is traceable to source documents
+P0.5 sales, customer-return, and transaction-level Accounts Receivable evidence is accepted for progression to P0.6.
 
-The current task must execute the sales transaction-flow evidence first. `AR-004` reporting remains part of the later reporting task unless it is explicitly and independently tested here. Do not mark any case `Supported` merely because transaction data created during this task could theoretically support it.
+The acceptance is based on a fresh local runtime revalidation: ERPNext 16.33.0 and Frappe 16.31.0 passed the health check; the idempotent seed found all expected synthetic master data and opening stock; and two consecutive sales-validator executions exited `0`, reused every transaction document, and reproduced identical stock, outstanding-balance, payment-allocation, return, and party-GL evidence.
 
-Do not begin permissions, approval workflow, Phase 1, `hardware_erp`, Business API, MCP, Agent, or multi-Agent implementation during this task.
+The first two health-check attempts returned HTTP 502 after Docker startup because the frontend retained a stale backend address. Restarting only the disposable `frontend` container refreshed its upstream address and the full health check passed. This recovery is recorded in `docs/PHASE0_VALIDATION.md`.
 
 ## Review Decision — 2026-09-05
 
@@ -102,7 +91,7 @@ Configured baseline:
 
 Latest evidence recorded in `docs/PHASE0_VALIDATION.md`:
 
-- runtime validation date: `2026-09-05 15:28:51 +0800`
+- runtime validation date: `2026-10-03 +0800`
 - ERPNext: `16.33.0`
 - Frappe: `16.31.0`
 - `create-site`: exited successfully with exit code `0`
@@ -246,6 +235,46 @@ Recorded evidence includes:
   - 3 goggles in secondary warehouse
 - a second complete validator run reused existing documents and reproduced the same balances without duplicate stock movements
 
+### Native sales, customer-return, and Accounts Receivable validation
+
+Native sales validation passed on 2026-09-06 through:
+
+- `phase0/sales-validation.json`
+- `scripts/phase0-validate-sales.py`
+
+Recorded supported cases:
+
+- `SAL-001` through `SAL-010`
+- `RET-001`
+- `RET-003`
+- `RET-005`
+- `AR-001`
+- `AR-002`
+- `AR-003`
+- `AR-005`
+
+Recorded execution evidence includes:
+
+- Quotation `SAL-QTN-2026-00001`
+- Sales Orders `SAL-ORD-2026-00001` through `SAL-ORD-2026-00003`
+- outbound Delivery Notes `MAT-DN-2026-00003` through `MAT-DN-2026-00006`
+- customer return Delivery Note `MAT-DN-2026-00007`, linked to `MAT-DN-2026-00006`
+- Sales Invoices `ACC-SINV-2026-00001` through `ACC-SINV-2026-00003`
+- credit note `ACC-SINV-2026-00004`, linked to `ACC-SINV-2026-00003`
+- customer Payment Entries `ACC-PAY-2026-00003` and `ACC-PAY-2026-00004`
+- full-payment invoice total CNY 84 and final outstanding CNY 0
+- partial-payment invoice total CNY 125, payment CNY 50, and preserved outstanding CNY 75
+- alternate-UOM delivery of 1 Box converted to 50 Piece
+- return of -1 Box / -50 Piece restored the screw balance to 650 Piece
+- party-specific receivable GL debits of CNY 84, 125, and 32.5
+- payment receivable GL credits of CNY 84 and 50
+- credit-note receivable GL credit of CNY 32.5
+- final main-warehouse quantities: pliers 16, measuring tape 25, screws 650 Piece
+
+The first transaction-producing run created all documents but failed its final assertion because it expected a fully returned Sales Order to remain 100% delivered. Observed ERPNext v16 behaviour correctly represents the returned order as net `per_delivered = 0`, `status = To Deliver`. The assertion was corrected, and two following complete runs exited `0`, reused every document, and reproduced identical final evidence without duplicate effects.
+
+`AR-004` remains `Not Tested`: the open CNY 75 receivable was preserved for the later reporting task, but no Accounts Receivable report was executed here.
+
 ### API boundary already demonstrated during Phase 0
 
 The reusable client:
@@ -264,18 +293,15 @@ Do not interpret the current Phase 0 REST client as the final Business API layer
 
 No valid execution evidence currently proves completion of:
 
-- `SAL-001` through `SAL-010`
-- `RET-001`
-- `RET-003`
-- `RET-005`
-- `AR-001` through `AR-005`
+- `AR-004`
 - remaining Accounts Payable reporting case(s)
-- permissions and role separation
-- native approval workflow behaviour
-- approval/audit history requirements
 - stock/purchase/sales/AR/AP reporting coverage
+- bilingual customer/supplier-facing print output
 - final evidence-based Phase 0 Gap Analysis
-- Phase 1 ERP MVP
+- approved first-release scope and Phase 0 development plan
+- production-ready native configuration and any approved `hardware_erp` customization
+- migration rehearsal, release candidate, and deployment-readiness acceptance
+- Phase 1 deployment and rollout
 - `hardware_erp` Custom App
 - governed Business API
 - MCP Server
@@ -328,14 +354,24 @@ These must remain incomplete until actual evidence exists.
 - [x] Verified item-level and warehouse-level stock queries.
 - [x] Verified purchase and stock validators can be rerun without duplicating their tested stock movements.
 - [x] Web GPT reviewed the committed purchase/stock evidence on 2026-09-05 and accepted progression to the sales-validation task.
+- [x] Added reproducible source-controlled sales-validation scenarios.
+- [x] Executed native sales validation `SAL-001` through `SAL-010`.
+- [x] Verified Quotation to Sales Order mapping, full delivery, and multiple partial deliveries.
+- [x] Verified alternate-UOM selling and the 1 Box to 50 Piece stock effect.
+- [x] Verified Sales Invoice receivable creation and full/partial customer settlement.
+- [x] Executed and traced customer stock return and Sales Invoice credit-note accounting.
+- [x] Executed and recorded `RET-001`, `RET-003`, `RET-005`, `AR-001`, `AR-002`, `AR-003`, and `AR-005`.
+- [x] Verified two complete post-correction sales-validator runs reused all documents without duplicate stock or accounting movement.
+- [x] Configured Simplified Chinese as the native site default and verified a persistent per-user English override.
+- [x] Added five synthetic System Users for purchase, sales, stock, finance, and approval validation.
+- [x] Executed `PER-001` through `PER-006` with positive and denied authenticated REST checks.
+- [x] Configured and executed native Purchase Order, Sales Order, and Payment Entry Workflows.
+- [x] Verified creator/manager separation, submit/cancel transitions, owner/modified-by attribution, and Version audit evidence.
+- [x] Re-ran the P0.6 validator idempotently and re-ran P0.5 sales/AR regression successfully.
 
 ## In Progress
 
-- [ ] Execute native Quote-to-Cash sales validation beginning with `SAL-001`.
-- [ ] Establish reproducible source-controlled sales-validation scenarios.
-- [ ] Record transaction, stock, Accounts Receivable, payment, and sales-return evidence.
-- [ ] Preserve all execution failures and corrections.
-- [ ] Prove validator idempotency through a second complete run.
+- [ ] Execute P0.7 native reporting validation and the evidence-based Phase 0 Gap Analysis.
 
 ## Problems / Risks
 
@@ -345,7 +381,7 @@ The Phase 0 environment is disposable.
 
 A previous Docker Desktop stopped-state blocker was resolved, but that does not prove Docker is running for the next task.
 
-Before sales validation:
+For any future transaction validation:
 
 - check Docker
 - start/reuse the Phase 0 stack
@@ -358,7 +394,7 @@ Do not claim current runtime health from an old timestamp.
 
 Purchase and stock validation intentionally changed synthetic inventory and accounting state.
 
-The sales validator must use the **current validated state**, or use scenarios whose expected baseline can be deterministically read back before execution.
+The sales validator uses the **current validated state** and scenarios whose final state can be deterministically read back after execution.
 
 Do not assume original opening quantities still exist.
 
@@ -450,7 +486,7 @@ This is not a blocker for the current local Phase 0 validation workflow.
 
 Do not describe the local ERPNext transaction evidence as independently reproduced by hosted CI.
 
-Static CI may be added later if useful, but do not let CI infrastructure work displace the current sales-validation task.
+Static CI may be added later if useful, but do not let CI infrastructure work displace the current Phase 0 evidence task.
 
 ### Premature customization
 
@@ -484,46 +520,46 @@ during the current task.
 
 ### P0.5 — Native Sales + Accounts Receivable Validation
 
-This is the current Codex task.
+This Codex task is complete, revalidated, and accepted as of 2026-10-03.
 
 Execute in this order.
 
 #### P0.5.1 — Inspect and re-establish runtime
 
-- [ ] Read:
+- [x] Read:
   1. `AGENTS.md`
   2. `README.md`
   3. `docs/AI_HANDOFF.md`
   4. `docs/ROADMAP.md`
   5. `docs/DECISIONS.md`
   6. `docs/PHASE0_VALIDATION.md`
-- [ ] Inspect actual Git state.
-- [ ] Preserve unrelated user changes if the worktree is dirty.
-- [ ] Confirm the current branch and relationship to `origin/main`.
-- [ ] Inspect the existing seed, purchase validator, stock validator, REST client, and validation JSON files before designing the sales validator.
-- [ ] Check Docker availability.
-- [ ] Start/reuse the Phase 0 stack if necessary:
+- [x] Inspect actual Git state.
+- [x] Preserve unrelated user changes if the worktree is dirty.
+- [x] Confirm the current branch and relationship to `origin/main`.
+- [x] Inspect the existing seed, purchase validator, stock validator, REST client, and validation JSON files before designing the sales validator.
+- [x] Check Docker availability.
+- [x] Start/reuse the Phase 0 stack if necessary:
 
     docker compose -f phase0/compose.yaml up -d
 
-- [ ] Run:
+- [x] Run:
 
     ./scripts/phase0-check.sh
 
-- [ ] Record actual command outcome and runtime evidence.
-- [ ] If runtime validation fails, preserve the failure and stop transaction work until the smallest concrete blocker is resolved.
-- [ ] Do not mark runtime validation successful unless the command actually passes.
+- [x] Record actual command outcome and runtime evidence.
+- [x] If runtime validation fails, preserve the failure and stop transaction work until the smallest concrete blocker is resolved.
+- [x] Do not mark runtime validation successful unless the command actually passes.
 
 #### P0.5.2 — Revalidate required synthetic master data
 
-- [ ] Run the existing seed idempotently:
+- [x] Run the existing seed idempotently:
 
     python3 scripts/phase0-seed.py
 
-- [ ] Confirm required customers, items, warehouses, selling prices, and UOM conversions still exist.
-- [ ] Do not reset the database merely to simplify the sales test.
-- [ ] Do not destroy existing purchase/stock evidence with `down -v`.
-- [ ] Preserve the CNY 60 open payable unless there is a documented reason the current task requires otherwise.
+- [x] Confirm required customers, items, warehouses, selling prices, and UOM conversions still exist.
+- [x] Do not reset the database merely to simplify the sales test.
+- [x] Do not destroy existing purchase/stock evidence with `down -v`.
+- [x] Preserve the CNY 60 open payable unless there is a documented reason the current task requires otherwise.
 
 #### P0.5.3 — Define reproducible sales scenarios
 
@@ -582,16 +618,16 @@ Validate the existing ledger cases exactly rather than replacing them with a new
 
 Required coverage:
 
-- [ ] `SAL-001` — Create Quotation
-- [ ] `SAL-002` — Create and submit Sales Order
-- [ ] `SAL-003` — Deliver full Sales Order quantity
-- [ ] `SAL-004` — Deliver one Sales Order through multiple partial deliveries
-- [ ] `SAL-005` — Sell an item using an alternate UOM with conversion
-- [ ] `SAL-006` — Delivery correctly reduces stock
-- [ ] `SAL-007` — Create Sales Invoice
-- [ ] `SAL-008` — Sales Invoice creates Accounts Receivable
-- [ ] `SAL-009` — Record full customer payment
-- [ ] `SAL-010` — Record partial customer payment
+- [x] `SAL-001` — Create Quotation
+- [x] `SAL-002` — Create and submit Sales Order
+- [x] `SAL-003` — Deliver full Sales Order quantity
+- [x] `SAL-004` — Deliver one Sales Order through multiple partial deliveries
+- [x] `SAL-005` — Sell an item using an alternate UOM with conversion
+- [x] `SAL-006` — Delivery correctly reduces stock
+- [x] `SAL-007` — Create Sales Invoice
+- [x] `SAL-008` — Sales Invoice creates Accounts Receivable
+- [x] `SAL-009` — Record full customer payment
+- [x] `SAL-010` — Record partial customer payment
 
 For each case, record:
 
@@ -616,9 +652,9 @@ Do not force all cases to become `Supported`. The purpose is capability discover
 
 Validate:
 
-- [ ] `RET-001` — Customer returns previously sold goods
-- [ ] `RET-003` — Sales return reverses stock effects correctly
-- [ ] `RET-005` — Return-related accounting effects are traceable
+- [x] `RET-001` — Customer returns previously sold goods
+- [x] `RET-003` — Sales return reverses stock effects correctly
+- [x] `RET-005` — Return-related accounting effects are traceable
 
 Where native ERPNext behaviour separates stock return and invoice/credit accounting behaviour, record that distinction rather than merging different native concepts into a false single workflow.
 
@@ -628,9 +664,9 @@ Document the exact native return path used.
 
 Validate transaction-level AR cases:
 
-- [ ] `AR-001` — Sales Invoice creates customer receivable
-- [ ] `AR-002` — Full payment clears customer outstanding balance
-- [ ] `AR-003` — Partial payment reduces outstanding balance correctly
+- [x] `AR-001` — Sales Invoice creates customer receivable
+- [x] `AR-002` — Full payment clears customer outstanding balance
+- [x] `AR-003` — Partial payment reduces outstanding balance correctly
 
 If the current transaction execution also directly proves `AR-005`, record the evidence and result.
 
@@ -675,135 +711,226 @@ Do not rewrite failed exploration attempts as if they never happened.
 
 Before handoff:
 
-- [ ] Run appropriate JSON validation.
-- [ ] Run Python compilation/static syntax validation for changed scripts.
-- [ ] Run `./scripts/phase0-check.sh`.
-- [ ] Run the seed.
-- [ ] Run the complete sales validator.
-- [ ] Run the complete sales validator a second time.
-- [ ] Review `git diff`.
-- [ ] Review `git status`.
-- [ ] Update this `docs/AI_HANDOFF.md` with actual results.
-- [ ] Record exact changed files.
-- [ ] Record all relevant document IDs.
-- [ ] Record outstanding balances.
-- [ ] Record final affected stock balances.
-- [ ] Record GL evidence where applicable.
-- [ ] Record failures and corrections.
-- [ ] Recommend the next Phase 0 task based on evidence.
-- [ ] Do not start permissions/reporting work unless this handoff has first been completed.
-- [ ] Do not start Phase 1+ work.
+- [x] Run appropriate JSON validation.
+- [x] Run Python compilation/static syntax validation for changed scripts.
+- [x] Run `./scripts/phase0-check.sh`.
+- [x] Run the seed.
+- [x] Run the complete sales validator.
+- [x] Run the complete sales validator a second time.
+- [x] Review `git diff`.
+- [x] Review `git status`.
+- [x] Update this `docs/AI_HANDOFF.md` with actual results.
+- [x] Record exact changed files.
+- [x] Record all relevant document IDs.
+- [x] Record outstanding balances.
+- [x] Record final affected stock balances.
+- [x] Record GL evidence where applicable.
+- [x] Record failures and corrections.
+- [x] Recommend the next Phase 0 task based on evidence.
+- [x] Do not start permissions/reporting work unless this handoff has first been completed.
+- [x] Do not start Phase 1+ work.
 
 ### P0.6 — Permissions, Roles, Approval and Audit Validation
 
-Do not start until P0.5 is completed and reviewed.
+P0.6 is complete as of 2026-10-03.
 
 Planned next scope:
 
-- [ ] Define representative synthetic Phase 0 roles/users if required.
-- [ ] Validate relevant purchase permissions.
-- [ ] Validate relevant sales permissions.
-- [ ] Validate stock-operation permissions.
-- [ ] Validate accounting/payment permissions.
-- [ ] Verify create/read/write/submit/cancel boundaries relevant to the MVP.
-- [ ] Validate native ERPNext approval/workflow options where relevant.
-- [ ] Validate approval history / Version / audit trace where applicable.
-- [ ] Classify results as `Supported`, `Configurable`, `Gap`, or `Not Tested`.
-- [ ] Avoid customization before the result is known.
+- [x] Set native System Settings language to Simplified Chinese.
+- [x] Validate a representative user's native language override to English and persistence after a new login.
+- [x] Record untranslated UI, data, and print-output boundaries without adding a custom language switcher.
+- [x] Define representative synthetic Phase 0 roles/users if required.
+- [x] Validate relevant purchase permissions.
+- [x] Validate relevant sales permissions.
+- [x] Validate stock-operation permissions.
+- [x] Validate accounting/payment permissions.
+- [x] Verify create/read/write/submit/cancel boundaries relevant to the MVP.
+- [x] Validate native ERPNext approval/workflow options where relevant.
+- [x] Validate approval history / Version / audit trace where applicable.
+- [x] Classify results as `Supported`, `Configurable`, `Gap`, or `Not Tested`.
+- [x] Avoid customization before the result is known.
 
 ### P0.7 — Reporting Validation and Gap Analysis
 
-Do not start until transaction and permissions/approval validation are sufficiently complete.
+Transaction and permissions/approval validation are sufficiently complete. P0.7 is now the current task.
 
-Validate relevant native reports or equivalent native query/report functions for:
+Execute the following work packages in order. Do not begin implementation of confirmed gaps or Phase 1 deployment while any P0.7 package remains incomplete.
 
-- [ ] Stock Balance
-- [ ] Stock Ledger
-- [ ] purchase status/analytics
-- [ ] sales status/analytics
-- [ ] Accounts Payable
-- [ ] Accounts Receivable
-- [ ] General Ledger
-- [ ] traceability from report balance to source transaction where required
+#### P0.7.1 — Re-establish the evidence baseline
 
-Use deliberately preserved open balances where useful:
+- [ ] Run `./scripts/phase0-check.sh` and record the current runtime result.
+- [ ] Run `scripts/phase0-seed.py` idempotently.
+- [ ] Re-run purchase, stock, sales, and access validators when required to prove that the reporting source transactions and configuration still match their recorded state.
+- [ ] Confirm the preserved CNY 60 supplier payable and CNY 75 customer receivable still exist.
+- [ ] Preserve cancelled P0.6 approval fixtures as audit evidence; do not include their reversed amounts in open-balance expectations.
 
-- supplier payable CNY 60
-- partial customer receivable created during P0.5
+#### P0.7.2 — Define reproducible reporting scenarios
 
-After the required Phase 0 evidence is complete:
+- [ ] Add the smallest source-controlled reporting expectation file, expected to be `phase0/reporting-validation.json`.
+- [ ] Add an idempotent native-report validator, expected to be `scripts/phase0-validate-reporting.py`.
+- [ ] Use ERPNext report/query APIs and reviewed REST boundaries; do not query MariaDB directly.
+- [ ] Define expected rows, quantities, parties, vouchers, and balances before marking a report supported.
+- [ ] Treat a report name or visible menu item as insufficient evidence without executing and checking its output.
 
-- [ ] Review every unresolved or failed requirement.
-- [ ] Build the evidence-based Gap Analysis.
-- [ ] Classify each gap as:
-  - native configuration
-  - acceptable process adjustment
-  - integration
-  - customization
-  - deferment
-  - unresolved investigation
-- [ ] Do not classify a preference as a technical gap without evidence.
-- [ ] Recommend Phase 1 MVP scope based on the completed ledger.
+#### P0.7.3 — Validate stock reporting
 
-A dedicated document such as `docs/PHASE0_GAP_ANALYSIS.md` may be created when enough evidence exists. Do not create it prematurely with speculative gaps.
+- [ ] `REP-001` — Stock Balance reports current quantity by item.
+- [ ] `REP-002` — Stock Balance or equivalent native output separates warehouse quantities correctly.
+- [ ] Validate Stock Ledger movement history for opening stock, receipt, delivery, transfer, reconciliation, and return documents.
+- [ ] Trace selected report quantities back to their Stock Ledger Entry and source voucher identifiers.
 
-## P1 — After Phase 0 Evidence Review
+#### P0.7.4 — Validate purchase and sales reporting
 
-Phase 1 remains blocked until the Phase 0 exit criteria are satisfied and reviewed.
+- [ ] `REP-003` — Purchase history/status can be reported by supplier.
+- [ ] `REP-004` — Purchase history/status can be reported by item.
+- [ ] `REP-005` — Sales history/status can be reported by customer.
+- [ ] `REP-006` — Sales history/status can be reported by item.
+- [ ] Verify report totals and quantities against the already validated Purchase Orders, Purchase Receipts, Sales Orders, Delivery Notes, and returns.
+- [ ] Record how cancelled P0.6 fixtures appear or are excluded.
 
-Future P1 actions:
+#### P0.7.5 — Validate AR, AP, and General Ledger reporting
 
-- [ ] Review all confirmed Phase 0 gaps with business impact.
-- [ ] Approve the minimum usable ERP MVP workflow.
-- [ ] Decide which requirements are met by native ERPNext.
-- [ ] Decide which requirements require configuration.
-- [ ] Decide which requirements require process changes.
-- [ ] Define required organization/role/approval configuration.
-- [ ] Define minimum production-relevant operational requirements:
-  - environment separation
-  - backup
-  - restore
-  - deployment
-  - operating procedures
-  - UAT
-- [ ] Define the minimum `hardware_erp` customization scope only from confirmed evidence.
-- [ ] Preserve ERPNext Core.
+- [ ] `AR-004` / `REP-007` — Accounts Receivable reports the preserved CNY 75 customer balance against the correct invoice and customer.
+- [ ] `AP-004` / `REP-008` — Accounts Payable reports the preserved CNY 60 supplier balance against the correct invoice and supplier.
+- [ ] `REP-009` — General Ledger reports the expected invoice, payment, credit-note, and cancellation postings.
+- [ ] `REP-010` — Selected report balances trace back to native source vouchers without manual database lookup.
+- [ ] Confirm the cancelled CNY 1 P0.6 Payment Entry has no net open-balance effect while its audit/accounting reversal remains traceable.
 
-Do not treat the disposable Phase 0 Compose topology as approved production architecture.
+#### P0.7.6 — Close the remaining language/output boundary
 
-## P2 — Later Customization and Integration Work
+- [ ] `LANG-003` — Execute Chinese and English print/preview output for representative purchase and sales documents.
+- [ ] Distinguish interface translation, saved master/transaction data, standard print labels, and custom translated content.
+- [ ] Classify bilingual output as `Supported`, `Configurable`, `Gap`, or `Not Tested` from actual rendered evidence.
+- [ ] Do not build custom print formats merely to force a passing Phase 0 result.
 
-Only after Phase 0 evidence and Phase 1 scope justify it:
+#### P0.7.7 — Produce the evidence-based Gap Analysis
 
-- [ ] Create `hardware_erp` only for approved gaps.
-- [ ] Trace every customization to a confirmed requirement/gap.
-- [ ] Add automated tests for custom behaviour.
-- [ ] Document migration and rollback impact.
-- [ ] Do not modify ERPNext Core.
+- [ ] Review every `Not Tested`, `Configurable`, failed, or unexpected case in `docs/PHASE0_VALIDATION.md`.
+- [ ] Create `docs/PHASE0_GAP_ANALYSIS.md` only after the report and bilingual-output evidence above exists.
+- [ ] Classify each confirmed issue as native configuration, acceptable process adjustment, integration, customization, deferment, or unresolved investigation.
+- [ ] Record business impact, evidence, workaround, recommended owner, and Phase 0 implementation or explicit post-release deferral for each item.
+- [ ] Do not classify a preference as a technical gap without execution evidence.
 
-After ERP workflows and customization boundaries stabilize:
+#### P0.7.8 — P0.7 closeout and review gate
 
-- [ ] Design stable Business API boundaries.
-- [ ] Define authentication.
-- [ ] Define authorization.
-- [ ] Define least-privilege service identities.
-- [ ] Define idempotency contracts.
-- [ ] Define error contracts.
-- [ ] Define audit logging.
-- [ ] Define approval gates for consequential writes.
-- [ ] Expose reviewed business operations through MCP.
+- [ ] Run JSON validation and Python compilation for every new or changed scenario/validator.
+- [ ] Run the complete reporting validator twice and prove idempotent read-only results.
+- [ ] Re-run `./scripts/phase0-check.sh`.
+- [ ] Review `git diff`, `git diff --check`, and `git status`.
+- [ ] Update `docs/PHASE0_VALIDATION.md`, this handoff, and the Gap Analysis with actual results and failures.
+- [ ] Confirm the native-capability validation exit criteria currently recorded in `docs/ROADMAP.md` have evidence.
+- [ ] Obtain an explicit P0.7 review decision before advancing the handoff to P0.8 scope freeze; do not change the current phase to Phase 1.
 
-Only after those boundaries are proven:
+Expected P0.7 deliverables:
 
-- [ ] Implement the first bounded Agent pilot.
-- [ ] Keep Agents away from direct database access.
-- [ ] Require human approval for consequential operations.
-- [ ] Define observable success/failure criteria and an off switch.
-- [ ] Consider multi-Agent orchestration only after narrow pilots prove value.
+- `phase0/reporting-validation.json`
+- `scripts/phase0-validate-reporting.py`
+- updated `docs/PHASE0_VALIDATION.md`
+- `docs/PHASE0_GAP_ANALYSIS.md` after evidence is sufficient
+- updated `docs/AI_HANDOFF.md`
 
-## Acceptance Criteria
+P0.7 must remain read-only with respect to validated business transactions wherever possible. It may create only narrowly scoped report/print evidence when native execution requires it, and must preserve all existing P0 balances and audit fixtures.
 
-The current `P0.5` task is complete only when the applicable criteria below are supported by actual evidence.
+### P0.8 — First-release scope freeze and phase-document alignment
+
+Begin only after P0.7 evidence and the Gap Analysis are reviewed. This gate turns evidence into an approved, testable first-release scope.
+
+- [ ] Build a requirement-to-evidence matrix for purchase, stock, sales, returns, AR, AP, reporting, language/print, permissions, approvals, audit, and required operating controls.
+- [ ] For every confirmed requirement, record one disposition: native configuration, process/SOP, `hardware_erp` customization, deployment-required integration, or explicit post-release deferral.
+- [ ] Label each item `Must`, `Should`, or `Deferred`; no `Must` item may have an unresolved owner, acceptance criterion, or implementation path.
+- [ ] Define measurable acceptance criteria and the validation layer for every `Must` and accepted `Should` item.
+- [ ] Freeze the first-release functional scope, supported organization structure, roles, approval matrix, language/print boundary, reports, and data-migration scope.
+- [ ] Decide whether `hardware_erp` is required. If no confirmed gap requires it, record that the first release remains native/configuration-only.
+- [ ] Explicitly decide whether any external integration or governed Business API is required for the first deployment. Keep MCP and Agent work deferred unless separately approved by the project owner.
+- [ ] Verify that the approved first-release scope remains consistent with the Phase 0 development / Phase 1 deployment boundary in `docs/ROADMAP.md`.
+- [ ] Refine `docs/DECISIONS.md` only if P0.8 introduces another durable architecture, security, or workflow decision beyond the recorded phase boundary.
+- [ ] Update this handoff so the first unchecked P0 item is the first approved implementation package.
+
+P0.8 deliverables:
+
+- approved requirement-to-evidence and scope matrix
+- updated `docs/PHASE0_GAP_ANALYSIS.md`
+- confirmed phase alignment across `docs/ROADMAP.md`, `docs/DECISIONS.md`, and this handoff
+- ordered Phase 0 implementation backlog with owners and acceptance evidence
+
+### P0.9 — Complete native ERP configuration and operating model
+
+Implement and source-control every approved native/configuration-first requirement before writing custom code for the same need.
+
+- [ ] Finalize organization, company, fiscal, chart-of-accounts, tax, warehouse, item/UOM, pricing, customer, supplier, and numbering configuration required by the frozen scope.
+- [ ] Finalize least-privilege roles, User Permissions, approval thresholds, Workflows, segregation of duties, and audit retention settings.
+- [ ] Finalize required native reports, dashboards, print formats, language settings, and customer/supplier-facing output.
+- [ ] Store reproducible fixtures, exports, scripts, or documented configuration steps without committing secrets or real business records.
+- [ ] Write operator SOPs for master data, purchase, receiving, stock, sales, returns, AR/AP, approval, reconciliation, period operations, and exception handling.
+- [ ] Add automated or repeatable acceptance checks and rerun affected regression validators twice where idempotency applies.
+- [ ] Update validation evidence and close each native/configuration item against its requirement ID.
+
+### P0.10 — Implement only approved customization gaps
+
+This package is conditional. Skip it with an explicit evidence-backed decision if P0.8 finds no required customization.
+
+- [ ] Create `hardware_erp` only for approved `Must`/accepted `Should` gaps that native configuration or an acceptable process cannot satisfy.
+- [ ] Trace every custom field, DocType, validation, report, hook, permission rule, and integration point to a frozen requirement and confirmed gap.
+- [ ] Preserve ERPNext Core; do not patch core files.
+- [ ] Add unit/integration/permission tests, fixtures, migration patches, uninstall/rollback notes, and upgrade-impact notes for each customization.
+- [ ] Verify fresh installation and migration on a clean environment, not only the long-lived disposable Phase 0 site.
+- [ ] Run full affected workflow, accounting, stock, access, approval, audit, reporting, and print regressions.
+- [ ] Resolve all release-blocking defects in Phase 0 and record remaining non-blockers as explicitly accepted deferrals.
+
+### P0.11 — Complete deployment-required data and integration development
+
+This package includes only capabilities required by the frozen first-release scope.
+
+- [ ] Define source-to-target mappings, ownership, cleansing rules, reconciliation totals, rejection handling, and rollback for opening master and transaction data.
+- [ ] Build and version sanitized import templates and migration tooling; never commit production exports, credentials, or private business data.
+- [ ] Execute at least one representative migration rehearsal in an isolated environment and reconcile record counts, stock, AR, AP, and accounting balances.
+- [ ] Implement only approved deployment-required integrations or Business API operations, with authentication, authorization, least privilege, idempotency, audit logging, error contracts, and retry/reconciliation behaviour.
+- [ ] Add contract, negative-permission, failure-recovery, and replay tests for each included integration.
+- [ ] Keep direct database access, MCP, Agent, and multi-Agent implementation out of the release unless separately approved in P0.8.
+
+### P0.12 — Build and accept the deployable release candidate
+
+P0.12 is the final Phase 0 gate. Phase 1 remains blocked until every applicable item passes or has explicit owner-approved risk acceptance.
+
+- [ ] Rebuild the candidate from source on a clean, production-like staging environment using documented, repeatable steps.
+- [ ] Pin and inventory ERPNext/Frappe, custom app, OS/container, database, queue, and other dependency versions.
+- [ ] Run the complete functional regression suite covering purchase, stock, sales, returns, AR/AP, reporting, print, permissions, approvals, audit, customization, integration, and migration scope.
+- [ ] Execute security and operational checks for secrets, least privilege, TLS assumptions, session/authentication settings, auditability, logging, monitoring, capacity, and failure recovery.
+- [ ] Prove backup and restore on an isolated environment and reconcile critical business balances after restore.
+- [ ] Rehearse deployment, migration, smoke test, rollback, and disaster-recovery procedures with measured timings and named owners.
+- [ ] Run business UAT against the frozen acceptance matrix and obtain owner sign-off for all release-blocking workflows.
+- [ ] Produce a versioned release candidate, immutable manifest/checksums, configuration inventory, migration package, known-issues list, deployment runbook, cutover checklist, rollback plan, and support/escalation plan.
+- [ ] Review `git diff`, repository status, validation evidence, open risks, and all deferred items.
+- [ ] Obtain explicit deployment-readiness approval before changing `current_phase` to Phase 1.
+
+Phase 0 is complete only when the accepted first-release scope is implemented, reproducible, regression-tested, migration-tested, recoverable, documented, and packaged as a deployable release candidate. Completion of analysis alone is not Phase 0 completion.
+
+## P1 — Deployment and Rollout Only
+
+Phase 1 remains blocked until P0.7 through P0.12 are complete and the deployment-readiness gate is explicitly approved.
+
+Phase 1 may execute only the accepted release candidate and its approved runbooks:
+
+- [ ] Provision and verify staging/production infrastructure, environment separation, domains/TLS, secret management, backups, logging, monitoring, and access ownership.
+- [ ] Install the exact accepted ERPNext/Frappe and `hardware_erp` release versions from the Phase 0 manifest.
+- [ ] Apply the approved configuration and execute the rehearsed migration/import process.
+- [ ] Reconcile master-data counts, stock, AR, AP, accounting balances, permissions, workflows, reports, and integrations.
+- [ ] Run deployment smoke tests and the approved production UAT subset; obtain business and technical go/no-go approval.
+- [ ] Execute cutover, communication, rollback checkpoints, and support escalation according to the runbook.
+- [ ] Monitor the stabilization window and close deployment incidents with evidence.
+- [ ] Hand over operating procedures, credentials ownership, backup/restore responsibility, monitoring, known issues, and support ownership.
+
+Phase 1 must not add planned features, new schema, new custom business rules, new reports, or new integration contracts. A purely environmental or configuration deployment correction may be handled in Phase 1 only when it does not change the frozen product behaviour and is recorded. Any product/code/migration change returns the work to Phase 0, creates a new release candidate, and repeats affected P0.12 checks before redeployment.
+
+Do not treat the disposable Phase 0 Compose topology as approved production architecture or as P0.12 production-like evidence.
+
+## Deferred work after the first deployment
+
+Unapproved customization, optional integrations, Business API expansion, MCP, Agent pilots, and multi-Agent orchestration are outside the first-release plan. They require an explicit new scope decision and a new development/validation cycle; they must not be inserted into Phase 1 deployment work.
+
+## Completed P0.5 Acceptance Criteria
+
+The criteria below are retained as completed historical evidence for P0.5. Current P0.7 acceptance and closeout requirements are defined under `P0.7.8` above.
 
 ### Repository state
 
@@ -1067,6 +1194,116 @@ The validator was corrected to verify:
 
 Preserve this behaviour as observed native evidence.
 
+### Sales, Customer Return, and Accounts Receivable — 2026-09-06
+
+Commands actually run included:
+
+    git fetch --prune origin
+    git pull --ff-only origin main
+    docker info
+    docker compose -f phase0/compose.yaml up -d
+    ./scripts/phase0-check.sh
+    python3 scripts/phase0-seed.py
+    python3 -m json.tool phase0/sales-validation.json
+    env PYTHONPYCACHEPREFIX=/tmp/erpnext-phase0-pyc python3 -m py_compile scripts/phase0-validate-sales.py
+    python3 scripts/phase0-validate-sales.py
+    python3 scripts/phase0-validate-sales.py
+    python3 scripts/phase0-validate-sales.py
+
+Actual runtime and master-data results:
+
+- Docker Desktop was running with all nine Phase 0 long-running services.
+- `./scripts/phase0-check.sh` exited `0` with ERPNext 16.33.0, Frappe 16.31.0, and a healthy ping response.
+- The seed exited `0`; every required company, customer, item, warehouse, price, UOM, and Opening Stock document was reported as existing.
+- The existing CNY 60 supplier payable and all purchase/stock evidence were preserved.
+
+Actual sales and accounting evidence:
+
+- Quotation: `SAL-QTN-2026-00001`.
+- Sales Orders: `SAL-ORD-2026-00001` through `SAL-ORD-2026-00003`.
+- Outbound Delivery Notes: `MAT-DN-2026-00003` through `MAT-DN-2026-00006`.
+- Customer return: `MAT-DN-2026-00007`, linked to `MAT-DN-2026-00006`, quantity -1 Box / -50 Piece.
+- Sales Invoices: `ACC-SINV-2026-00001` CNY 84, `ACC-SINV-2026-00002` CNY 125, and `ACC-SINV-2026-00003` CNY 32.5.
+- Credit note: `ACC-SINV-2026-00004`, linked to `ACC-SINV-2026-00003`, grand total and outstanding both -CNY 32.5.
+- Customer payments: `ACC-PAY-2026-00003` fully allocated CNY 84 and `ACC-PAY-2026-00004` partially allocated CNY 50.
+- Final tested invoice outstanding amounts: CNY 0 and CNY 75 for the full and partial scenarios.
+- Party receivable GL debits: CNY 84, CNY 125, and CNY 32.5.
+- Party receivable GL credits from payments: CNY 84 and CNY 50.
+- Party receivable GL credit from the credit note: CNY 32.5.
+- Final main-warehouse stock: pliers 16, measuring tape 25, screws 650 Piece.
+- `AR-004` remains `Not Tested`; the CNY 75 receivable is intentionally preserved for reporting validation.
+
+Idempotency and failure evidence:
+
+- The first transaction-producing execution created all required documents, then failed the validator's final assertion because it expected the fully returned Sales Order to retain `per_delivered = 100`.
+- ERPNext v16 instead reports the returned order's net state as `per_delivered = 0`, `status = To Deliver`; the assertion was corrected to distinguish historical delivery evidence from the post-return net order state.
+- Two complete executions after the correction exited `0`, reported all transaction documents as `EXISTS`, and returned identical stock, invoice, payment, return, and GL evidence without duplicate effects.
+
+Changed files:
+
+- `README.md`
+- `phase0/sales-validation.json`
+- `scripts/phase0-validate-sales.py`
+- `docs/PHASE0_VALIDATION.md`
+- `docs/AI_HANDOFF.md`
+
+Historical recommendation at the 2026-09-06 handoff: review the completed P0.5 evidence before authorizing P0.6. This recommendation was satisfied by the 2026-10-03 closeout revalidation and acceptance below.
+
+### P0.5 Closeout Revalidation — 2026-10-03
+
+Commands actually run included:
+
+    docker info --format '{{.ServerVersion}}'
+    docker compose -f phase0/compose.yaml up -d
+    docker compose -f phase0/compose.yaml ps -a
+    docker compose -f phase0/compose.yaml restart frontend
+    ./scripts/phase0-check.sh
+    python3 -m json.tool phase0/synthetic-data.json
+    python3 -m json.tool phase0/sales-validation.json
+    env PYTHONPYCACHEPREFIX=/tmp/erpnext-p05-pyc python3 -m py_compile scripts/phase0_api.py scripts/phase0-seed.py scripts/phase0-validate-purchase.py scripts/phase0-validate-stock.py scripts/phase0-validate-sales.py
+    python3 scripts/phase0-seed.py
+    python3 scripts/phase0-validate-sales.py
+    python3 scripts/phase0-validate-sales.py
+
+Actual results:
+
+- Docker Engine `29.5.2` was started; all nine required long-running Phase 0 services were running and `create-site` remained exited `0`.
+- The first two health-check attempts returned HTTP 502. Logs showed the already-running frontend still referenced the backend's previous container address. Restarting only `frontend` restored the upstream connection; the next complete health check exited `0` with ERPNext `16.33.0`, Frappe `16.31.0`, and a healthy ping.
+- Compose configuration, both relevant JSON files, and all five Python scripts passed static validation.
+- The seed exited `0`, reported all synthetic entities and `MAT-RECO-2026-00001` as existing, and summarized company `1`, warehouses `2`, suppliers `3`, customers `3`, and items `20`.
+- Two consecutive sales-validator executions exited `0`. Both reported the existing Quotation, three Sales Orders, four outbound Delivery Notes, three Sales Invoices, two customer payments, customer return, and credit note without creating duplicates.
+- Both runs reproduced final stock of pliers `16`, measuring tape `25`, and screws `650`; invoice outstanding balances `0`, `75`, and `32.5`; payment receivable credits `84` and `50`; and credit-note receivable credit `32.5`.
+- P0.5 was accepted and authorized progression to P0.6.
+
+### Language, Permissions, Approval, and Audit — 2026-10-03
+
+Implemented through:
+
+- `phase0/access-validation.json`
+- `scripts/phase0-validate-access.py`
+- the shared `scripts/phase0_api.py` REST client
+
+Actual results:
+
+- Native System Settings persisted `language = zh`.
+- Five synthetic System Users were created for purchase, sales, stock, finance, and approval roles. Authenticated Desk boot pages resolved `zh` for four Chinese users and `en` for the sales user's explicit English override.
+- Positive and negative REST checks passed: purchase could access Purchase Order but not Payment Entry/Stock Entry; sales could access Sales Order but not Purchase Order/Payment Entry/Stock Entry; stock could access Stock Entry but not Payment Entry; finance could access Payment Entry/Purchase Invoice/Sales Invoice but not Stock Entry.
+- `P0 Purchase Order Approval`, `P0 Sales Order Approval`, and `P0 Payment Entry Approval` were configured as active native Workflows.
+- Business creators could create Pending documents but could not execute the manager-only Approve transition. The synthetic approval manager submitted and then cancelled the validation documents through Workflow transitions.
+- Final evidence included cancelled Purchase Orders `PUR-ORD-2026-00004` and `PUR-ORD-2026-00005`, cancelled Sales Order `SAL-ORD-2026-00004`, and cancelled CNY 1 Payment Entry `ACC-PAY-2026-00005`.
+- Each selected approval fixture had two Version records; `owner` remained the business creator and `modified_by` identified the approval manager.
+- A complete rerun reused the five users, three Workflows, and cancelled validation documents without new transaction effects.
+- P0.5 sales/AR regression passed afterward with stock `16`, `25`, and `650`, and outstanding balances `0`, `75`, and `32.5` unchanged.
+
+Preserved failures and corrections:
+
+- filtering Purchase Order by `supplier_order_info` was rejected as a non-permitted REST list filter; the validator now queries by allowed party fields and inspects candidate documents
+- the first manager-only approver lacked base Item/document access; the synthetic approval identity now combines the relevant User and Manager roles
+- the failed approval left `PUR-ORD-2026-00004` Pending; the corrected run recovered, approved, and cancelled it instead of deleting it
+- direct API invocation of non-whitelisted `frappe.boot.get_bootinfo` was rejected; resolved language is verified from the authenticated Desk `/app` HTML
+
+P0.6 is complete. The next task is P0.7 reporting validation and Gap Analysis. Bilingual print output remains untested and must not be inferred from the successful Desk language result.
+
 ## Notes for Next Agent
 
 Before making any change:
@@ -1086,7 +1323,9 @@ Important constraints:
 
 - Actual code, configuration, tests, Git state, and observed runtime behaviour outrank this document.
 - The Web GPT review has accepted purchase/stock evidence for progression; it has not independently rerun the user's Docker environment.
-- The current task is sales + AR transaction validation beginning with `SAL-001`.
+- P0.5 sales, return, and transaction-level AR evidence was revalidated and accepted on 2026-10-03.
+- P0.6 language, permissions, roles, approval, and audit validation completed on 2026-10-03. Use native ERPNext language settings; do not add a custom language switcher without evidence that native behaviour is insufficient.
+- The current task is P0.7 reporting validation and evidence-based Gap Analysis.
 - Do not renumber or silently replace the existing Phase 0 validation cases.
 - Do not mark a test complete without actual execution evidence.
 - Use synthetic/sanitized data only.
@@ -1098,10 +1337,11 @@ Important constraints:
 - Preserve ERPNext Core.
 - Do not add customization to force a native validation case to pass.
 - Record native limitations as `Configurable`, `Gap`, or `Not Tested` according to evidence.
-- Do not begin permissions/reporting until the current sales handoff is complete unless a small supporting check is inseparable from proving the current transaction.
-- Do not begin Phase 1, `hardware_erp`, Business API, MCP, Agent, or multi-Agent work.
+- P0.7 is the current task and the first gate of the remaining Phase 0 plan; proceed to P0.8 after its explicit review, not to Phase 1.
+- Do not begin `hardware_erp` or deployment-required integration development during P0.7. They may begin only if P0.8 approves them and orders them into P0.10/P0.11.
+- Do not begin Phase 1 until P0.7 through P0.12 are complete and deployment readiness is explicitly approved.
+- Keep MCP, Agent, and multi-Agent work deferred unless the project owner explicitly adds it to a future Phase 0 release scope.
 - Treat `ERP与AI智能体设计笔记.md` as direction, not implementation proof.
 - Update this handoff in the same change as the implementation/evidence it describes.
-- Do not update `docs/ROADMAP.md` unless phase scope, milestone, dependency, or exit criteria genuinely change.
-- Do not update `docs/DECISIONS.md` unless a durable architecture, security, or workflow decision genuinely changes.
+- The owner-approved Phase 0 development / Phase 1 deployment boundary is recorded in `docs/ROADMAP.md` and `docs/DECISIONS.md`; keep them aligned if P0.8 changes milestones or introduces another durable decision.
 - Do not modify Obsidian during this routine Phase 0 task.

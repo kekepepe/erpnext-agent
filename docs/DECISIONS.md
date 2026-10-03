@@ -59,6 +59,15 @@ This file records durable decisions, not routine implementation notes. New entri
 - **Consequence:** The public repository must contain only code, synthetic test data, sanitized examples, non-sensitive architecture notes, validation evidence, and project coordination documents. Production secrets, reusable credentials, real customer/supplier records, confidential pricing, contracts, personal information, production exports, and other non-public business data must never be committed.
 - **Revisit when:** Both Web GPT and Codex can reliably access an appropriately permissioned private repository, or the project reaches a stage where required implementation information cannot be safely represented with synthetic/sanitized artifacts.
 
+## DEC-008 — Complete first-release development in Phase 0 and reserve Phase 1 for deployment
+
+- **Status:** Accepted
+- **Date:** 2026-10-03
+- **Decision:** Phase 0 now includes all functionality, native configuration, approved customization, deployment-required integration, migration tooling, testing, UAT, recovery rehearsal, and release-candidate preparation required for the first deployable ERP release. Phase 1 begins only after deployment-readiness approval and is limited to environment provisioning, applying the accepted release, approved data migration, cutover, operational handover, and stabilization.
+- **Rationale:** Entering deployment with planned development unfinished mixes product change with rollout risk, weakens acceptance evidence, and makes migration and rollback results unreliable.
+- **Consequence:** Passing native-capability validation or Gap Analysis does not end Phase 0. The project must freeze scope, complete approved implementation, build and validate a reproducible release candidate, and obtain explicit deployment-readiness approval. A Phase 1 finding that requires business-logic, schema, custom-app, report, integration-contract, or migration-code changes returns to Phase 0 and triggers a new candidate plus affected revalidation. Optional MCP, Agent, and multi-Agent work remains outside the first release unless explicitly approved into a future development cycle.
+- **Revisit when:** The first deployment has stabilized and the owner explicitly approves a new release lifecycle or changes the project phase model.
+
 ## Open Decisions
 
 The following are intentionally undecided pending evidence:

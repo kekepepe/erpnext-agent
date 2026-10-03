@@ -76,8 +76,24 @@ class ERPNextAPI:
                 f"ERPNext API GET {doctype} {name} failed: {detail}"
             ) from error
 
+    def get_text(self, path: str) -> str:
+        request = urllib.request.Request(f"{self.base_url}{path}", method="GET")
+        try:
+            with self.opener.open(request, timeout=30) as response:
+                return response.read().decode("utf-8")
+        except urllib.error.HTTPError as error:
+            detail = error.read().decode("utf-8", errors="replace")
+            raise RuntimeError(
+                f"ERPNext API GET {path} failed with HTTP {error.code}: {detail}"
+            ) from error
+
     def insert(self, doctype: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self.request("POST", self.resource_path(doctype), payload)["data"]
+
+    def update(
+        self, doctype: str, name: str, payload: dict[str, Any]
+    ) -> dict[str, Any]:
+        return self.request("PUT", self.resource_path(doctype, name), payload)["data"]
 
     def list_docs(
         self,
@@ -104,3 +120,9 @@ class ERPNextAPI:
 
     def submit(self, document: dict[str, Any]) -> dict[str, Any]:
         return self.call("frappe.client.submit", {"doc": document})
+
+    def cancel(self, document: dict[str, Any]) -> dict[str, Any]:
+        return self.call(
+            "frappe.client.cancel",
+            {"doctype": document["doctype"], "name": document["name"]},
+        )
