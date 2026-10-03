@@ -605,7 +605,7 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 | AR-001 | Sales Invoice creates customer receivable | Supported |
 | AR-002 | Full payment clears customer outstanding balance | Supported |
 | AR-003 | Partial payment reduces outstanding balance correctly | Supported |
-| AR-004 | Outstanding receivables can be reported | Not Tested |
+| AR-004 | Outstanding receivables can be reported | Supported |
 | AR-005 | Receivable history is traceable to source documents | Supported |
 
 ### Accounts Receivable Evidence from Sales Execution
@@ -641,7 +641,14 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 - **Actual Result:** All three invoice rows reference their Sales Orders; both payments reference their exact Sales Invoice and allocation; the credit note references its original invoice; GL rows identify each voucher and customer.
 - **Evidence:** `SAL-ORD-2026-00001` through `00003`, `ACC-SINV-2026-00001` through `00004`, and `ACC-PAY-2026-00003` / `00004`.
 - **Result:** Supported
-- **Notes:** `AR-004` remains `Not Tested` because no Accounts Receivable report was executed in this task.
+- **Notes:** AR-004 was subsequently executed and is recorded below.
+
+#### AR-004 — Outstanding receivable report
+
+- **Requirement:** The native Accounts Receivable report identifies the correct customer, invoice, original amount, payment, and remaining balance.
+- **Steps:** Execute Accounts Receivable as of 2026-10-03 and compare the target row with the submitted Sales Invoice REST resource.
+- **Actual Result:** `ACC-SINV-2026-00002` for `P0 Credit Trade Customer` reported invoiced CNY 125, paid CNY 50, and outstanding CNY 75; the source Sales Invoice reported the same outstanding amount.
+- **Result:** Supported
 
 ### Sales Validator Idempotency
 
@@ -657,7 +664,7 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 | AP-001 | Purchase Invoice creates supplier payable | Supported |
 | AP-002 | Full payment clears supplier outstanding balance | Supported |
 | AP-003 | Partial payment reduces outstanding balance correctly | Supported |
-| AP-004 | Outstanding payables can be reported | Not Tested |
+| AP-004 | Outstanding payables can be reported | Supported |
 | AP-005 | Payable history is traceable to source documents | Supported |
 
 ### Accounts Payable Evidence from Purchase Execution
@@ -704,7 +711,14 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 - **Actual Result:** Both Payment Entries reference their Purchase Invoice with exact allocated amounts; Creditors GL rows identify the supplier and `against_voucher` invoice.
 - **Evidence:** `ACC-PINV-2026-00001`, `ACC-PINV-2026-00002`, `ACC-PAY-2026-00001`, `ACC-PAY-2026-00002` and their GL Entries.
 - **Result:** Supported
-- **Notes:** The dedicated Accounts Payable report itself remains `Not Tested` under AP-004.
+- **Notes:** AP-004 was subsequently executed and is recorded below.
+
+#### AP-004 — Outstanding payable report
+
+- **Requirement:** The native Accounts Payable report identifies the correct supplier, invoice, original amount, payment, and remaining balance.
+- **Steps:** Execute Accounts Payable as of 2026-10-03 and compare the target row with the submitted Purchase Invoice REST resource.
+- **Actual Result:** `ACC-PINV-2026-00002` for `P0 Alternate Tool Supply` reported invoiced CNY 120, paid CNY 60, and outstanding CNY 60; the source Purchase Invoice reported the same outstanding amount.
+- **Result:** Supported
 
 ## Language and Localisation Validation
 
@@ -856,10 +870,10 @@ Each report was also read back as a standard ERPNext `Script Report`. The interf
 | REP-004 | Report purchase history by item | Supported |
 | REP-005 | Report sales history by customer | Supported |
 | REP-006 | Report sales history by item | Supported |
-| REP-007 | Report outstanding Accounts Receivable | Not Tested |
-| REP-008 | Report outstanding Accounts Payable | Not Tested |
-| REP-009 | Report General Ledger postings for validated transactions and reversals | Not Tested |
-| REP-010 | Trace selected report balances to native source vouchers | Not Tested |
+| REP-007 | Report outstanding Accounts Receivable | Supported |
+| REP-008 | Report outstanding Accounts Payable | Supported |
+| REP-009 | Report General Ledger postings for validated transactions and reversals | Supported |
+| REP-010 | Trace selected report balances to native source vouchers | Supported |
 
 ### Stock Reporting Execution — 2026-10-03
 
@@ -896,6 +910,18 @@ Two consecutive Sales Analytics runs reproduced these submitted Sales Order quan
 - by item: pliers `2`, measuring tape `5`, screws `50` Piece after UOM conversion
 
 The expected maps are exact: no additional submitted P0 supplier, customer, or item row is accepted. The cancelled P0.6 Purchase Orders and Sales Order therefore do not inflate the reported totals. Purchase Receipt, Delivery Note, purchase-return, and customer-return movements remain separately traceable through the Stock Ledger evidence above; the order analytics are not misrepresented as return-netted stock reports.
+
+### AR, AP, and General Ledger Reporting Execution — 2026-10-03
+
+Two consecutive read-only validator runs reproduced:
+
+- AR: `ACC-SINV-2026-00002`, P0 Credit Trade Customer, invoiced CNY 125, paid CNY 50, outstanding CNY 75
+- AP: `ACC-PINV-2026-00002`, P0 Alternate Tool Supply, invoiced CNY 120, paid CNY 60, outstanding CNY 60
+- balanced General Ledger debit/credit totals for two Purchase Invoices, four normal Payment Entries, three Sales Invoices, and one Sales Invoice credit note
+
+Each active General Ledger voucher was resolved back to its submitted source document and its non-cancelled `GL Entry` rows through REST. Report debit/credit totals matched the resource totals exactly, so REP-010 does not depend on direct database lookup.
+
+The cancelled P0.6 Payment Entry `ACC-PAY-2026-00005` is excluded from the default General Ledger report. With the native `show_cancelled_entries` filter enabled, it appears as two consolidated account rows with CNY 2 debit and CNY 2 credit in total. REST readback exposes four `is_cancelled = 1` GL rows representing the original CNY 1 posting and its reversal. Both views net to zero, and the AR/AP open balances remain CNY 75/CNY 60.
 
 ## Gap Log
 

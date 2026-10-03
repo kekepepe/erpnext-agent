@@ -790,11 +790,11 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.5 — Validate AR, AP, and General Ledger reporting
 
-- [ ] `AR-004` / `REP-007` — Accounts Receivable reports the preserved CNY 75 customer balance against the correct invoice and customer.
-- [ ] `AP-004` / `REP-008` — Accounts Payable reports the preserved CNY 60 supplier balance against the correct invoice and supplier.
-- [ ] `REP-009` — General Ledger reports the expected invoice, payment, credit-note, and cancellation postings.
-- [ ] `REP-010` — Selected report balances trace back to native source vouchers without manual database lookup.
-- [ ] Confirm the cancelled CNY 1 P0.6 Payment Entry has no net open-balance effect while its audit/accounting reversal remains traceable.
+- [x] `AR-004` / `REP-007` — Accounts Receivable reports the preserved CNY 75 customer balance against the correct invoice and customer.
+- [x] `AP-004` / `REP-008` — Accounts Payable reports the preserved CNY 60 supplier balance against the correct invoice and supplier.
+- [x] `REP-009` — General Ledger reports the expected invoice, payment, credit-note, and cancellation postings.
+- [x] `REP-010` — Selected report balances trace back to native source vouchers without manual database lookup.
+- [x] Confirm the cancelled CNY 1 P0.6 Payment Entry has no net open-balance effect while its audit/accounting reversal remains traceable.
 
 #### P0.7.6 — Close the remaining language/output boundary
 

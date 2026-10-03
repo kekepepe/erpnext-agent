@@ -104,7 +104,10 @@ def report_filters(config: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
         (config["accounts_payable"]["report_name"], ageing),
         (
             config["general_ledger"]["report_name"],
-            {**date_filters, "group_by": "Group by Voucher (Consolidated)"},
+            {
+                **date_filters,
+                "categorize_by": "Categorize by Voucher (Consolidated)",
+            },
         ),
     ]
 
@@ -353,6 +356,173 @@ def validate_purchase_sales_reports(
     return evidence
 
 
+def ageing_filters(config: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "company": config["company"],
+        "report_date": config["report_date"],
+        "ageing_based_on": "Due Date",
+        "range1": 30,
+        "range2": 60,
+        "range3": 90,
+        "range4": 120,
+    }
+
+
+def validate_ageing_row(
+    api: ERPNextAPI, config: dict[str, Any], section: str
+) -> dict[str, Any]:
+    expected = config[section]
+    result = api.run_report(expected["report_name"], ageing_filters(config))
+    matches = [
+        row
+        for row in dict_rows(result)
+        if row.get("voucher_no") == expected["voucher_no"]
+        and row.get("party") == expected["party"]
+    ]
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"{expected['report_name']} expected one target row, got {len(matches)}"
+        )
+    row = matches[0]
+    for field in ["invoiced", "paid", "outstanding"]:
+        assert_number(
+            row.get(field), expected[field], f"{expected['report_name']} {field}"
+        )
+    source_doctype = (
+        "Sales Invoice" if section == "accounts_receivable" else "Purchase Invoice"
+    )
+    source = api.get_doc(source_doctype, expected["voucher_no"])
+    if not source or int(source.get("docstatus", 0)) != 1:
+        raise RuntimeError(f"Missing submitted source {source_doctype}")
+    assert_number(
+        source.get("outstanding_amount"),
+        expected["outstanding"],
+        f"{source_doctype} outstanding",
+    )
+    return {
+        "voucher_no": row["voucher_no"],
+        "party": row["party"],
+        "invoiced": float(row["invoiced"]),
+        "paid": float(row["paid"]),
+        "outstanding": float(row["outstanding"]),
+    }
+
+
+def validate_general_ledger(
+    api: ERPNextAPI, config: dict[str, Any]
+) -> dict[str, Any]:
+    expected = config["general_ledger"]
+    filters = {
+        "company": config["company"],
+        "from_date": config["from_date"],
+        "to_date": config["to_date"],
+        "categorize_by": "Categorize by Voucher (Consolidated)",
+    }
+    report_rows = dict_rows(api.run_report(expected["report_name"], filters))
+    verified: dict[str, dict[str, float]] = {}
+    for voucher_no in expected["required_vouchers"]:
+        selected = [row for row in report_rows if row.get("voucher_no") == voucher_no]
+        if not selected:
+            raise RuntimeError(f"General Ledger is missing voucher {voucher_no}")
+        debit = sum(float(row.get("debit", 0)) for row in selected)
+        credit = sum(float(row.get("credit", 0)) for row in selected)
+        assert_number(debit, credit, f"General Ledger balance {voucher_no}")
+        if debit <= 0:
+            raise RuntimeError(f"General Ledger voucher has no value: {voucher_no}")
+        voucher_type = selected[0].get("voucher_type")
+        if not voucher_type:
+            raise RuntimeError(f"General Ledger voucher type missing: {voucher_no}")
+        source = api.get_doc(voucher_type, voucher_no)
+        if not source or int(source.get("docstatus", 0)) != 1:
+            raise RuntimeError(f"Missing submitted source {voucher_type} {voucher_no}")
+        resource_rows = api.list_docs(
+            "GL Entry",
+            ["name", "debit", "credit", "voucher_type", "voucher_no", "is_cancelled"],
+            [
+                ["GL Entry", "voucher_no", "=", voucher_no],
+                ["GL Entry", "is_cancelled", "=", 0],
+            ],
+            100,
+        )
+        if not resource_rows:
+            raise RuntimeError(f"No active GL Entry rows for {voucher_no}")
+        assert_number(
+            sum(float(row.get("debit", 0)) for row in resource_rows),
+            debit,
+            f"GL resource/report debit {voucher_no}",
+        )
+        assert_number(
+            sum(float(row.get("credit", 0)) for row in resource_rows),
+            credit,
+            f"GL resource/report credit {voucher_no}",
+        )
+        verified[voucher_no] = {"debit": debit, "credit": credit}
+
+    cancelled = expected["cancelled_payment"]
+    default_cancelled_rows = [
+        row for row in report_rows if row.get("voucher_no") == cancelled
+    ]
+    if default_cancelled_rows:
+        raise RuntimeError("Cancelled Payment Entry appeared in default General Ledger")
+    cancelled_filters = {
+        **filters,
+        "voucher_no": cancelled,
+        "show_cancelled_entries": 1,
+    }
+    cancelled_rows = [
+        row
+        for row in dict_rows(api.run_report(expected["report_name"], cancelled_filters))
+        if row.get("voucher_no") == cancelled
+    ]
+    if len(cancelled_rows) != 2:
+        raise RuntimeError(
+            f"Expected two consolidated cancelled GL rows, got {len(cancelled_rows)}"
+        )
+    cancel_debit = sum(float(row.get("debit", 0)) for row in cancelled_rows)
+    cancel_credit = sum(float(row.get("credit", 0)) for row in cancelled_rows)
+    assert_number(cancel_debit, cancel_credit, "Cancelled General Ledger net")
+    resource_cancelled = api.list_docs(
+        "GL Entry",
+        ["name", "debit", "credit", "account", "voucher_no", "is_cancelled"],
+        [["GL Entry", "voucher_no", "=", cancelled]],
+        100,
+    )
+    if len(resource_cancelled) != 4 or any(
+        int(row.get("is_cancelled", 0)) != 1 for row in resource_cancelled
+    ):
+        raise RuntimeError("Cancelled Payment Entry GL audit rows are incomplete")
+    assert_number(
+        sum(float(row.get("debit", 0)) for row in resource_cancelled),
+        sum(float(row.get("credit", 0)) for row in resource_cancelled),
+        "Cancelled GL resource net",
+    )
+    return {
+        "active_vouchers": verified,
+        "cancelled_payment": {
+            "voucher_no": cancelled,
+            "default_report_rows": 0,
+            "cancelled_report_rows": len(cancelled_rows),
+            "resource_rows": len(resource_cancelled),
+            "debit": cancel_debit,
+            "credit": cancel_credit,
+        },
+    }
+
+
+def validate_accounting_reports(
+    api: ERPNextAPI, config: dict[str, Any]
+) -> dict[str, Any]:
+    evidence = {
+        "accounts_receivable": validate_ageing_row(
+            api, config, "accounts_receivable"
+        ),
+        "accounts_payable": validate_ageing_row(api, config, "accounts_payable"),
+        "general_ledger": validate_general_ledger(api, config),
+    }
+    print("ACCOUNTS " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
+    return evidence
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -379,9 +549,10 @@ def main() -> int:
             "interfaces": validate_report_interfaces(api, config),
             "stock": validate_stock_reports(api, config),
             "trade": validate_purchase_sales_reports(api, config),
+            "accounting": validate_accounting_reports(api, config),
         }
         print("EVIDENCE " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
-        print("OK: Phase 0 native stock, purchase, and sales reports are reproducible")
+        print("OK: Phase 0 native operational and accounting reports are reproducible")
     except (OSError, ValueError, RuntimeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
