@@ -175,6 +175,109 @@ def validate_report_interfaces(
     return evidence
 
 
+def dict_rows(result: dict[str, Any]) -> list[dict[str, Any]]:
+    return [row for row in result["result"] if isinstance(row, dict)]
+
+
+def assert_number(actual: Any, expected: Any, label: str) -> None:
+    if abs(float(actual) - float(expected)) > 0.000001:
+        raise RuntimeError(f"{label}: expected {expected}, got {actual}")
+
+
+def validate_stock_reports(
+    api: ERPNextAPI, config: dict[str, Any]
+) -> dict[str, Any]:
+    filters = {
+        "company": config["company"],
+        "from_date": config["from_date"],
+        "to_date": config["to_date"],
+    }
+    balance_result = api.run_report(
+        config["stock_balance"]["report_name"], filters
+    )
+    balance_rows = {
+        (row["item_code"], row["warehouse"]): row
+        for row in dict_rows(balance_result)
+        if row.get("item_code") and row.get("warehouse")
+    }
+    verified_balances: dict[str, float] = {}
+    for expected in config["stock_balance"]["expected_balances"]:
+        key = (expected["item_code"], expected["warehouse"])
+        row = balance_rows.get(key)
+        if not row:
+            raise RuntimeError(f"Stock Balance is missing {key}")
+        assert_number(row.get("bal_qty"), expected["qty"], f"Stock Balance {key}")
+        verified_balances[f"{key[0]} @ {key[1]}"] = float(row["bal_qty"])
+
+    ledger_result = api.run_report(
+        config["stock_ledger"]["report_name"], filters
+    )
+    report_rows = dict_rows(ledger_result)
+    verified_vouchers: dict[str, int] = {}
+    for expected in config["stock_ledger"]["expected_vouchers"]:
+        voucher_no = expected["voucher_no"]
+        voucher_type = expected["voucher_type"]
+        selected = [
+            row
+            for row in report_rows
+            if row.get("voucher_no") == voucher_no
+            and row.get("voucher_type") == voucher_type
+        ]
+        if not selected:
+            raise RuntimeError(
+                f"Stock Ledger report is missing {voucher_type} {voucher_no}"
+            )
+        ledger_rows = api.list_docs(
+            "Stock Ledger Entry",
+            [
+                "name",
+                "item_code",
+                "warehouse",
+                "qty_after_transaction",
+                "voucher_type",
+                "voucher_no",
+            ],
+            [
+                ["Stock Ledger Entry", "voucher_no", "=", voucher_no],
+                ["Stock Ledger Entry", "is_cancelled", "=", 0],
+            ],
+            500,
+        )
+        report_signature = {
+            (
+                row["item_code"],
+                row["warehouse"],
+                float(row["qty_after_transaction"]),
+                row["voucher_type"],
+                row["voucher_no"],
+            )
+            for row in selected
+        }
+        ledger_signature = {
+            (
+                row["item_code"],
+                row["warehouse"],
+                float(row["qty_after_transaction"]),
+                row["voucher_type"],
+                row["voucher_no"],
+            )
+            for row in ledger_rows
+        }
+        if report_signature != ledger_signature:
+            raise RuntimeError(
+                f"Stock Ledger report/resource mismatch for {voucher_no}: "
+                f"report={report_signature}, resource={ledger_signature}"
+            )
+        verified_vouchers[voucher_no] = len(selected)
+
+    evidence = {
+        "balances": verified_balances,
+        "voucher_row_counts": verified_vouchers,
+    }
+    print("STOCK   " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
+    return evidence
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -197,9 +300,12 @@ def main() -> int:
         config = load_config(args.scenarios)
         api = ERPNextAPI(args.base_url)
         api.login(args.username, args.password)
-        evidence = validate_report_interfaces(api, config)
+        evidence = {
+            "interfaces": validate_report_interfaces(api, config),
+            "stock": validate_stock_reports(api, config),
+        }
         print("EVIDENCE " + json.dumps(evidence, ensure_ascii=False, sort_keys=True))
-        print("OK: Phase 0 native report interfaces are reproducible")
+        print("OK: Phase 0 native report and stock evidence is reproducible")
     except (OSError, ValueError, RuntimeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

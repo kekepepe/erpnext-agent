@@ -850,8 +850,8 @@ Each report was also read back as a standard ERPNext `Script Report`. The interf
 
 | Test ID | Requirement | Result |
 |---|---|---|
-| REP-001 | Report current stock by item | Not Tested |
-| REP-002 | Report current stock by warehouse | Not Tested |
+| REP-001 | Report current stock by item | Supported |
+| REP-002 | Report current stock by warehouse | Supported |
 | REP-003 | Report purchase history by supplier | Not Tested |
 | REP-004 | Report purchase history by item | Not Tested |
 | REP-005 | Report sales history by customer | Not Tested |
@@ -860,6 +860,28 @@ Each report was also read back as a standard ERPNext `Script Report`. The interf
 | REP-008 | Report outstanding Accounts Payable | Not Tested |
 | REP-009 | Report General Ledger postings for validated transactions and reversals | Not Tested |
 | REP-010 | Trace selected report balances to native source vouchers | Not Tested |
+
+### Stock Reporting Execution — 2026-10-03
+
+Two consecutive read-only validator runs returned identical Stock Balance quantities:
+
+- hammer: 28 Piece in the main warehouse
+- screwdriver: 58 Piece in the main warehouse
+- screws: 650 Piece in the main warehouse
+- goggles: 12 Piece in the main warehouse and 3 Piece in the secondary warehouse
+- toolbox: 5 Piece in the main warehouse
+
+The Stock Ledger report was reconciled row-for-row to REST-read `Stock Ledger Entry` records for these native source vouchers:
+
+- Opening Stock `MAT-RECO-2026-00001`: 18 rows
+- Purchase Receipt `MAT-PRE-2026-00001`: 1 row
+- Delivery Note `MAT-DN-2026-00001`: 1 row
+- Material Transfer `MAT-STE-2026-00001`: 2 rows
+- Stock Reconciliation `MAT-RECO-2026-00002`: 1 row
+- Purchase Return `MAT-PRE-2026-00005`: 1 row
+- Customer Return `MAT-DN-2026-00007`: 1 row
+
+For each voucher, the report and resource signatures matched on item, warehouse, resulting quantity, voucher type, and voucher number. This supports REP-001 and REP-002 and proves native traceability for the selected opening, receipt, delivery, transfer, reconciliation, and return movements.
 
 ## Gap Log
 

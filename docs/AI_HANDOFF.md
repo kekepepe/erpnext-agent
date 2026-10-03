@@ -774,10 +774,10 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.3 — Validate stock reporting
 
-- [ ] `REP-001` — Stock Balance reports current quantity by item.
-- [ ] `REP-002` — Stock Balance or equivalent native output separates warehouse quantities correctly.
-- [ ] Validate Stock Ledger movement history for opening stock, receipt, delivery, transfer, reconciliation, and return documents.
-- [ ] Trace selected report quantities back to their Stock Ledger Entry and source voucher identifiers.
+- [x] `REP-001` — Stock Balance reports current quantity by item.
+- [x] `REP-002` — Stock Balance or equivalent native output separates warehouse quantities correctly.
+- [x] Validate Stock Ledger movement history for opening stock, receipt, delivery, transfer, reconciliation, and return documents.
+- [x] Trace selected report quantities back to their Stock Ledger Entry and source voucher identifiers.
 
 #### P0.7.4 — Validate purchase and sales reporting
 
