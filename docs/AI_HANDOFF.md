@@ -59,9 +59,9 @@ Repository implementation and future observed runtime behaviour continue to outr
 
 - Repository: `kekepepe/erpnext-agent`.
 - Branch: `main`.
-- Latest verified main commit during this handoff review:
-  - `af6b1db8a15c0278ce08888d6709a3d77d82107f`
-  - `test: validate phase 0 purchase and stock flows`
+- Latest verified and pushed main commit:
+  - `5a39923`
+  - `test: complete phase 0 sales and access validation`
 - Repository visibility is intentionally **public** for the current Web GPT → GitHub → Codex collaboration workflow.
 - Public visibility is a collaboration requirement only. It is not permission to commit real company data.
 - Only code, synthetic data, sanitized examples, non-sensitive documentation, and validation evidence may be committed.
@@ -758,11 +758,11 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.1 — Re-establish the evidence baseline
 
-- [ ] Run `./scripts/phase0-check.sh` and record the current runtime result.
-- [ ] Run `scripts/phase0-seed.py` idempotently.
-- [ ] Re-run purchase, stock, sales, and access validators when required to prove that the reporting source transactions and configuration still match their recorded state.
-- [ ] Confirm the preserved CNY 60 supplier payable and CNY 75 customer receivable still exist.
-- [ ] Preserve cancelled P0.6 approval fixtures as audit evidence; do not include their reversed amounts in open-balance expectations.
+- [x] Run `./scripts/phase0-check.sh` and record the current runtime result.
+- [x] Run `scripts/phase0-seed.py` idempotently.
+- [x] Re-run purchase, stock, sales, and access validators when required to prove that the reporting source transactions and configuration still match their recorded state.
+- [x] Confirm the preserved CNY 60 supplier payable and CNY 75 customer receivable still exist.
+- [x] Preserve cancelled P0.6 approval fixtures as audit evidence; do not include their reversed amounts in open-balance expectations.
 
 #### P0.7.2 — Define reproducible reporting scenarios
 

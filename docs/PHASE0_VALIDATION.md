@@ -794,6 +794,40 @@ The result is `Configurable`, not default `Supported`, because the approval gate
 3. That failed attempt left `PUR-ORD-2026-00004` in `Pending`. The corrected idempotent validator detected it, applied the manager approval, and cancelled it; it was not silently deleted.
 4. Direct REST invocation of non-whitelisted `frappe.boot.get_bootinfo` was rejected. Session language was instead verified through each authenticated Desk `/app` boot page, without bypassing the whitelist.
 
+## P0.7 Reporting Baseline Revalidation — 2026-10-03
+
+Before adding reporting scenarios, the complete existing evidence baseline was revalidated against the same disposable site.
+
+Commands executed:
+
+    python3 -m json.tool phase0/synthetic-data.json
+    python3 -m json.tool phase0/purchase-validation.json
+    python3 -m json.tool phase0/stock-validation.json
+    python3 -m json.tool phase0/sales-validation.json
+    python3 -m json.tool phase0/access-validation.json
+    env PYTHONPYCACHEPREFIX=/tmp/erpnext-p0-baseline-pyc python3 -m py_compile scripts/phase0_api.py scripts/phase0-seed.py scripts/phase0-validate-purchase.py scripts/phase0-validate-stock.py scripts/phase0-validate-sales.py scripts/phase0-validate-access.py
+    sh -n scripts/phase0-check.sh
+    docker compose -f phase0/compose.yaml config --quiet
+    ./scripts/phase0-check.sh
+    python3 scripts/phase0-seed.py
+    python3 scripts/phase0-validate-purchase.py
+    python3 scripts/phase0-validate-stock.py
+    python3 scripts/phase0-validate-sales.py
+    python3 scripts/phase0-validate-access.py
+    python3 scripts/phase0-validate-sales.py
+
+Actual results:
+
+- JSON, Python compilation, shell syntax, Compose configuration, and `git diff --check` passed.
+- Docker Engine `29.5.2`, ERPNext `16.33.0`, Frappe `16.31.0`, all nine long-running services, completed `create-site`, and HTTP ping passed the health check.
+- The seed reused one company, two warehouses, three suppliers, three customers, twenty items, forty prices, and Opening Stock `MAT-RECO-2026-00001` without duplicate creation.
+- Purchase validation reused all existing documents and preserved the CNY 60 outstanding balance on `ACC-PINV-2026-00002`.
+- Stock validation reproduced the expected item/warehouse balances and the native insufficient-stock rejection.
+- Sales validation reproduced CNY 0 and CNY 75 outstanding balances for the full and partial invoices, with stock `16` pliers, `25` measuring tapes, and `650` screws.
+- Access validation reused the five synthetic users, three Workflows, and cancelled approval fixtures. `PUR-ORD-2026-00005`, `SAL-ORD-2026-00004`, and `ACC-PAY-2026-00005` remained cancelled with two Version records each.
+- A final sales regression after access validation reproduced the same balances, proving that the cancelled CNY 1 P0.6 Payment Entry had no open-balance effect.
+- Commit `5a39923` containing P0.5/P0.6 implementation, evidence, and the Phase 0 development plan was pushed to `origin/main` before reporting implementation began.
+
 ## Reporting Validation
 
 | Test ID | Requirement | Result |
