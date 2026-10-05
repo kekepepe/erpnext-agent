@@ -68,6 +68,14 @@ This file records durable decisions, not routine implementation notes. New entri
 - **Consequence:** Passing native-capability validation or Gap Analysis does not end Phase 0. The project must freeze scope, complete approved implementation, build and validate a reproducible release candidate, and obtain explicit deployment-readiness approval. A Phase 1 finding that requires business-logic, schema, custom-app, report, integration-contract, or migration-code changes returns to Phase 0 and triggers a new candidate plus affected revalidation. Optional MCP, Agent, and multi-Agent work remains outside the first release unless explicitly approved into a future development cycle.
 - **Revisit when:** The first deployment has stabilized and the owner explicitly approves a new release lifecycle or changes the project phase model.
 
+## DEC-009 — Chinese presentation without renaming business identifiers
+
+- **Status:** Accepted for the owner's 2026-10-06 language request only.
+- **Decision:** All active test users and site language use Simplified Chinese. Translate system display names, fixed UI chrome and controlled print formats; preserve API/schema identifiers, document/item codes, addresses, email and personal input.
+- **Rationale:** Official dictionaries plus native configuration cover metadata, but the installed v16 application-title and autocomplete code bypasses gettext. A narrowly scoped presentation app closes those demonstrated gaps without patching Core.
+- **Consequences:** A versioned custom image and Chinese Compose overlay are now required. Historical English override/standard-print tests remain compatibility evidence, not the active UI policy. This does not approve P0.8 scope or production deployment.
+- **Revisit when:** ERPNext upgrades or owner-approved release language requirements change. Re-run source inventory, actual-session coverage, print and permission/business regressions.
+
 ## Open Decisions
 
 The following are intentionally undecided pending evidence:

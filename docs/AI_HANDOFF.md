@@ -2,7 +2,7 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Review completed P0.7 evidence and Gap Analysis before authorizing P0.8 scope freeze
+current_task: Complete owner-requested Simplified Chinese presentation and its regression checks
 last_updated: 2026-10-06
 updated_by: Codex
 ---
@@ -17,7 +17,24 @@ The implementation used source-controlled synthetic scenarios and an idempotent 
 
 P0.5 and P0.6 were revalidated and completed on 2026-10-03. P0.7.1 through P0.7.7 are implemented; P0.7.8 technical closeout passed on 2026-10-06. The current task is now:
 
-**Review the completed P0.7 reporting and Gap Analysis evidence and record the progression decision before beginning P0.8 first-release scope freeze.**
+**Complete the owner's 2026-10-06 Simplified Chinese presentation request, then return to the P0.7 progression review. This narrowly scoped request does not authorize P0.8 or Phase 1.**
+
+### Owner-directed Chinese presentation package — 2026-10-06
+
+The owner requested inspection of language paths and Simplified Chinese system names. This supersedes the active English-user override, retaining its historical capability evidence.
+
+- Inventory: 7,299 source files hashed; 811 DocType metadata files inspected for 6,165 field labels and Select options. This is not a claim of manual review of every business-logic line.
+- Native Translation, site/user language, Property Setters and scoped List Client Scripts translate display names without renaming keys.
+- Thin `erpnext_zh` app addresses source-proven gaps: app titles bypassing gettext and hardcoded sidebar/autocomplete chrome. No Core, privileges, transactions or accounting rules changed.
+- Ten Chinese print templates render through native HTTP, retaining identifiers and source/target warehouses. Uppercase currency has offline regression tests.
+- All five synthetic roles now use Chinese. Permission/approval/audit, purchase, stock, sales and native-reporting regressions passed; stock and AR/AP results are unchanged.
+- Use `scripts/phase0-start.sh` with the Chinese Compose overlay; base-only recreation is unsafe after app installation.
+- Scope, sources/licensing, checks and limitations: `phase0/localization/README.md`.
+- Final restart/browser verification passed for the Chinese list and standard-format detail names, buttons, generator labels, sidebar and autocomplete. Repeat apply reports zero translation/user-language/list-script changes. Fresh login without a forced language query resolves to Chinese; ten native Chinese print previews passed.
+- Known boundaries: protected standard Print Formats reject edits; retain original internal language properties and use controlled Chinese business defaults. Optional dynamic screens/help/code examples are not exhaustively browser-tested. Existing realtime origin error and PDF download gap remain. Therefore do not claim universal zero-English coverage or close all release gates.
+- Next: resolve or explicitly accept the remaining protected-template/dynamic-screen language boundary, then obtain explicit P0.7 progression review. No P0.8/Phase 1 authorization is inferred.
+
+Historical language statements elsewhere are superseded by this dated package.
 
 ### Phase boundary directive — 2026-10-03
 

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["flit_core==3.12.0"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "erpnext_zh"
+version = "0.1.0"
+description = "Simplified Chinese ERPNext presentation"
+requires-python = ">=3.9"
+license = "MIT"
+
+[tool.flit.module]
+name = "erpnext_zh"

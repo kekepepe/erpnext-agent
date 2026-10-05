@@ -11,7 +11,7 @@ docker compose -f "$compose_file" config --quiet
 create_site_id=$(docker compose -f "$compose_file" ps -a -q create-site)
 if [ -z "$create_site_id" ]; then
   echo "ERROR: Phase 0 services have not been created."
-  echo "Run: docker compose -f phase0/compose.yaml up -d"
+  echo "Run: ./scripts/phase0-start.sh"
   exit 1
 fi
 

@@ -8,6 +8,8 @@ This file describes phase goals and exit criteria, not daily task status. Daily 
 
 **Goal:** complete, validate, and package the full approved first ERP release before deployment begins.
 
+Language scope directive (2026-10-06): the owner now requires Simplified Chinese system display names and active-user language. Technical identifiers and externally entered identity/content remain unchanged. This approves the bounded presentation package only; it does not accept P0.7 progression or freeze all P0.8 release requirements. See DEC-009.
+
 Scope:
 
 - Disposable local ERPNext validation environment

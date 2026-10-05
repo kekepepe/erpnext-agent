@@ -1,0 +1,2 @@
+# Preserve fixed upstream dictionary bytes and their published hashes.
+phase0/localization/vendor/* -text whitespace=-blank-at-eol,-blank-at-eof

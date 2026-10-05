@@ -1,0 +1,10 @@
+app_name = "erpnext_zh"
+app_title = "简体中文展示"
+app_publisher = "ERPNext Agent Project"
+app_description = "Simplified Chinese presentation without core or business-rule changes"
+app_email = "localization@example.invalid"
+app_license = "MIT"
+required_apps = ["erpnext"]
+boot_session = "erpnext_zh.boot.localize_titles"
+app_include_js = ["/assets/erpnext_zh/js/presentation.js"]
+jinja = {"methods": ["erpnext_zh.printing.chinese_money"]}

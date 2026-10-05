@@ -2,7 +2,7 @@
 
 本目录当前用于五金贸易 ERP 项目的 **Phase 0：ERPNext 原生能力验证**。
 
-当前只建立可丢弃的 ERPNext v16 测试环境，用于验证商品、采购、库存、销售和应收应付链路。这里不是生产部署，也不是 Custom App 开发环境。
+当前使用可丢弃的 ERPNext v16 测试环境，验证商品、采购、库存、销售和应收应付链路；另有已获用户授权的轻量中文展示扩展，不改核心或业务规则。这里不是生产部署。
 
 ## 当前基线
 
@@ -18,7 +18,9 @@
 ## 启动
 
 ```bash
-docker compose -f phase0/compose.yaml up -d
+python3 -m venv .venv
+.venv/bin/pip install -r phase0/localization/requirements.txt
+./scripts/phase0-start.sh
 ./scripts/phase0-check.sh
 ```
 
@@ -78,7 +80,7 @@ python3 scripts/phase0-validate-sales.py
 python3 scripts/phase0-validate-access.py
 ```
 
-脚本读取 `phase0/access-validation.json`，将站点默认语言配置为简体中文，为纯合成采购、销售、库存、财务和审批用户配置原生角色，并验证用户级英文覆盖、允许与拒绝访问、采购订单/销售订单/付款单 Workflow、自审批阻断、提交/撤销和 Version 审计记录。重复运行会复用用户、Workflow 和已撤销的验证单据。角色密码只用于本机 disposable 环境，可通过 `PHASE0_ROLE_PASSWORD` 覆盖，不得复用于其他环境。
+脚本读取 `phase0/access-validation.json`，将站点及五类合成用户统一为简体中文，验证原生角色的允许与拒绝访问、采购订单/销售订单/付款单审批、自审批阻断、提交/撤销和审计记录。历史英文覆盖试验仍保留证据，但不再是当前配置。重复运行会复用用户、审批流程和已撤销的验证单据。角色密码只用于本机 disposable 环境，可通过 `PHASE0_ROLE_PASSWORD` 覆盖，不得复用于其他环境。
 
 ## 验证原生报表与双语打印预览
 
@@ -90,7 +92,9 @@ python3 scripts/phase0-validate-reporting.py
 
 脚本读取 `phase0/reporting-validation.json`，通过原生报表 API 和 REST 只读验证库存余额与流水、采购/销售分析、应收应付、总账、撤销记录和采购/销售单据中英文 HTML 预览。它核对采购退货原单关联及具体科目冲回金额，不创建业务交易。报表日期固定为原始合成场景的 `2026-10-03`；复验日期单独记入证据文档。
 
-P0.7 实现和本地技术检查已完成，等待推进评审。中文预览仍有部分英文内容，原生 PDF 下载失败仍待配置解决；完整结果见 `docs/PHASE0_VALIDATION.md` 和 `docs/PHASE0_GAP_ANALYSIS.md`。
+P0.7 技术检查已完成，推进评审尚未授权。当前按用户最新要求补齐简体中文界面，语言变更及验证见 `phase0/localization/README.md`。原生 PDF 下载失败仍待配置解决。
+
+中文扩展安装后，必须使用上述启动脚本或同时传入 `phase0/compose.zh.yaml`，不能仅用基础 Compose 重建服务。首次启动前创建 `.venv` 并执行 `.venv/bin/pip install -r phase0/localization/requirements.txt`。这是一次性 Phase 0 环境，不是生产部署方案。
 
 ## 停止
 

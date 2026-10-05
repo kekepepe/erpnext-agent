@@ -13,6 +13,7 @@ from typing import Any
 class ERPNextAPI:
     def __init__(self, base_url: str) -> None:
         self.base_url = base_url.rstrip("/")
+        self.csrf_token: str | None = None
         cookie_jar = CookieJar()
         self.opener = urllib.request.build_opener(
             urllib.request.HTTPCookieProcessor(cookie_jar)
@@ -26,6 +27,8 @@ class ERPNextAPI:
     ) -> dict[str, Any]:
         data = None
         headers = {"Accept": "application/json"}
+        if self.csrf_token:
+            headers["X-Frappe-CSRF-Token"] = self.csrf_token
         if payload is not None:
             data = json.dumps(payload).encode("utf-8")
             headers["Content-Type"] = "application/json"

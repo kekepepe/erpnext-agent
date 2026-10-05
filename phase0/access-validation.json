@@ -3,31 +3,31 @@
   "users": {
     "purchase": {
       "email": "p0.purchase@example.invalid",
-      "first_name": "P0 Purchase User",
+      "first_name": "采购测试用户",
       "language": "zh",
       "roles": ["Purchase User"]
     },
     "sales": {
       "email": "p0.sales@example.invalid",
-      "first_name": "P0 Sales User",
-      "language": "en",
+      "first_name": "销售测试用户",
+      "language": "zh",
       "roles": ["Sales User"]
     },
     "stock": {
       "email": "p0.stock@example.invalid",
-      "first_name": "P0 Stock User",
+      "first_name": "库存测试用户",
       "language": "zh",
       "roles": ["Stock User"]
     },
     "finance": {
       "email": "p0.finance@example.invalid",
-      "first_name": "P0 Finance User",
+      "first_name": "财务测试用户",
       "language": "zh",
       "roles": ["Accounts User"]
     },
     "approver": {
       "email": "p0.approver@example.invalid",
-      "first_name": "P0 Approval Manager",
+      "first_name": "审批测试主管",
       "language": "zh",
       "roles": [
         "Purchase User",

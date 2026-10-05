@@ -1,5 +1,7 @@
 # Phase 0 Gap Analysis
 
+> 2026-10-06 中文展示更新：用户最新指令已授权简体中文展示包，覆盖系统名称、字段、账户语言和十类中文打印格式；见 `phase0/localization/README.md` 及 handoff 的 dated package。下表 CFG-003 是修改前的发现，不再代表已配置中文格式的当前结果。CFG-004 的 PDF 下载问题尚未关闭；此语言请求不等于 P0.8 范围冻结或 P0.7 整体推进验收。
+
 ## Purpose and evidence boundary
 
 This document converts executed Phase 0 evidence into first-release implementation decisions. It does not infer requirements from ERPNext menus or from product preferences.
