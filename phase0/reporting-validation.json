@@ -80,9 +80,18 @@
       "ACC-SINV-2026-00003",
       "ACC-SINV-2026-00004",
       "ACC-PAY-2026-00003",
-      "ACC-PAY-2026-00004"
+      "ACC-PAY-2026-00004",
+      "MAT-PRE-2026-00005"
     ],
-    "cancelled_payment": "ACC-PAY-2026-00005"
+    "cancelled_payment": "ACC-PAY-2026-00005",
+    "purchase_return": {
+      "voucher_no": "MAT-PRE-2026-00005",
+      "return_against": "MAT-PRE-2026-00004",
+      "postings": {
+        "Stock In Hand - PZH": {"debit": 0, "credit": 17.5},
+        "Stock Received But Not Billed - PZH": {"debit": 17.5, "credit": 0}
+      }
+    }
   },
   "print_output": {
     "purchase_document": {

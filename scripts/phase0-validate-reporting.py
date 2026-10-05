@@ -460,6 +460,28 @@ def validate_general_ledger(
         )
         verified[voucher_no] = {"debit": debit, "credit": credit}
 
+    purchase_return = expected["purchase_return"]
+    return_no = purchase_return["voucher_no"]
+    return_source = api.get_doc("Purchase Receipt", return_no)
+    if (
+        not return_source
+        or int(return_source.get("docstatus", 0)) != 1
+        or int(return_source.get("is_return", 0)) != 1
+        or return_source.get("return_against") != purchase_return["return_against"]
+    ):
+        raise RuntimeError(f"Purchase return source/link mismatch: {return_no}")
+    return_rows = [row for row in report_rows if row.get("voucher_no") == return_no]
+    if {row.get("account") for row in return_rows} != set(purchase_return["postings"]):
+        raise RuntimeError(f"Purchase return GL account mismatch: {return_no}")
+    for account, amounts in purchase_return["postings"].items():
+        account_rows = [row for row in return_rows if row.get("account") == account]
+        for side in ("debit", "credit"):
+            assert_number(
+                sum(float(row.get(side, 0)) for row in account_rows),
+                amounts[side],
+                f"Purchase return {return_no} {account} {side}",
+            )
+
     cancelled = expected["cancelled_payment"]
     default_cancelled_rows = [
         row for row in report_rows if row.get("voucher_no") == cancelled
@@ -500,6 +522,7 @@ def validate_general_ledger(
     )
     return {
         "active_vouchers": verified,
+        "purchase_return": purchase_return,
         "cancelled_payment": {
             "voucher_no": cancelled,
             "default_report_rows": 0,

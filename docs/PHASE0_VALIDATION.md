@@ -596,7 +596,7 @@ The source-controlled scenarios are in `phase0/stock-validation.json`; `scripts/
 - **Actual Result:** The return row recorded -1 Box, conversion 50, and stock quantity -50; final screw balance was 650.
 - **Evidence:** `MAT-PRE-2026-00005`; Bin REST readback.
 - **Result:** Supported
-- **Notes:** Return-accounting traceability remains `Not Tested`.
+- **Notes:** The General Ledger report subsequently traced the purchase return to balanced CNY 17.5 entries: Stock In Hand was credited and Stock Received But Not Billed was debited.
 
 ## Accounts Receivable Validation
 
@@ -945,6 +945,14 @@ The cancelled P0.6 Payment Entry `ACC-PAY-2026-00005` is excluded from the defau
 
 ## Gap Log
 
+### P0.7.7 evidence revalidation — 2026-10-06
+
+`python3 -m json.tool phase0/reporting-validation.json` and compilation of `scripts/phase0_api.py` / `scripts/phase0-validate-reporting.py` passed using `PYTHONPYCACHEPREFIX=/tmp/erpnext-p07-closeout-pyc`. The final validator executed twice with exit code `0`; complete stdout was identical, including the four preview hashes. Reporting dates remain fixed at 2026-10-03 to preserve the original synthetic evidence window.
+
+The additional purchase-return assertion verified `MAT-PRE-2026-00005` is submitted, is a return, and references `MAT-PRE-2026-00004`. Its General Ledger accounts are exactly Stock In Hand - PZH (credit CNY 17.5) and Stock Received But Not Billed - PZH (debit CNY 17.5). Eleven active vouchers matched REST GL totals; the cancelled payment retained two consolidated report rows / four cancelled resource rows with zero net effect. AR remained CNY 75 and AP CNY 60; all six selected stock balances matched expectations.
+
+`./scripts/phase0-check.sh` passed before and after regression: ERPNext 16.33.0, Frappe 16.31.0, successful site initialization, nine running services, and healthy ping. The initial sandbox attempt was denied Docker socket access; the authorized host check passed without container restart. No new business transactions were created by this read-only reporting validation. PDF download was not rerun; its recorded failure remains unresolved.
+
 Only add entries after an executed test produces supporting evidence.
 
 | Gap ID | Test ID | Requirement | Business Impact | Native Workaround / Configuration | Proposed Classification | Status |
@@ -962,6 +970,8 @@ Allowed proposed classifications after review:
 
 ## Phase 0 Summary
 
-Not yet available.
+Native capability validation is complete for the current synthetic scope: environment health, master data, purchase, stock, sales, returns, AR/AP, permissions, approval/audit, operational/accounting reports, and bilingual HTML print previews have execution evidence. The complete reporting validator is read-only and reproducible.
 
-Complete this section only after the critical native workflows have been executed, evidence has been reviewed, and confirmed gaps have been classified.
+No evidence currently requires ERPNext Core modification or a `hardware_erp` Custom App. Confirmed first-release work is configuration/process oriented: production role/workflow design, bilingual master/print decisions, native PDF generation/networking, and an SOP for the net Sales Order state after a full return. These dispositions are detailed in `docs/PHASE0_GAP_ANALYSIS.md`.
+
+This closes native capability discovery, not Phase 0 development. P0.8 through P0.12 remain required before deployment.

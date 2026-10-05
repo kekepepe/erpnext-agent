@@ -2,8 +2,8 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Execute P0.7 reporting validation and Gap Analysis as the first gate in the Phase 0 development-closeout plan
-last_updated: 2026-10-03
+current_task: Close P0.7 reporting and Gap Analysis, then begin P0.8 first-release scope freeze
+last_updated: 2026-10-06
 updated_by: Codex
 ---
 
@@ -371,7 +371,15 @@ These must remain incomplete until actual evidence exists.
 
 ## In Progress
 
-- [ ] Execute P0.7 native reporting validation and the evidence-based Phase 0 Gap Analysis.
+- [ ] Close P0.7.8 and obtain the recorded review decision before P0.8 scope freeze.
+
+### P0.7.7 execution record — 2026-10-06
+
+Completed the evidence-based `docs/PHASE0_GAP_ANALYSIS.md`: six configuration/process/operational items, each with impact, evidence, implementation path, owner role, and P0.8/P0.9/P0.12 disposition. No executed case currently justifies `hardware_erp` or ERPNext Core modification.
+
+Extended `phase0/reporting-validation.json` and `scripts/phase0-validate-reporting.py` to assert the purchase return's submitted status, `is_return`, original receipt linkage, exact GL accounts, and CNY 17.5 debit/credit reversal. Updated `docs/PHASE0_VALIDATION.md` with that evidence and the native-discovery conclusion.
+
+JSON parsing and Python compilation passed. Two complete reporting-validator runs exited `0` and their full outputs were identical, including all four print-preview hashes. Health checks before and after those runs exited `0`. P0.7.8 documentation reconciliation and review-gate closeout follow this work package.
 
 ## Problems / Risks
 
@@ -805,11 +813,11 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.7 — Produce the evidence-based Gap Analysis
 
-- [ ] Review every `Not Tested`, `Configurable`, failed, or unexpected case in `docs/PHASE0_VALIDATION.md`.
-- [ ] Create `docs/PHASE0_GAP_ANALYSIS.md` only after the report and bilingual-output evidence above exists.
-- [ ] Classify each confirmed issue as native configuration, acceptable process adjustment, integration, customization, deferment, or unresolved investigation.
-- [ ] Record business impact, evidence, workaround, recommended owner, and Phase 0 implementation or explicit post-release deferral for each item.
-- [ ] Do not classify a preference as a technical gap without execution evidence.
+- [x] Review every `Not Tested`, `Configurable`, failed, or unexpected case in `docs/PHASE0_VALIDATION.md`.
+- [x] Create `docs/PHASE0_GAP_ANALYSIS.md` only after the report and bilingual-output evidence above exists.
+- [x] Classify each confirmed issue as native configuration, acceptable process adjustment, integration, customization, deferment, or unresolved investigation.
+- [x] Record business impact, evidence, workaround, recommended owner, and Phase 0 implementation or explicit post-release deferral for each item.
+- [x] Do not classify a preference as a technical gap without execution evidence.
 
 #### P0.7.8 — P0.7 closeout and review gate
 
