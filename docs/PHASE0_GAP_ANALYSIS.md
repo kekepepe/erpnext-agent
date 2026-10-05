@@ -71,3 +71,9 @@ P0.8 may approve a versioned standard ERPNext Print Format configuration if bili
 - Whether any external integration or governed Business API is required for the first deployment.
 
 Until confirmed, these are requirements questions rather than technical gaps.
+
+## P0.7 closeout status — 2026-10-06
+
+The six confirmed items have evidence and an ordered Phase 0 disposition. Native capability discovery and local technical checks are complete; P0.7 progression review is awaiting an explicit recorded decision. Scope freeze, organization/tax/migration choices, PDF remediation, and release-readiness work have not been approved or completed by this analysis.
+
+The current roadmap's first four discovery criteria are evidenced by environment checks, source-controlled synthetic assumptions, workflow/report execution, and this classification. Its remaining development and release criteria are still open. No `hardware_erp` implementation is authorized by the evidence alone.

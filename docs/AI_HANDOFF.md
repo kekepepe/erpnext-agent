@@ -2,7 +2,7 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Close P0.7 reporting and Gap Analysis, then begin P0.8 first-release scope freeze
+current_task: Review completed P0.7 evidence and Gap Analysis before authorizing P0.8 scope freeze
 last_updated: 2026-10-06
 updated_by: Codex
 ---
@@ -15,9 +15,9 @@ Native Quote-to-Cash validation is complete for `SAL-001` through `SAL-010`, inc
 
 The implementation used source-controlled synthetic scenarios and an idempotent REST validator. Two complete post-correction runs reused every matching document and reproduced identical stock, outstanding-balance, payment-allocation, and party-GL results.
 
-P0.5 and P0.6 were revalidated and completed on 2026-10-03. The current implementation task is now:
+P0.5 and P0.6 were revalidated and completed on 2026-10-03. P0.7.1 through P0.7.7 are implemented; P0.7.8 technical closeout passed on 2026-10-06. The current task is now:
 
-**Execute P0.7 native stock, purchase, sales, Accounts Payable, Accounts Receivable, and General Ledger reporting validation, then build the evidence-based Phase 0 Gap Analysis.**
+**Review the completed P0.7 reporting and Gap Analysis evidence and record the progression decision before beginning P0.8 first-release scope freeze.**
 
 ### Phase boundary directive — 2026-10-03
 
@@ -31,7 +31,27 @@ The project owner has reset the delivery boundary:
 
 `docs/ROADMAP.md` and `docs/DECISIONS.md` now record this phase boundary at milestone level. This handoff remains the source for the ordered daily execution plan; P0.8 must refine the approved first-release scope without moving development into Phase 1.
 
-Simplified Chinese is now the native site default, with an English per-user override proven through authenticated Desk boot sessions. Native role separation and configurable approval/audit workflows passed for Purchase Order, Sales Order, and Payment Entry. `AR-004`, `AP-004`, reporting, bilingual print output, Gap Analysis, Phase 1, `hardware_erp`, Business API, MCP, Agent, and multi-Agent work remain incomplete.
+Simplified Chinese is the native site default, with a proven English per-user override. Native role separation and configurable approval/audit workflows passed. `AR-004`, `AP-004`, and `REP-001` through `REP-010` have executed report evidence. Bilingual HTML print previews passed; LANG-003 remains `Configurable` because Chinese output is partly English and native PDF download failed. The Gap Analysis is complete. P0.8–P0.12, Phase 1, `hardware_erp`, Business API, MCP, Agent, and multi-Agent implementation remain uncompleted or deferred as scoped.
+
+## P0.7 Technical Closeout — 2026-10-06
+
+Implementation and local technical verification are complete. Two final full reporting runs exited `0` with identical stdout; JSON parsing, Python compilation, pre/post health checks, and diff review passed. This does not record owner acceptance or an independent Web GPT review. The remaining P0.7.8 item is the explicit progression review decision.
+
+Smallest next action: review `docs/PHASE0_VALIDATION.md` and `docs/PHASE0_GAP_ANALYSIS.md`, accept or request changes to the synthetic native-discovery evidence and classified limitations, then record that decision here before changing the task to P0.8. First-release business scope and deployment readiness are separate later approvals.
+
+P0.7 per-package trace (all listed commits pushed to `main`):
+
+| Package | Commit | Evidence/change |
+|---|---|---|
+| P0.7.1 | `fb64159` | Revalidated transaction/runtime baseline |
+| P0.7.2 | `e5b389c` | Native report scenarios and validator |
+| P0.7.3 | `30fb27d` | Stock Balance / Stock Ledger |
+| P0.7.4 | `5c96aad` | Purchase / Sales Analytics |
+| P0.7.5 | `f1a17eb` | AR / AP / General Ledger |
+| P0.7.6 | `95ef5bc` | Bilingual HTML previews and rendered screenshots |
+| P0.7.7 | `34ded94` | Gap Analysis and purchase-return account assertions |
+
+P0.7.8 changes reconcile this handoff and README with actual implementation, record the final command outcomes in the validation ledger, and leave the progression-review checkbox open. No roadmap phase boundary or durable architecture decision changed in this closeout.
 
 ## Review Decision — 2026-10-03
 
@@ -60,12 +80,12 @@ Repository implementation and future observed runtime behaviour continue to outr
 - Repository: `kekepepe/erpnext-agent`.
 - Branch: `main`.
 - Latest verified and pushed main commit:
-  - `5a39923`
-  - `test: complete phase 0 sales and access validation`
+  - `34ded94` — P0.7.7 Gap Analysis and purchase-return accounting assertions
+  - This P0.7.8 documentation closeout follows that commit; verify Git for its eventual hash.
 - Repository visibility is intentionally **public** for the current Web GPT → GitHub → Codex collaboration workflow.
 - Public visibility is a collaboration requirement only. It is not permission to commit real company data.
 - Only code, synthetic data, sanitized examples, non-sensitive documentation, and validation evidence may be committed.
-- No GitHub Actions workflow run or combined commit status was found for the latest validated commit during Web GPT review.
+- No independent hosted CI runtime evidence is recorded for these P0.7 checks; the prior Web GPT review recorded no Actions run or combined status for its then-reviewed commit.
 - Current transaction-validation evidence therefore comes from the recorded local Phase 0 runtime execution, not an independent hosted CI ERPNext environment.
 
 ### Phase 0 environment
@@ -91,7 +111,7 @@ Configured baseline:
 
 Latest evidence recorded in `docs/PHASE0_VALIDATION.md`:
 
-- runtime validation date: `2026-10-03 +0800`
+- runtime validation date: `2026-10-06 +0800`
 - ERPNext: `16.33.0`
 - Frappe: `16.31.0`
 - `create-site`: exited successfully with exit code `0`
@@ -293,11 +313,8 @@ Do not interpret the current Phase 0 REST client as the final Business API layer
 
 No valid execution evidence currently proves completion of:
 
-- `AR-004`
-- remaining Accounts Payable reporting case(s)
-- stock/purchase/sales/AR/AP reporting coverage
-- bilingual customer/supplier-facing print output
-- final evidence-based Phase 0 Gap Analysis
+- fully localized formal customer/supplier-facing output and downloadable PDF output
+- explicit P0.7 progression review acceptance
 - approved first-release scope and Phase 0 development plan
 - production-ready native configuration and any approved `hardware_erp` customization
 - migration rehearsal, release candidate, and deployment-readiness acceptance
@@ -315,7 +332,7 @@ These must remain incomplete until actual evidence exists.
 ## Completed
 
 - [x] Selected ERPNext/Frappe v16 as the ERP Core direction.
-- [x] Defined Phase 0 as ERPNext native-capability validation.
+- [x] Initially defined native-capability discovery; expanded Phase 0 to complete first-release development and release preparation under DEC-008.
 - [x] Bootstrapped a disposable local ERPNext v16 validation environment.
 - [x] Pinned Phase 0 container images.
 - [x] Added startup and teardown instructions.
@@ -368,6 +385,9 @@ These must remain incomplete until actual evidence exists.
 - [x] Configured and executed native Purchase Order, Sales Order, and Payment Entry Workflows.
 - [x] Verified creator/manager separation, submit/cancel transitions, owner/modified-by attribution, and Version audit evidence.
 - [x] Re-ran the P0.6 validator idempotently and re-ran P0.5 sales/AR regression successfully.
+- [x] Executed native stock, purchase, sales, AR/AP, and General Ledger reports with source-voucher/REST traceability.
+- [x] Verified bilingual HTML print previews and recorded localization/PDF limitations.
+- [x] Completed evidence-based Gap Analysis and two identical final reporting regression runs.
 
 ## In Progress
 
@@ -760,7 +780,7 @@ Planned next scope:
 
 ### P0.7 — Reporting Validation and Gap Analysis
 
-Transaction and permissions/approval validation are sufficiently complete. P0.7 is now the current task.
+P0.7 implementation and technical closeout are complete. Its explicit progression review remains the first unchecked P0 item.
 
 Execute the following work packages in order. Do not begin implementation of confirmed gaps or Phase 1 deployment while any P0.7 package remains incomplete.
 
@@ -821,12 +841,12 @@ Execute the following work packages in order. Do not begin implementation of con
 
 #### P0.7.8 — P0.7 closeout and review gate
 
-- [ ] Run JSON validation and Python compilation for every new or changed scenario/validator.
-- [ ] Run the complete reporting validator twice and prove idempotent read-only results.
-- [ ] Re-run `./scripts/phase0-check.sh`.
-- [ ] Review `git diff`, `git diff --check`, and `git status`.
-- [ ] Update `docs/PHASE0_VALIDATION.md`, this handoff, and the Gap Analysis with actual results and failures.
-- [ ] Confirm the native-capability validation exit criteria currently recorded in `docs/ROADMAP.md` have evidence.
+- [x] Run JSON validation and Python compilation for every new or changed scenario/validator.
+- [x] Run the complete reporting validator twice and prove idempotent read-only results.
+- [x] Re-run `./scripts/phase0-check.sh`.
+- [x] Review `git diff`, `git diff --check`, and `git status`.
+- [x] Update `docs/PHASE0_VALIDATION.md`, this handoff, and the Gap Analysis with actual results and failures.
+- [x] Confirm the native-discovery subset of Phase 0 exit criteria in `docs/ROADMAP.md` has evidence; the complete development/release criteria remain pending P0.8–P0.12.
 - [ ] Obtain an explicit P0.7 review decision before advancing the handoff to P0.8 scope freeze; do not change the current phase to Phase 1.
 
 Expected P0.7 deliverables:
@@ -1310,7 +1330,7 @@ Preserved failures and corrections:
 - the failed approval left `PUR-ORD-2026-00004` Pending; the corrected run recovered, approved, and cancelled it instead of deleting it
 - direct API invocation of non-whitelisted `frappe.boot.get_bootinfo` was rejected; resolved language is verified from the authenticated Desk `/app` HTML
 
-P0.6 is complete. The next task is P0.7 reporting validation and Gap Analysis. Bilingual print output remains untested and must not be inferred from the successful Desk language result.
+Historical P0.6 recommendation: continue to P0.7 reporting and output validation. Those checks are now implemented; see the 2026-10-06 P0.7 closeout above.
 
 ## Notes for Next Agent
 
@@ -1333,7 +1353,7 @@ Important constraints:
 - The Web GPT review has accepted purchase/stock evidence for progression; it has not independently rerun the user's Docker environment.
 - P0.5 sales, return, and transaction-level AR evidence was revalidated and accepted on 2026-10-03.
 - P0.6 language, permissions, roles, approval, and audit validation completed on 2026-10-03. Use native ERPNext language settings; do not add a custom language switcher without evidence that native behaviour is insufficient.
-- The current task is P0.7 reporting validation and evidence-based Gap Analysis.
+- The current task is the explicit P0.7 progression review; implementation and local technical checks are complete.
 - Do not renumber or silently replace the existing Phase 0 validation cases.
 - Do not mark a test complete without actual execution evidence.
 - Use synthetic/sanitized data only.

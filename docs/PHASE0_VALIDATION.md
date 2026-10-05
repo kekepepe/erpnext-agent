@@ -970,6 +970,25 @@ Allowed proposed classifications after review:
 
 ## Phase 0 Summary
 
+### P0.7.8 technical closeout — 2026-10-06
+
+Commands actually executed for the final implementation:
+
+```bash
+python3 -m json.tool phase0/reporting-validation.json >/dev/null
+env PYTHONPYCACHEPREFIX=/tmp/erpnext-p07-closeout-pyc python3 -m py_compile scripts/phase0_api.py scripts/phase0-validate-reporting.py
+python3 scripts/phase0-validate-reporting.py
+python3 scripts/phase0-validate-reporting.py
+./scripts/phase0-check.sh
+git diff --check
+git diff
+git status -sb
+```
+
+All validation commands exited `0`; two final full reporting outputs were identical. Interfaces returned Stock Balance 20 rows, Stock Ledger 32, Purchase Analytics 4 per grouping, Sales Analytics 4 per grouping, AR 4, AP 2, and General Ledger 47. The validator traced seven selected stock vouchers and eleven active accounting vouchers, plus the cancelled payment. This closeout reused the 2026-10-03 visual preview evidence and did not rerender screenshots or retry PDF generation.
+
+Roadmap exit-criteria review: reproducible environment health, documented synthetic master data/assumptions, critical executed workflow evidence, and classified gaps are covered. Approved first-release scope, required implementation, clean production-like rebuild, migration/recovery rehearsal, business UAT, and release-candidate approval remain pending P0.8–P0.12. P0.7 progression review remains open in `docs/AI_HANDOFF.md`; local technical completion does not imply business acceptance or deployment readiness.
+
 Native capability validation is complete for the current synthetic scope: environment health, master data, purchase, stock, sales, returns, AR/AP, permissions, approval/audit, operational/accounting reports, and bilingual HTML print previews have execution evidence. The complete reporting validator is read-only and reproducible.
 
 No evidence currently requires ERPNext Core modification or a `hardware_erp` Custom App. Confirmed first-release work is configuration/process oriented: production role/workflow design, bilingual master/print decisions, native PDF generation/networking, and an SOP for the net Sales Order state after a full return. These dispositions are detailed in `docs/PHASE0_GAP_ANALYSIS.md`.

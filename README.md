@@ -80,6 +80,18 @@ python3 scripts/phase0-validate-access.py
 
 脚本读取 `phase0/access-validation.json`，将站点默认语言配置为简体中文，为纯合成采购、销售、库存、财务和审批用户配置原生角色，并验证用户级英文覆盖、允许与拒绝访问、采购订单/销售订单/付款单 Workflow、自审批阻断、提交/撤销和 Version 审计记录。重复运行会复用用户、Workflow 和已撤销的验证单据。角色密码只用于本机 disposable 环境，可通过 `PHASE0_ROLE_PASSWORD` 覆盖，不得复用于其他环境。
 
+## 验证原生报表与双语打印预览
+
+交易与权限验证完成后，运行：
+
+```bash
+python3 scripts/phase0-validate-reporting.py
+```
+
+脚本读取 `phase0/reporting-validation.json`，通过原生报表 API 和 REST 只读验证库存余额与流水、采购/销售分析、应收应付、总账、撤销记录和采购/销售单据中英文 HTML 预览。它核对采购退货原单关联及具体科目冲回金额，不创建业务交易。报表日期固定为原始合成场景的 `2026-10-03`；复验日期单独记入证据文档。
+
+P0.7 实现和本地技术检查已完成，等待推进评审。中文预览仍有部分英文内容，原生 PDF 下载失败仍待配置解决；完整结果见 `docs/PHASE0_VALIDATION.md` 和 `docs/PHASE0_GAP_ANALYSIS.md`。
+
 ## 停止
 
 保留测试数据：
@@ -105,7 +117,7 @@ docker compose -f phase0/compose.yaml down -v
 - 创建 Agent、MCP Server 或让 Agent 直接访问数据库；
 - 把本 Compose 文件当作生产部署方案。
 
-测试公司和代表性主数据已经初始化，采购、库存、销售、客户退货、交易级应收、语言、权限、审批和审计验证已经完成。后续应继续按 `docs/PHASE0_VALIDATION.md` 验证报表场景并形成证据化 Gap Analysis。
+测试公司、主数据、采购、库存、销售、退货、应收应付、语言、权限、审批、审计和报表已有合成场景执行证据，Gap Analysis 已形成。Phase 0 还包含 P0.8–P0.12 的范围冻结、必要开发与发布准备；Phase 1 才进入部署。下一步按 `docs/AI_HANDOFF.md` 完成 P0.7 推进评审。
 
 ## 来源
 
