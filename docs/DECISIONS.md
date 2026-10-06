@@ -76,7 +76,17 @@ This file records durable decisions, not routine implementation notes. New entri
 - **Consequences:** A versioned custom image and Chinese Compose overlay are now required. Historical English override/standard-print tests remain compatibility evidence, not the active UI policy. This does not approve P0.8 scope or production deployment.
 - **Revisit when:** ERPNext upgrades or owner-approved release language requirements change. Re-run source inventory, actual-session coverage, print and permission/business regressions.
 
-## Open Decisions
+## DEC-010 — Owner-authorized presentation-only source patches
+
+- **Status:** Accepted for the owner's explicit 2026-10-06 patch request; limited exception to DEC-004/DEC-009 and the Core-preservation rule.
+- **Decision:** Keep upstream ERPNext/Frappe fixed and unchanged as a baseline; a derived Phase 0 image may apply reviewed source patches exclusively to proven UI translation omissions. Do not edit live containers, remove standard-template protection, change internal names, write transactions, alter permissions, or modify business/accounting validation.
+- **Evidence:** Rendered native workflow help exposes its English composite title, state, role and action despite a Chinese session/dictionary. Select-state version history and icon-only tag accessible names also bypass translation. Dictionary-only fixes cannot intercept those call sites.
+- **Controls:** Versioned exact replacements, before/after SHA-256 per file, no fuzzy application, whole-batch prevalidation, rebuilt frontend assets, original immutable source inventory, explicit patched-file audit, offline drift/reversal tests, rendered checks and full affected business/access regression. Upgrades must fail closed until the patch set is reviewed.
+- **Recovery:** Build with `APPLY_ZH_SOURCE_PATCHES=0` to retain the same Chinese app/configuration while restoring upstream source; this is a source rollback, not deletion/uninstallation or a promised database rollback. Verify the recovery image separately before using it.
+- **Consequence:** The previous claim that all Core hashes are unchanged is historical only once a patched image is activated. Record the exact approved changed files and leave broad language coverage open until verified. P0.8 scope approval and Phase 1 readiness are not inferred.
+- **Revisit when:** Native fixes land, hooks cover the demonstrated gaps, dependency versions change, or a patch touches anything beyond presentation.
+
+## Open Decisions (remaining)
 
 The following are intentionally undecided pending evidence:
 

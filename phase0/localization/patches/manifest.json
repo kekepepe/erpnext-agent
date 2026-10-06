@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "base_image": "frappe/erpnext:v16.33.0",
+  "frappe_version": "16.31.0",
+  "files": [
+    {
+      "path": "apps/frappe/frappe/public/js/frappe/form/workflow.js",
+      "before_sha256": "710e34902a53e546aacd995b516e953cc8fb86dea42f4d7938303cddb08fdd0e",
+      "after_sha256": "b03cdd9feb2e79f260b2733ade553f8a72c96383edf395a1e666e2c06d31ef27",
+      "reason": "Rendered workflow help bypasses gettext for title, states, roles and actions.",
+      "replacements": [
+        ["title: \"Workflow: \" + frappe.workflow.workflows[me.frm.doctype].name,", "title: __(\"Workflow: {0}\", [__(frappe.workflow.workflows[me.frm.doctype].name)]),"],
+        ["frappe.utils.bold(d.action)", "frappe.utils.bold(__(d.action))"],
+        ["${d.allowed}", "${__(d.allowed)}"],
+        ["frappe.utils.bold(role)", "frappe.utils.bold(__(role))"],
+        ["frappe.utils.bold(state)", "frappe.utils.bold(__(state))"]
+      ]
+    },
+    {
+      "path": "apps/frappe/frappe/public/js/frappe/form/footer/version_timeline_content_builder.js",
+      "before_sha256": "ffa25671d1147fb048acca79a8b5fb1eff047210aaf7607d337a12c8e2d1f402",
+      "after_sha256": "4d5a84f3517ab5469112773fab24a301cbe6c368a11405d1b6f25bfbfda9f423",
+      "reason": "Rendered Select/workflow-state audit values bypass gettext; other business content must remain raw.",
+      "counts": {"format_content_for_timeline(p[1])": 2, "format_content_for_timeline(p[2])": 2},
+      "replacements": [
+        ["format_content_for_timeline(p[1])", "format_content_for_timeline(p[1], df)"],
+        ["format_content_for_timeline(p[2])", "format_content_for_timeline(p[2], df)"],
+        ["function format_content_for_timeline(content) {", "function format_content_for_timeline(content, df) {\n\tif (df && (df.fieldtype === \"Select\" || df.options === \"Workflow State\")) {\n\t\tcontent = __(content);\n\t}"]
+      ]
+    },
+    {
+      "path": "apps/frappe/frappe/public/js/frappe/ui/tags.js",
+      "before_sha256": "582002ff37ba59aa36cbeb8f886679a0493b14982c6ba71b7c28d564eceab890",
+      "after_sha256": "24b2366bcd1f42fe84991afb85832cf4e0fab3609b746ec4c6d375a17ae77ac5",
+      "reason": "Icon-only tag control exposes its English element ID as its accessible name.",
+      "replacements": [
+        ["id=\"add_tags\">", "id=\"add_tags\" aria-label=\"${__(\"Add Tags\")}\">"]
+      ]
+    }
+  ]
+}

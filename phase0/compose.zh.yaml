@@ -1,21 +1,21 @@
 # Local Phase 0 presentation extension; base ERPNext/Frappe versions remain pinned.
 services:
   backend:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
     build:
       context: ..
       dockerfile: phase0/localization/Dockerfile
   configurator:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   create-site:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   frontend:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   queue-long:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   queue-short:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   scheduler:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1
   websocket:
-    image: erpnext-phase0-zh:16.33.0-0.1.0
+    image: erpnext-phase0-zh:16.33.0-0.1.0-p1

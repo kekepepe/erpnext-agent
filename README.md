@@ -116,7 +116,7 @@ docker compose -f phase0/compose.yaml down -v
 
 当前阶段不要：
 
-- 修改 ERPNext Core；
+- 修改 ERPNext Core 的业务逻辑；用户于 2026-10-06 明确批准的展示翻译补丁是唯一限定例外，见 DEC-010 与 `phase0/localization/README.md`；
 - 创建未经 Gap Analysis 证明必要的 Custom Field / Custom DocType；
 - 创建 Agent、MCP Server 或让 Agent 直接访问数据库；
 - 把本 Compose 文件当作生产部署方案。

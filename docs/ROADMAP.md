@@ -75,7 +75,7 @@ Exit criteria:
 
 - Scope is separately approved and prioritized.
 - Work does not bypass the development and release gates established in Phase 0.
-- ERPNext Core remains unmodified.
+- ERPNext business Core remains unmodified; DEC-010 permits only the owner's bounded, versioned Chinese presentation patches, not business-logic changes.
 
 ## Phase 3 — Business API and MCP Foundation
 

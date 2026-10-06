@@ -157,6 +157,15 @@ def main():
                             input=Path(__file__).read_text(), text=True, capture_output=True, check=True)
     data = json.loads(result.stdout)
     baseline = json.loads((DATA / "source-inventory.json").read_text())["source_sha256"]
+    # Preserve the immutable upstream baseline; allow only reviewed patched hashes.
+    patch_manifest = json.loads((DATA / "patches/manifest.json").read_text())
+    patched = []
+    for spec in patch_manifest["files"]:
+        if baseline.get(spec["path"]) != spec["before_sha256"]:
+            raise RuntimeError("Patch baseline differs from original source inventory")
+        if data["hashes"].get(spec["path"]) == spec["after_sha256"]:
+            baseline[spec["path"]] = spec["after_sha256"]
+            patched.append(spec["path"])
     if data.pop("hashes") != baseline:
         raise RuntimeError("Core source differs from pinned inventory; review before auditing")
     spec = importlib.util.spec_from_file_location("localize", ROOT / "scripts/phase0-localize.py")
@@ -175,6 +184,7 @@ def main():
     # Keep the actionable triage queue compact; summary covers all occurrences.
     data["rows"] = [row for row in data["rows"] if row["state"] != "translated"]
     data.update(schema_version=1, core_hashes_match=True, session_language="zh",
+                approved_patched_files=patched,
                 summary=dict(sorted(summary.items())),
                 limitations=["Static candidates are not verified user-visible defects.",
                              "Dynamic keys, Vue scripts, context expressions and template conditions need manual/runtime review.",

@@ -10000,15 +10000,6 @@
       "translation": null
     },
     {
-      "path": "apps/frappe/frappe/public/js/frappe/form/workflow.js",
-      "line": 28,
-      "kind": "direct_ui_candidate",
-      "source": "Workflow: ",
-      "context": null,
-      "state": "needs_runtime_review",
-      "translation": null
-    },
-    {
       "path": "apps/frappe/frappe/public/js/frappe/legacy_gravatar_cleanup.js",
       "line": 13,
       "kind": "gettext",
@@ -20053,15 +20044,6 @@
       "translation": null
     },
     {
-      "path": "apps/erpnext/erpnext/buying/module_onboarding/buying_onboarding/buying_onboarding.json",
-      "line": 40,
-      "kind": "metadata_title",
-      "source": "Buying Setup",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
       "path": "apps/erpnext/erpnext/buying/number_card/active_suppliers/active_suppliers.json",
       "line": 11,
       "kind": "metadata_label",
@@ -20098,46 +20080,10 @@
       "translation": null
     },
     {
-      "path": "apps/erpnext/erpnext/buying/onboarding_step/create_item/create_item.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "Create Item",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/erpnext/erpnext/buying/onboarding_step/create_purchase_invoice/create_purchase_invoice.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "Create Purchase Invoice",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
       "path": "apps/erpnext/erpnext/buying/onboarding_step/create_supplier/create_supplier.json",
       "line": 15,
       "kind": "metadata_title",
       "source": "Create Supplier",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/erpnext/erpnext/buying/onboarding_step/review_buying_settings/review_buying_settings.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "Review Buying Settings",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/erpnext/erpnext/buying/onboarding_step/view_purchase_order_analysis/view_purchase_order_analysis.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "View Purchase Order Analysis",
       "context": null,
       "state": "missing_or_identity",
       "translation": null
@@ -26767,15 +26713,6 @@
       "translation": null
     },
     {
-      "path": "apps/erpnext/erpnext/selling/onboarding_step/create_item/create_item.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "Create Item",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
       "path": "apps/erpnext/erpnext/selling/onboarding_step/review_selling_settings/review_selling_settings.json",
       "line": 3,
       "kind": "metadata_title",
@@ -32878,15 +32815,6 @@
       "translation": null
     },
     {
-      "path": "apps/erpnext/erpnext/stock/onboarding_step/create_item/create_item.json",
-      "line": 3,
-      "kind": "metadata_title",
-      "source": "Create Item",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
       "path": "apps/erpnext/erpnext/stock/onboarding_step/create_purchase_receipt/create_purchase_receipt.json",
       "line": 3,
       "kind": "metadata_title",
@@ -34680,11 +34608,16 @@
   "schema_version": 1,
   "core_hashes_match": true,
   "session_language": "zh",
+  "approved_patched_files": [
+    "apps/frappe/frappe/public/js/frappe/form/workflow.js",
+    "apps/frappe/frappe/public/js/frappe/form/footer/version_timeline_content_builder.js",
+    "apps/frappe/frappe/public/js/frappe/ui/tags.js"
+  ],
   "summary": {
     "latin_in_translation": 670,
-    "missing_or_identity": 2438,
-    "needs_runtime_review": 744,
-    "translated": 27698
+    "missing_or_identity": 2431,
+    "needs_runtime_review": 743,
+    "translated": 27706
   },
   "limitations": [
     "Static candidates are not verified user-visible defects.",

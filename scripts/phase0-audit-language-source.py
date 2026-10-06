@@ -29,6 +29,11 @@ result = subprocess.run(
     check=True, capture_output=True, text=True,
 )
 data = json.loads(result.stdout)
+patches = ROOT/'phase0/localization/patches/manifest.json'
+if patches.exists():
+    for spec in json.loads(patches.read_text())['files']:
+        if data['source_sha256'].get(spec['path']) != spec['before_sha256']:
+            raise RuntimeError('Cannot overwrite upstream baseline with patched/drifted sources')
 if any('tokens truncated' in label for label in data['labels']):
     raise RuntimeError('Source inventory contains a truncated label')
 destination = ROOT/'phase0/localization'
