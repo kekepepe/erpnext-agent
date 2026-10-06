@@ -36,6 +36,17 @@ The owner requested inspection of language paths and Simplified Chinese system n
 
 Historical language statements elsewhere are superseded by this dated package.
 
+### Chinese completion sequence — owner authorized 2026-10-06
+
+Execute these bounded packages in order; record and push each completed package.
+
+1. [x] **ZH-1 source triage:** broaden metadata-only inventory to literal Python/JavaScript gettext, metadata descriptions, direct UI sinks and template prose; compare actual Chinese session dictionary. `scripts/phase0-audit-language-ui.py` emits `phase0/localization/ui-source-audit.json` with source path/line and classification. All 7,299 Core hashes match the existing baseline. Counts are occurrences, not distinct verified defects: 27,668 translated; 2,448 missing/identity; 663 Latin-bearing translations; 744 heuristic candidates. No extraction errors reported. Health check and three offline audit tests passed. No Core, business data or runtime settings changed. Dynamic expressions, Vue scripts, template conditions and technical/code values still need manual/runtime review; this is not universal coverage.
+2. [ ] **ZH-2 native translation/extensions:** inspect prioritized Desk/form/print/report candidates, fix confirmed dictionary gaps through existing native Translation and presentation extension, verify actual-session readback and rendered flows. Do not translate internal IDs or private user content.
+3. [ ] **ZH-3 bounded source fallback:** only when a rendered defect and absent native hook are proven, decide the smallest versioned upstream patch/derived build with fixed-version checks, upgrade and rollback tests. Never remove standard-template protection, permissions or accounting validation. Skip with evidence if extensions suffice. Owner permission for presentation fallback is conditional, not permission for business-logic changes.
+4. [ ] **ZH-4 regression:** browser flows, Chinese print previews and existing purchase/stock/sales/access/report validators; record untested pages, failures and unchanged balances before claiming completion.
+
+Latest verified prior pushed implementation: `1d73da6`. ZH-1 closeout commands: `./scripts/phase0-check.sh`; `.venv/bin/python scripts/phase0-audit-language-ui.py`; `python3 -m unittest discover -s scripts -p 'test_phase0_language_audit.py' -v`. The full sorted triage queue is committed, not a private runtime dump. Next action: ZH-2 common form messages and Print Format help, then inspect hardcoded candidates. P0.7 progression approval and Phase 1 remain blocked separately.
+
 ### Phase boundary directive — 2026-10-03
 
 The project owner has reset the delivery boundary:
