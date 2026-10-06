@@ -1,0 +1,18 @@
+{
+  "{0} changed the values for {1}": "{0} 修改了 {1} 的值",
+  "Edit {0} rows": "编辑 {0} 行",
+  "No editable fields available for bulk edit.": "没有可批量编辑的字段。",
+  "Updated {0} selected {1}. Save the form to keep changes.": "已更新选中的 {0} 个{1}。请保存表单以保留更改。",
+  "Update {0} rows": "更新 {0} 行",
+  "In {0}, {1} is required in every row.": "在{0}中，每一行都必须填写{1}。",
+  "In {0}, {1} is required in row {2}.": "在{0}中，第 {2} 行必须填写{1}。",
+  "In {0}, {1} is required in rows {2}.": "在{0}中，第 {2} 行必须填写{1}。",
+  "In {0}, {1} is required in {2} rows.": "在{0}中，有 {2} 行必须填写{1}。",
+  "Please fill the following mandatory fields before saving:": "保存前请填写以下必填字段：",
+  "Last Edited By {0}": "由 {0} 最后编辑",
+  "You can only insert images in Markdown fields": "仅可在轻量标记文本字段中插入图片",
+  "Insert Image in Markdown": "在轻量标记文本中插入图片",
+  "This document has unsaved changes which might not appear in final PDF. <br> Consider saving the document before printing.": "此单据有尚未保存的更改，可能不会显示在最终便携文档中。<br>建议先保存单据再打印。",
+  "The CSV format is case sensitive": "逗号分隔表格格式区分大小写",
+  "Any string-based printer languages can be used. Writing raw commands requires knowledge of the printer's native language provided by the printer manufacturer. Please refer to the developer manual provided by the printer manufacturer on how to write their native commands. These commands are rendered on the server side using the Jinja Templating Language.": "可以使用任何基于字符串的打印机语言。编写原始命令需要了解制造商提供的打印机原生语言，请参阅制造商的开发手册。这些命令使用打印模板语言在服务器端渲染。"
+}

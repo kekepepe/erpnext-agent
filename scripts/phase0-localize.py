@@ -49,6 +49,45 @@ def presentation_signature(value):
     return [("text", "".join(value for key, value in parser.parts if key == "text"))] + [part for part in parser.parts if part[0] != "text"]
 
 
+def localize_help_prose(value, text_map=None):
+    """Translate known Print Format help prose, preserving markup/code/URLs.
+
+    Applied only to the two known native help keys, never arbitrary business HTML.
+    """
+    class Help(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=False)
+            self.hidden = 0
+            self.parts = []
+        def handle_starttag(self, tag, attrs):
+            self.parts.append(self.get_starttag_text())
+            if tag in {"code", "pre", "script", "style"}:
+                self.hidden += 1
+        def handle_startendtag(self, tag, attrs):
+            self.parts.append(self.get_starttag_text())
+        def handle_endtag(self, tag):
+            self.parts.append("</" + tag + ">")
+            if tag in {"code", "pre", "script", "style"} and self.hidden:
+                self.hidden -= 1
+        def handle_data(self, data):
+            if not self.hidden:
+                if text_map is not None:
+                    data = text_map.get(data, data)
+                for source, target in (("Boostrap CSS", "页面样式"), ("Bootstrap CSS", "页面样式"),
+                                       ("Jinja", "打印模板"), ("CSS", "样式")):
+                    data = re.sub(r"(?<![A-Za-z])" + re.escape(source) + r"(?![A-Za-z])", target, data)
+            self.parts.append(data)
+        def handle_entityref(self, name):
+            self.parts.append("&" + name + ";")
+        def handle_charref(self, name):
+            self.parts.append("&#" + name + ";")
+        def handle_comment(self, data):
+            self.parts.append("<!--" + data + "-->")
+    parser = Help()
+    parser.feed(value)
+    return "".join(parser.parts)
+
+
 def boot(api, force_chinese=True):
     html = api.get_text("/app?_lang=zh" if force_chinese else "/app")
     token = re.search(r'frappe.csrf_token\s*=\s*["\']([^"\']+)', html)
@@ -101,6 +140,12 @@ def dictionary(api):
         if target != label:
             entries[label] = target
     entries.update(json.loads((DATA / "field-labels.json").read_text(encoding="utf-8")))
+    entries.update(json.loads((DATA / "ui-overrides.json").read_text(encoding="utf-8")))
+    # Official translated help corrupts some example punctuation. Build these
+    # two keys from pinned native originals, translating prose only.
+    help_prose = json.loads((DATA / "print-help-prose.json").read_text(encoding="utf-8"))
+    for source in json.loads((DATA / "print-help-source.json").read_text(encoding="utf-8")).values():
+        entries[source] = localize_help_prose(source, help_prose)
     # Composite standard-format names are display values, never record renames.
     for row in api.list_docs("Print Format", ["name"], [], 1000):
         name = row["name"]
@@ -253,6 +298,14 @@ def main():
         print(json.dumps({"actual_session_language": actual["lang"], "actual_catalog_audit": coverage}, ensure_ascii=False, indent=2))
         if actual["lang"] != "zh" or any(row["english_names"] for row in coverage.values()):
             raise RuntimeError("Actual installed session still has English system names")
+        required_ui = json.loads((DATA / "ui-overrides.json").read_text(encoding="utf-8"))
+        help_prose = json.loads((DATA / "print-help-prose.json").read_text(encoding="utf-8"))
+        for source in json.loads((DATA / "print-help-source.json").read_text(encoding="utf-8")).values():
+            required_ui[source] = localize_help_prose(source, help_prose)
+        if any(presentation_signature(actual["__messages"].get(key, "")) != presentation_signature(target)
+               for key, target in required_ui.items()):
+            raise RuntimeError("Actual session UI translations differ from the controlled overlay")
+        print(json.dumps({"actual_ui_translations_verified": len(required_ui)}))
         verify_prints(api, actual["__messages"])
         print("OK: installed Simplified Chinese catalog and field coverage verified")
 

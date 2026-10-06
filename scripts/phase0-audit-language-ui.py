@@ -115,6 +115,9 @@ def collect():
                                     offset = source.find(json.dumps(text, ensure_ascii=False))
                                     for option in text.splitlines():
                                         add(source.count("\n", 0, offset) + 1 if offset >= 0 else None, "metadata_option", option)
+                                elif key == "options" and node.get("fieldtype") == "HTML" and isinstance(text, str):
+                                    offset = source.find(json.dumps(text, ensure_ascii=False))
+                                    add(source.count("\n", 0, offset) + 1 if offset >= 0 else None, "metadata_html_help", text)
                                 else:
                                     walk(text)
                         elif isinstance(node, list):

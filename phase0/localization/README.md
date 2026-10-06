@@ -67,3 +67,19 @@ python3 scripts/phase0-validate-reporting.py
 8. 原生标准打印格式更新遭遇保护校验，已停止该写入并保留原始模板。全部非标准格式及十类业务默认使用中文；不得宣称每个受保护标准模板的语言属性已被改写。
 
 此包实现并验证了系统目录、字段及主要业务中文展示，但用户“所有语言/所有页面无英文”的更广泛要求尚不能据此整体关闭。下一小阶段需盘点动态页面和受保护模板的替代/退役方案，始终保留业务编码与核心源码。
+
+## 后续清单与首批补译（2026-10-06）
+
+按交接文件中的顺序执行：源码清单 → 原生补译/扩展 → 有证据才做版本化源码补丁 → 完整回归。清单阶段已推送为 `6a4e7de`；原生补译阶段尚未整体完成。
+
+```sh
+.venv/bin/python scripts/phase0-audit-language-ui.py
+.venv/bin/python -m unittest discover -s scripts -p 'test_phase0*.py' -v
+.venv/bin/python scripts/phase0-localize.py --apply --verify
+```
+
+`ui-source-audit.json` 保存剩余候选的源码路径、行号、原文及实际中文词库结果，不保存用户或会话数据。统计按出现位置计数，不是唯一缺陷数；正则扫描、动态表达式、模板条件与可选模块仍需运行核查。新增扫描包含元数据说明及网页帮助选项。
+
+首批补译包含 16 条动态提示和两段打印帮助。`print-help-source.json` 来自固定版本 Frappe 的 `printing/doctype/print_format/print_format.json`（MIT，原许可证见 `vendor/FRAPPE-LICENSE.txt`）；只翻译 `print-help-prose.json` 中的说明，恢复并保留原始代码示例与链接，避免上游译文把代码符号翻译后破坏可用性。
+
+本批实际验证：8 项离线测试通过，18 条词库读回通过，10 类中文打印预览通过，报表回归及健康检查通过；再次应用无改动。桌面列表进入标准格式详情并查看帮助通过，实时通信来源错误仍存在，小屏和其它动态触发流程未测试。完整交易/权限回归留在最终回归阶段，不能据本批宣称全站零英文。

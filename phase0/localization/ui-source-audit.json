@@ -523,6 +523,15 @@
       "translation": null
     },
     {
+      "path": "apps/frappe/frappe/core/doctype/document_naming_settings/document_naming_settings.json",
+      "line": 40,
+      "kind": "metadata_html_help",
+      "source": "<div class=\"well\">\n    Edit list of Series in the box. Rules:\n    <ul>\n        <li>Each Series Prefix on a new line.</li>\n        <li>Allowed special characters are \"/\" and \"-\"</li>\n        <li>\n            Optionally, set the number of digits in the series using dot (.)\n            followed by hashes (#). For example, \".####\" means that the series\n            will have four digits. Default is five digits.\n        </li>\n        <li>\n            You can also use variables in the series name by putting them\n            between (.) dots\n            <br>\n            Supported Variables:\n            <ul>\n                <li><code>.YYYY.</code> - Year in 4 digits</li>\n                <li><code>.YY.</code> - Year in 2 digits</li>\n                <li><code>.MM.</code> - Month</li>\n                <li><code>.DD.</code> - Day of month</li>\n                <li><code>.WW.</code> - Week of the year</li>\n                <li>\n                    <code>.{fieldname}.</code> - fieldname on the document e.g.\n                    <code>branch</code>\n                </li>\n                <li><code>.FY.</code> - Fiscal Year (requires ERPNext to be installed)</li>\n                <li><code>.ABBR.</code> - Company Abbreviation (requires ERPNext to be installed)</li>\n            </ul>\n        </li>\n    </ul>\n    Examples:\n    <ul>\n        <li>INV-</li>\n        <li>INV-10-</li>\n        <li>INVK-</li>\n        <li>INV-.YYYY.-.{branch}.-.MM.-.####</li>\n    </ul>\n</div>\n<br>\n",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<div class=\"well\">\n    在框中编辑系列列表。规则：\n    <ul>\n        <li>每个系列前缀占一行。</li>\n        <li>允许的特殊字符为“/”和“-”</li>\n        <li>\n            可选地，使用点 (.)\n            后跟井号 (#) 来设置系列中的位数。例如，“.####”表示系列\n            将有四位数字。默认值为五位数字。\n        </li>\n        <li>\n            您还可以在系列名称中使用变量，方法是将它们放在\n            (.) 点之间\n            <br>\n            支持的变量：\n            <ul>\n                <li><code>.YYYY。</code> - 4 位数字的年份</li>\n                <li><code>.YY。</code> - 2 位数字的年份</li>\n                <li><code>.MM.</code> - 月份</li>\n                <li><code>.DD.</code> - 月份中的日期</li>\n                <li><code>.WW.</code> - 一年中的周数</li>\n                <li><code>.FY.</code> - 财政年度</li>\n                <li><code>.ABBR.</code> - 公司缩写</li>\n                <li>\n                    <code>.{fieldname}.</code> - 文档上的字段名称，例如\n                    <code>分支</code>\n                </li>\n            </ul>\n        </li>\n    </ul>\n    示例：\n    <ul>\n        <li>INV-</li>\n        <li>INV-10-</li>\n        <li>INVK-</li>\n        <li>INV-.YYYY.-.{branch}.-.MM.-.####</li>\n    </ul>\n</div>\n<br>\n"
+    },
+    {
       "path": "apps/frappe/frappe/core/doctype/document_naming_settings/document_naming_settings.py",
       "line": 67,
       "kind": "gettext",
@@ -6994,6 +7003,15 @@
       "translation": "SQL 条件。示例：{\"status\" : \"open\", \"priority\" : \"medium\"}"
     },
     {
+      "path": "apps/frappe/frappe/desk/doctype/custom_html_block/custom_html_block.json",
+      "line": 72,
+      "kind": "metadata_html_help",
+      "source": "<p>To interact with above HTML you will have to use `root_element` as a parent selector.</p><p>For example:</p><pre class=\"p-3 bg-gray-100 border-radius rounded-sm mb-0\" style=\"width: fit-content;\"><code>// here root_element is provided by default\nlet some_class_element = root_element.querySelector('.some-class');\nsome_class_element.textContent = \"New content\";\n</code></pre>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<p>要与上述 HTML 交互，您必须使用 `root_element` 作为父选择器。</p><p>例如：</p><pre class=\"p-3 bg-gray-100 border-radius rounded-sm mb-0\" style=\"width:fit-content\"><code>// 这里默认提供 root_element\nlet some_class_element = root_element.querySelector('.some-class');\nsome_class_element.textContent = \"New content\";\n</code></pre>"
+    },
+    {
       "path": "apps/frappe/frappe/desk/doctype/dashboard/dashboard.json",
       "line": 41,
       "kind": "metadata_description",
@@ -8090,6 +8108,15 @@
       "context": null,
       "state": "latin_in_translation",
       "translation": "邮件大小 {0:.2f} MB 超过了允许的最大大小 {1:.2f} MB"
+    },
+    {
+      "path": "apps/frappe/frappe/email/doctype/email_template/email_template.json",
+      "line": 42,
+      "kind": "metadata_html_help",
+      "source": "<h4>Email Reply Example</h4>\n\n<pre>Order Overdue\n\nTransaction {{ name }} has exceeded Due Date. Please take necessary action.\n\nDetails\n\n- Customer: {{ customer }}\n- Amount: {{ grand_total }}\n</pre>\n\n<h4>How to get fieldnames</h4>\n\n<p>The fieldnames you can use in your email template are the fields in the document from which you are sending the email. You can find out the fields of any documents via Setup &gt; Customize Form View and selecting the document type (e.g. Sales Invoice)</p>\n\n<h4>Templating</h4>\n\n<p>Templates are compiled using the Jinja Templating Language. To learn more about Jinja, <a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">read this documentation.</a></p>\n",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<h4>电子邮件回复示例</h4>\n\n<pre>订单逾期\n\n交易 {{ name }} 已超过到期日。请采取必要行动。\n\n详情\n\n- 客户： {{ customer }}\n- 金额： {{ grand_total }}\n</pre>\n\n<h4>如何获取字段名</h4>\n\n<p>您可以在电子邮件模板中使用的字段名是发送电子邮件的文档中的字段。您可以通过设置 &gt; 自定义表单视图并选择文档类型（如销售发票）来查找任何文档的字段。</p>\n\n<h4>模板</h4>\n\n<p>模板使用 Jinja 模板语言编译。要了解有关 Jinja 的更多信息，请<a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\" rel=\"noopener noreferrer\">阅读此文档。</a></p>\n"
     },
     {
       "path": "apps/frappe/frappe/email/doctype/notification/notification.json",
@@ -9460,15 +9487,6 @@
       "translation": "由于缺少依赖项，该功能无法使用。\n\t\t\t\t请联系系统管理员，通过安装 pycups 来启用此功能！"
     },
     {
-      "path": "apps/frappe/frappe/printing/doctype/print_format/print_format.json",
-      "line": 127,
-      "kind": "metadata_description",
-      "source": "Any string-based printer languages can be used. Writing raw commands requires knowledge of the printer's native language provided by the printer manufacturer. Please refer to the developer manual provided by the printer manufacturer on how to write their native commands. These commands are rendered on the server side using the Jinja Templating Language.",
-      "context": null,
-      "state": "latin_in_translation",
-      "translation": "可以使用任何基于字符串的打印机语言。编写原始命令需要了解打印机制造商提供的打印机本机语言。请参阅打印机制造商提供的开发人员手册，了解如何编写本机命令。这些命令使用Jinja模板语言在服务器端呈现。"
-    },
-    {
       "path": "apps/frappe/frappe/printing/doctype/print_settings/print_settings.json",
       "line": 42,
       "kind": "metadata_description",
@@ -9829,24 +9847,6 @@
       "translation": null
     },
     {
-      "path": "apps/frappe/frappe/public/js/frappe/form/controls/markdown_editor.js",
-      "line": 75,
-      "kind": "gettext",
-      "source": "You can only insert images in Markdown fields",
-      "context": null,
-      "state": "latin_in_translation",
-      "translation": "仅可在Markdown字段插入图片"
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/controls/markdown_editor.js",
-      "line": 82,
-      "kind": "gettext",
-      "source": "Insert Image in Markdown",
-      "context": null,
-      "state": "latin_in_translation",
-      "translation": "在Markdown中插入图片"
-    },
-    {
       "path": "apps/frappe/frappe/public/js/frappe/form/footer/form_timeline.js",
       "line": 472,
       "kind": "direct_ui_candidate",
@@ -9874,15 +9874,6 @@
       "translation": null
     },
     {
-      "path": "apps/frappe/frappe/public/js/frappe/form/footer/version_timeline_content_builder.js",
-      "line": 199,
-      "kind": "gettext",
-      "source": "{0} changed the values for {1}",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
       "path": "apps/frappe/frappe/public/js/frappe/form/form.js",
       "line": 1131,
       "kind": "gettext",
@@ -9899,60 +9890,6 @@
       "context": null,
       "state": "latin_in_translation",
       "translation": "修改核心单据类型：DocType 。请格外小心！"
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/form.js",
-      "line": 1372,
-      "kind": "gettext",
-      "source": "This document has unsaved changes which might not appear in final PDF. <br> Consider saving the document before printing.",
-      "context": null,
-      "state": "latin_in_translation",
-      "translation": "此文档存在未保存更改，可能不会反映在最终PDF中。<br>打印前请先保存文档。"
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/grid.js",
-      "line": 256,
-      "kind": "gettext",
-      "source": "Edit {0} rows",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/grid.js",
-      "line": 1153,
-      "kind": "gettext",
-      "source": "No editable fields available for bulk edit.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/grid.js",
-      "line": 1226,
-      "kind": "gettext",
-      "source": "Updated {0} selected {1}. Save the form to keep changes.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/grid.js",
-      "line": 1233,
-      "kind": "gettext",
-      "source": "Update {0} rows",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/grid.js",
-      "line": 1550,
-      "kind": "gettext",
-      "source": "The CSV format is case sensitive",
-      "context": null,
-      "state": "latin_in_translation",
-      "translation": "CSV格式区分大小写"
     },
     {
       "path": "apps/frappe/frappe/public/js/frappe/form/grid_row.js",
@@ -10046,66 +9983,12 @@
     },
     {
       "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
-      "line": 223,
-      "kind": "gettext",
-      "source": "In {0}, {1} is required in every row.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
-      "line": 229,
-      "kind": "gettext",
-      "source": "In {0}, {1} is required in row {2}.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
-      "line": 238,
-      "kind": "gettext",
-      "source": "In {0}, {1} is required in rows {2}.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
-      "line": 245,
-      "kind": "gettext",
-      "source": "In {0}, {1} is required in {2} rows.",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
-      "line": 256,
-      "kind": "gettext",
-      "source": "Please fill the following mandatory fields before saving:",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/save.js",
       "line": 282,
       "kind": "gettext",
       "source": "Invalid \"mandatory_depends_on\" expression",
       "context": null,
       "state": "latin_in_translation",
       "translation": "“mandatory_depends_on”表达式无效"
-    },
-    {
-      "path": "apps/frappe/frappe/public/js/frappe/form/sidebar/form_sidebar.js",
-      "line": 152,
-      "kind": "gettext",
-      "source": "Last Edited By {0}",
-      "context": null,
-      "state": "missing_or_identity",
-      "translation": null
     },
     {
       "path": "apps/frappe/frappe/public/js/frappe/form/templates/print_layout.html",
@@ -12773,6 +12656,15 @@
     },
     {
       "path": "apps/frappe/frappe/website/doctype/web_form/web_form.json",
+      "line": 387,
+      "kind": "metadata_html_help",
+      "source": "<p>Multiple webforms can be created for a single doctype. Add filters specific to this webform to display correct record after submission.</p><p>For Example:</p>\n<p>If you create a separate webform every year to capture feedback from employees add a \n field named year in doctype and add a filter <b>year = 2023</b></p>\n",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<p>可为单一类型创建多个网络表单。为该网络表单添加特定筛选器，以便在提交后显示正确的记录。</p><p>例如</p>\n<p>如果您每年都创建一个单独的网络表格来收集员工的反馈意见，请在 doctype 中添加一个名为年份的 \n 字段，并添加过滤器<b>年份 = 2023</b></p>\n"
+    },
+    {
+      "path": "apps/frappe/frappe/website/doctype/web_form/web_form.json",
       "line": 432,
       "kind": "metadata_description",
       "source": "If enabled, the web form can only be used with a <i>Key</i> from a corresponding <b>Web Form Request</b>.",
@@ -13733,6 +13625,15 @@
       "context": null,
       "state": "latin_in_translation",
       "translation": "如果更新值是公式或表达式（例如 doc.amount * 2），请勾选此项。对于纯文本值请不要勾选。"
+    },
+    {
+      "path": "apps/frappe/frappe/workflow/doctype/workflow_transition/workflow_transition.json",
+      "line": 89,
+      "kind": "metadata_html_help",
+      "source": "<pre><code>doc.grand_total &gt; 0</code></pre>\n\n<p>Conditions should be written in simple Python. Please use properties available in the form only.</p>\n<p>Allowed functions:\n</p><ul>\n<li>frappe.db.get_value</li>\n<li>frappe.db.get_list</li>\n<li>frappe.session</li>\n<li>frappe.utils.now_datetime</li>\n<li>frappe.utils.get_datetime</li>\n<li>frappe.utils.add_to_date</li>\n<li>frappe.utils.now</li>\n</ul>\n<p>Example: </p><pre><code>doc.creation &gt; frappe.utils.add_to_date(frappe.utils.now_datetime(), days=-5, as_string=True, as_datetime=True) </code></pre><p></p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<pre><code>doc.grand_total &gt; 0</code></pre>\n\n<p>条件应使用简单的 Python 语言编写。请仅使用表单中可用的属性。</p>\n<p>允许使用的函数：\n</p><ul>\n<li>frappe.db.get_value</li>\n<li>frappe.db.get_list</li>\n<li>frappe.session</li>\n<li>frappe.utils.now_datetime</li>\n<li>frappe.utils.get_datetime</li>\n<li>frappe.utils.add_too_date</li>\n<li>frappe.utils.now</li>\n</ul>\n<p>示例： </p><pre><code>doc.creation &gt; frappe.utils.add_to_date(frappe.utils.now_datetime(), days=-5, as_string=True, as_datetime=True) </code></pre><p></p>"
     },
     {
       "path": "apps/frappe/frappe/workspace_sidebar/integrations.json",
@@ -15274,6 +15175,15 @@
       "translation": "唯一值，例如SAVE20，用于获取折扣"
     },
     {
+      "path": "apps/erpnext/erpnext/accounts/doctype/currency_exchange_settings/currency_exchange_settings.json",
+      "line": 50,
+      "kind": "metadata_html_help",
+      "source": "<h3>Currency Exchange Settings Help</h3>\n<p>There are 3 variables that could be used within the endpoint, result key and in values of the parameter.</p>\n<p>Exchange rate between {from_currency} and {to_currency} on {transaction_date} is fetched by the API.</p>\n<p>Example: If your endpoint is exchange.com/2021-08-01, then, you will have to input exchange.com/{transaction_date}</p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<h3>货币兑换设置帮助</h3>\n<p>在端点、结果键和参数值中可以使用 3 个变量。</p>\n<p>API 将获取 {transaction_date} 上 {from_currency} 和 {to_currency} 之间的汇率。</p>\n<p>举例说明：如果您的端点是 exchange.com/2021-08-01，则必须输入 exchange.com/{transaction_date}。 </p>"
+    },
+    {
       "path": "apps/erpnext/erpnext/accounts/doctype/dunning/dunning.json",
       "line": 73,
       "kind": "metadata_option",
@@ -15299,6 +15209,15 @@
       "context": null,
       "state": "missing_or_identity",
       "translation": null
+    },
+    {
+      "path": "apps/erpnext/erpnext/accounts/doctype/dunning_letter_text/dunning_letter_text.json",
+      "line": 56,
+      "kind": "metadata_html_help",
+      "source": "<h4>Body Text and Closing Text Example</h4>\n\n<div>We have noticed that you have not yet paid invoice {{sales_invoice}} for {{frappe.db.get_value(\"Currency\", currency, \"symbol\")}} {{outstanding_amount}}. This is a friendly reminder that the invoice was due on {{due_date}}. Please pay the amount due immediately to avoid any further dunning cost.</div>\n\n<h4>How to get fieldnames</h4>\n\n<p>The fieldnames you can use in your template are the fields in the document. You can find out the fields of any documents via Setup &gt; Customize Form View and selecting the document type (e.g. Sales Invoice)</p>\n\n<h4>Templating</h4>\n\n<p>Templates are compiled using the Jinja Templating Language. To learn more about Jinja, <a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">read this documentation.</a></p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<h4>正文和结尾文本示例</h4>\n\n<div>我们注意到您尚未支付 {{sales_invoice}} 的发票 {{frappe.db.get_value(\"Currency\", currency, \"symbol\")}} {{outstanding_amount}}。特此友情提醒，发票到期日为 {{due_date}}。请立即支付应付金额，以免产生更多扣款费用。</div>\n\n<h4>如何获取字段名</h4>\n\n<p>您可以在模板中使用的字段名是文档中的字段。您可以通过设置 &gt; 自定义表单视图并选择文档类型（如销售发票）来查找任何文档的字段。</p>\n\n<h4>模板</h4>\n\n<p>模板使用 Jinja 模板语言编译。要了解有关 Jinja 的更多信息，请<a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">阅读此文档。</a></p>"
     },
     {
       "path": "apps/erpnext/erpnext/accounts/doctype/dunning_type/dunning_type.py",
@@ -16631,6 +16550,15 @@
       "context": null,
       "state": "missing_or_identity",
       "translation": null
+    },
+    {
+      "path": "apps/erpnext/erpnext/accounts/doctype/process_statement_of_accounts/process_statement_of_accounts.json",
+      "line": 277,
+      "kind": "metadata_html_help",
+      "source": "<br>\n<h4>Note</h4>\n<ul>\n<li>\nYou can use <a href=\"https://jinja.palletsprojects.com/en/2.11.x/\" target=\"_blank\">Jinja tags</a> in <b>Subject</b> and <b>Body</b> fields for dynamic values.\n</li><li>\n    All fields in this doctype are available under the <b>doc</b> object and all fields for the customer to whom the mail will go to is available under the  <b>customer</b> object.\n</li></ul>\n<h4> Examples</h4>\n<!-- {% raw %} -->\n<ul>\n    <li><b>Subject</b>:<br><br><pre><code>Statement Of Accounts for {{ customer.customer_name }}</code></pre><br></li>\n    <li><b>Body</b>: <br><br>\n<pre><code>Hello {{ customer.customer_name }},<br>PFA your Statement Of Accounts from {{ doc.from_date }} to {{ doc.to_date }}.</code> </pre></li>\n</ul>\n<!-- {% endraw %} -->",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<br>\n<h4>注意事项</h4>\n<ul>\n<li>\n您可以在 \"<b>主题 \"</b>和<b>\"正文</b>\"字段中使用 \"<a href=\"https://jinja.palletsprojects.com/en/2.11.x/\" target=\"_blank\">Jinja \"标记</a>来获取动态值。\n</li><li>\n    该类型中的所有字段均可在<b>doc</b>对象下使用，而邮件将发送给的客户的所有字段均可在<b>客户</b>对象下使用。\n</li></ul>\n<h4>示例</h4>\n<!-- {% raw %} -->\n<ul>\n    <li><b>主题</b>：<br><br><pre><code> {{ customer.customer_name }}的账目报表 </code></pre><br></li>\n    <li><b>正文</b>：<br><br>\n<pre><code>您好 {{ customer.customer_name }},<br>PFA 您的会计报表从 {{ doc.from_date }} 转到 {{ doc.to_date }}。</code> </pre></li>\n</ul>\n<!-- {% endraw %} -->"
     },
     {
       "path": "apps/erpnext/erpnext/accounts/doctype/process_statement_of_accounts/process_statement_of_accounts.py",
@@ -19936,6 +19864,15 @@
       "translation": "PUR-RFQ-.YYYY.-"
     },
     {
+      "path": "apps/erpnext/erpnext/buying/doctype/request_for_quotation/request_for_quotation.json",
+      "line": 291,
+      "kind": "metadata_html_help",
+      "source": "<p>In your <b>Email Template</b>, you can use the following special variables:\n</p>\n<ul>\n        <li>\n            <code>{{ update_password_link }}</code>: A link where your supplier can set a new password to log into your portal.\n        </li>\n        <li>\n            <code>{{ portal_link }}</code>: A link to this RFQ in your supplier portal.\n        </li>\n        <li>\n            <code>{{ supplier_name }}</code>: The company name of your supplier.\n        </li>\n        <li>\n            <code>{{ contact.salutation }} {{ contact.last_name }}</code>: The contact person of your supplier.\n        </li><li>\n            <code>{{ user_fullname }}</code>: Your full name.\n        </li>\n    </ul>\n<p></p>\n<p>Apart from these, you can access all values in this RFQ, like <code>{{ message_for_supplier }}</code> or <code>{{ terms }}</code>.</p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<p>在<b>电子邮件模板</b>中，您可以使用以下特殊变量：\n</p>\n<ul>\n        <li>\n            <code>{{ update_password_link }}</code>:供应商可以设置新密码登录门户网站的链接。\n        </li>\n        <li>\n            <code>{{ portal_link }}</code>:供应商门户网站中该询价单的链接。\n        </li>\n        <li>\n            <code>{{ supplier_name }}</code>:供应商的公司名称。\n        </li>\n        <li>\n            <code>{{ contact.salutation }} {{ contact.last_name }}</code>:供应商的联系人。\n        </li><li>\n            <code>{{ user_fullname }}</code>:您的全名。\n        </li>\n    </ul>\n<p></p>\n<p>除此之外，您还可以访问此 RFQ 中的所有值，如 <code>{{ message_for_supplier }}</code>或 <code>{{ terms }}</code>.</p>"
+    },
+    {
       "path": "apps/erpnext/erpnext/buying/doctype/request_for_quotation/request_for_quotation.py",
       "line": 555,
       "kind": "gettext",
@@ -20987,6 +20924,15 @@
       "context": null,
       "state": "missing_or_identity",
       "translation": "SAL-CAM-.YYYY.-"
+    },
+    {
+      "path": "apps/erpnext/erpnext/crm/doctype/contract_template/contract_template.json",
+      "line": 55,
+      "kind": "metadata_html_help",
+      "source": "<h4>Contract Template Example</h4>\n\n<pre>Contract for Customer {{ party_name }}\n\n-Valid From : {{ start_date }} \n-Valid To : {{ end_date }}\n</pre>\n\n<h4>How to get fieldnames</h4>\n\n<p>The field names you can use in your Contract Template are the fields in the Contract for which you are creating the template. You can find out the fields of any documents via Setup &gt; Customize Form View and selecting the document type (e.g. Contract)</p>\n\n<h4>Templating</h4>\n\n<p>Templates are compiled using the Jinja Templating Language. To learn more about Jinja, <a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">read this documentation.</a></p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<h4>合同模板示例</h4>\n\n<pre>客户合同 {{ party_name }}\n\n-Valid From : {{ start_date }} \n-Valid To : {{ end_date }}\n</pre>\n\n<h4>如何获取字段名</h4>\n\n<p>您可以在合同模板中使用的字段名称是您创建模板的合同中的字段。您可以通过设置 &gt; 自定义表单视图并选择文档类型（如合同）来查找任何文档的字段。</p>\n\n<h4>模板制作</h4>\n\n<p>模板使用 Jinja 模板语言编译。要了解有关 Jinja 的更多信息，请<a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">阅读此文档。</a></p>"
     },
     {
       "path": "apps/erpnext/erpnext/crm/doctype/crm_settings/crm_settings.js",
@@ -27550,6 +27496,15 @@
       "translation": "员工设置{0}为设置用户ID"
     },
     {
+      "path": "apps/erpnext/erpnext/setup/doctype/terms_and_conditions/terms_and_conditions.json",
+      "line": 53,
+      "kind": "metadata_html_help",
+      "source": "<h4>Standard Terms and Conditions Example</h4>\n\n<pre>Delivery Terms for Order number {{ name }}\n\n-Order Date : {{ transaction_date }} \n-Expected Delivery Date : {{ delivery_date }}\n</pre>\n\n<h4>How to get fieldnames</h4>\n\n<p>The fieldnames you can use in your email template are the fields in the document from which you are sending the email. You can find out the fields of any documents via Setup &gt; Customize Form View and selecting the document type (e.g. Sales Invoice)</p>\n\n<h4>Templating</h4>\n\n<p>Templates are compiled using the Jinja Templating Language. To learn more about Jinja, <a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">read this documentation.</a></p>",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<h4>合同模板示例</h4>\n\n<pre>客户合同 {{ party_name }}\n\n-Valid From : {{ start_date }} \n-Valid To : {{ end_date }}\n</pre>\n\n<h4>如何获取字段名</h4>\n\n<p>您可以在合同模板中使用的字段名称是您创建模板的合同中的字段。您可以通过设置 &gt; 自定义表单视图并选择文档类型（如合同）来查找任何文档的字段。</p>\n\n<h4>模板制作</h4>\n\n<p>模板使用 Jinja 模板语言编译。要了解有关 Jinja 的更多信息，请<a class=\"strong\" href=\"http://jinja.pocoo.org/docs/dev/templates/\">阅读此文档。</a></p>"
+    },
+    {
       "path": "apps/erpnext/erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.js",
       "line": 70,
       "kind": "gettext",
@@ -30890,6 +30845,15 @@
     },
     {
       "path": "apps/erpnext/erpnext/stock/doctype/inventory_dimension/inventory_dimension.json",
+      "line": 126,
+      "kind": "metadata_html_help",
+      "source": "<table class=\"table table-bordered table-condensed\">\n<thead>\n  <tr>\n         <th class=\"table-sr\" style=\"width: 50%;\">Child Document</th>\n         <th class=\"table-sr\" style=\"width: 50%;\">Non Child Document</th>\n   </tr>\n</thead>\n<tbody>\n<tr>\n         <td>\n                  <p> To access parent document field use parent.fieldname and to access child table document field use doc.fieldname </p>\n\n         </td>\n         <td>\n                    <p>To access document field use doc.fieldname </p>\n         </td>\n</tr>\n<tr>\n        <td>\n                   <p><b>Example: </b> parent.doctype == \"Stock Entry\" and doc.item_code == \"Test\" </p>\n\n        </td>\n         <td>\n                   <p><b>Example: </b> doc.doctype == \"Stock Entry\" and doc.purpose == \"Manufacture\"</p>    \n          </td>\n</tr>\n\n</tbody>\n</table>\n\n\n\n\n\n\n",
+      "context": null,
+      "state": "latin_in_translation",
+      "translation": "<table class=\"table table-bordered table-condensed\">\n<thead>\n  <tr>\n         <th class=\"table-sr\" style=\"width: 50%;\">子文档</th>\n         <th class=\"table-sr\" style=\"width: 50%;\">非子文档</th>\n   </tr>\n</thead>\n<tbody>\n<tr>\n         <td>\n                  <p> 要访问父文档字段，请使用 parent.字段名；要访问子表文档字段，请使用doc.字段名 </p>\n\n         </td>\n         <td>\n                    <p>要访问文档字段，请使用 doc.字段名 </p>\n         </td>\n</tr>\n<tr>\n        <td>\n                   <p><b>示例： </b> parent.doctype == \"入库单\" 和 doc.item_code == \"测试物料\" </p>\n\n        </td>\n         <td>\n                   <p><b>示例： </b> doc.doctype == “入库单” 和 doc.purpose == “生产用途”</p>    \n          </td>\n</tr>\n\n</tbody>\n</table>\n\n\n\n\n\n\n"
+    },
+    {
+      "path": "apps/erpnext/erpnext/stock/doctype/inventory_dimension/inventory_dimension.json",
       "line": 167,
       "kind": "metadata_description",
       "source": "Python expression evaluated on the server. Use doc.fieldname for the row and parent.fieldname for the parent document. When it evaluates to true the dimension becomes mandatory. Example: doc.t_warehouse and doc.qty > 0",
@@ -31370,6 +31334,15 @@
       "line": 907,
       "kind": "metadata_description",
       "source": "Allow stock to go below zero for this item, even if negative stock is disabled in Stock Settings.",
+      "context": null,
+      "state": "missing_or_identity",
+      "translation": null
+    },
+    {
+      "path": "apps/erpnext/erpnext/stock/doctype/item/item.json",
+      "line": 1062,
+      "kind": "metadata_html_help",
+      "source": "<div style=\"margin-bottom:10px; color: var(--gray-500) !important;\">Define alternate units for this item. Eg: 1 Box = 12 Nos, set conversion factor as 12. (Will also apply for variants) <a href=\"https://docs.frappe.io/erpnext/uom\" target=\"_blank\">Learn more &#8594;</a></div>",
       "context": null,
       "state": "missing_or_identity",
       "translation": null
@@ -34708,10 +34681,10 @@
   "core_hashes_match": true,
   "session_language": "zh",
   "summary": {
-    "latin_in_translation": 663,
-    "missing_or_identity": 2448,
+    "latin_in_translation": 670,
+    "missing_or_identity": 2438,
     "needs_runtime_review": 744,
-    "translated": 27668
+    "translated": 27698
   },
   "limitations": [
     "Static candidates are not verified user-visible defects.",
