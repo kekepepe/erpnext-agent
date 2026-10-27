@@ -260,6 +260,10 @@ def stock_balance(api: ERPNextAPI, item_code: str, warehouse: str) -> float:
 
 def validate(api: ERPNextAPI, config: dict[str, Any]) -> None:
     company = config["company"]
+    company_doc = api.get_doc("Company", company)
+    cash_account = (company_doc or {}).get("default_cash_account")
+    if not cash_account:
+        raise RuntimeError("Company default cash account is required")
     warehouse = config["warehouse"]
     scenarios = config["scenarios"]
     baseline = {
@@ -306,14 +310,14 @@ def validate(api: ERPNextAPI, config: dict[str, Any]) -> None:
         api,
         company,
         full_invoice,
-        config["cash_account"],
+        cash_account,
         float(full_invoice["grand_total"]),
     )
     partial_payment = ensure_payment(
         api,
         company,
         partial_invoice,
-        config["cash_account"],
+        cash_account,
         float(scenarios["partial"]["partial_payment"]),
     )
 

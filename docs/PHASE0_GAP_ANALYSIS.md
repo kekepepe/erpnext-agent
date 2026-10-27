@@ -1,6 +1,32 @@
 # Phase 0 Gap Analysis
 
+> 2026-10-12 当前处置：CFG-005 最小审批守卫、CFG-004 原生中文 PDF 及 OPS-002 本地实时配置已通过合成技术验收；见 `docs/P09_ACCEPTANCE.md`。原生商业能力依然保留，新增守卫是明确批准的 Must 例外。下方 dated discovery 的“实施中/尚未关闭/无定制需求”均是历史，不代表当前状态。真实 UAT、迁移、完整备份恢复/回退与 RC 仍开放。
+
+
 > 2026-10-06 中文展示更新：用户最新指令已授权简体中文展示包，覆盖系统名称、字段、账户语言和十类中文打印格式；见 `phase0/localization/README.md` 及 handoff 的 dated package。下表 CFG-003 是修改前的发现，不再代表已配置中文格式的当前结果。CFG-004 的 PDF 下载问题尚未关闭；此语言请求不等于 P0.8 范围冻结或 P0.7 整体推进验收。
+
+## 2026-10-11 N2 native approval boundary finding — approved remediation in progress
+
+`CFG-005 / R1-09 / R1-10`: two six-case Purchase Order probes show native Workflow amount conditions do not protect direct submit, creator self-submit or simultaneous amount mutation and approval. Native items field permission protection does not stop an unchanged high-value direct submit. Evidence and minimal isolated application guard proposal are in `docs/NATIVE_APPROVAL_GAP.md` and `phase0/evidence/n2-native-approval-20261011.json`. Probe exits2 mean reproduced blocker, not validation success. All temporary controls restored; submitted probe orders cancelled; original regression/report balances intact.
+
+The owner has explicitly approved the bounded guard as an N2 dependency (DEC-012 / R1-scope-v1.1). Implementation/acceptance is in progress; the scope-decision blocker is resolved. The earlier conclusion that no executed business case justified customization is historical and is superseded for this specific Must approval boundary. Existing purchase/stock/sales/report capability conclusions remain valid. Do not claim that other document types, full least privilege, or all approval requirements are tested. Do not move to N3/N4 until the current N2 blocker is resolved.
+
+## 2026-10-09 disposition under frozen R1 scope
+
+P0.7 progression is authorized by the owner instruction and supported by fresh local regression; P0.8 scope is frozen in `docs/FIRST_RELEASE_SCOPE.md` under the owner's delegated parameter decisions. Older “awaiting review/confirmation” passages below are dated discovery history, not the active task. Scope freeze does not close implementation gaps.
+
+| Item | Frozen disposition | Owner role / acceptance |
+|---|---|---|
+| CFG-001 | Must: Chinese default; controlled exceptions only | ERP administrator / N3, scoped browser UAT |
+| CFG-002 | Must: maker/approver separation and tiered 10,000/20,000 CNY thresholds | Business owner + ERP administrator / N2, server-side boundary/negative tests |
+| CFG-003 | Must: ten controlled Chinese business formats; keep protected standard templates and raw business values | Sales/purchase + ERP administrator / N3, ten HTML/PDF renders; original data readback |
+| CFG-004 | Must: native downloadable PDFs; recorded failure not retried/closed in this batch | Deployment owner / N3 fix + A1 acceptance |
+| PROC-001 | Must: documented returned-order handling | Sales owner / N4 UAT |
+| OPS-001 | Must: production-like restart/service recovery | Deployment owner / A1 rehearsal |
+| OPS-002 | Observed persistent socket.io Invalid origin; Must investigate and validate realtime under supported topology | Deployment owner / N3 investigation + A1 session checks |
+| LANG-004 | Optional-module whole-site candidates deferred; frozen workflows still require complete language/mobile UAT | ERP administrator / N3 + A1; no zero-English claim |
+
+Native business capabilities need no `hardware_erp` based on executed evidence. Existing owner-approved presentation app and three guarded source patches are a distinct, included exception, not proof of a new business gap. Real data, approved fiscal inputs, migration, backups, complete running-site source recovery and RC acceptance remain open. The new native-hook repair preserves raw English item/amount fields and arbitrary comments.
 
 ## Purpose and evidence boundary
 

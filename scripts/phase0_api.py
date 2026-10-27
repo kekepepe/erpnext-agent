@@ -3,11 +3,30 @@
 from __future__ import annotations
 
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
 from http.cookiejar import CookieJar
 from typing import Any
+from urllib.parse import urlparse
+
+
+def validate_disposable_url(base_url: str) -> str:
+    """Accept only an explicit local HTTP endpoint used by disposable stacks."""
+    parsed = urlparse(base_url)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"localhost", "127.0.0.1"}
+        or parsed.port is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path not in {"", "/"}
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError("Disposable localhost HTTP URL with an explicit port required")
+    return base_url.rstrip("/")
 
 
 class ERPNextAPI:
@@ -57,6 +76,16 @@ class ERPNextAPI:
             raise RuntimeError(f"ERPNext login failed: {detail}") from error
         if result.get("message") != "Logged In":
             raise RuntimeError("ERPNext login did not return the expected result")
+        # Frappe v16 embeds the session CSRF token in Desk bootstrap HTML.  A
+        # cookie-authenticated system user must echo it for state-changing REST
+        # requests; Administrator may appear to work without it and would hide
+        # this release-path failure.
+        with self.opener.open(f"{self.base_url}/app", timeout=30) as response:
+            desk_html = response.read().decode("utf-8", errors="replace")
+        match = re.search(r'frappe\.csrf_token\s*=\s*"([^"]+)"', desk_html)
+        if not match:
+            raise RuntimeError("ERPNext Desk did not expose a CSRF token")
+        self.csrf_token = match.group(1)
 
     @staticmethod
     def resource_path(doctype: str, name: str | None = None) -> str:

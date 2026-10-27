@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +56,21 @@ def seed(api: ERPNextAPI, dataset: dict[str, Any]) -> None:
     }
     ensure_named_doc(api, "Company", company_name, company_payload)
 
+    current_year = date.today().year
+    fiscal_year = f"P0 Synthetic Fiscal Year {current_year}"
+    ensure_named_doc(
+        api,
+        "Fiscal Year",
+        fiscal_year,
+        {
+            "year": fiscal_year,
+            "year_start_date": f"{current_year}-01-01",
+            "year_end_date": f"{current_year}-12-31",
+            "disabled": 0,
+            "companies": [{"company": company_name}],
+        },
+    )
+
     for uom in dataset["uoms"]:
         ensure_named_doc(api, "UOM", uom["uom_name"], uom)
 
@@ -86,7 +102,7 @@ def seed(api: ERPNextAPI, dataset: dict[str, Any]) -> None:
         warehouse_names.append(full_name)
 
     for supplier in dataset["suppliers"]:
-        ensure_named_doc(
+        supplier_doc = ensure_named_doc(
             api,
             "Supplier",
             supplier["supplier_name"],
@@ -95,11 +111,19 @@ def seed(api: ERPNextAPI, dataset: dict[str, Any]) -> None:
                 "supplier_type": "Company",
                 "supplier_group": supplier["supplier_group"],
                 "country": company["country"],
+                "default_currency": company["default_currency"],
             },
         )
+        if supplier_doc.get("default_currency") != company["default_currency"]:
+            api.update(
+                "Supplier",
+                supplier["supplier_name"],
+                {"default_currency": company["default_currency"]},
+            )
+            print(f"UPDATED Supplier currency: {supplier['supplier_name']}")
 
     for customer in dataset["customers"]:
-        ensure_named_doc(
+        customer_doc = ensure_named_doc(
             api,
             "Customer",
             customer["customer_name"],
@@ -108,6 +132,31 @@ def seed(api: ERPNextAPI, dataset: dict[str, Any]) -> None:
                 "customer_type": "Company",
                 "customer_group": customer["customer_group"],
                 "territory": company["country"],
+                "default_currency": company["default_currency"],
+            },
+        )
+        if customer_doc.get("default_currency") != company["default_currency"]:
+            api.update(
+                "Customer",
+                customer["customer_name"],
+                {"default_currency": company["default_currency"]},
+            )
+            print(f"UPDATED Customer currency: {customer['customer_name']}")
+
+    for price_list, buying, selling in (
+        ("Standard Buying", 1, 0),
+        ("Standard Selling", 0, 1),
+    ):
+        ensure_named_doc(
+            api,
+            "Price List",
+            price_list,
+            {
+                "price_list_name": price_list,
+                "currency": company["default_currency"],
+                "enabled": 1,
+                "buying": buying,
+                "selling": selling,
             },
         )
 
@@ -194,6 +243,19 @@ def seed(api: ERPNextAPI, dataset: dict[str, Any]) -> None:
     else:
         opening_account_name = f"Temporary Opening - {company['abbr']}"
         opening_account = api.get_doc("Account", opening_account_name)
+        if opening_account is None:
+            native_opening_accounts = api.list_docs(
+                "Account",
+                ["name", "root_type", "account_type", "is_group"],
+                [
+                    ["Account", "company", "=", company_name],
+                    ["Account", "account_type", "=", "Temporary"],
+                    ["Account", "is_group", "=", 0],
+                ],
+            )
+            if len(native_opening_accounts) == 1:
+                opening_account = native_opening_accounts[0]
+                opening_account_name = opening_account["name"]
         if opening_account is None or opening_account.get("root_type") not in {
             "Asset",
             "Liability",

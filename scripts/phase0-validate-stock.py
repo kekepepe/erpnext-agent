@@ -296,6 +296,13 @@ def warehouse_balances(api: ERPNextAPI, warehouse: str) -> dict[str, float]:
 
 
 def validate(api: ERPNextAPI, config: dict[str, Any], dataset: dict[str, Any]) -> None:
+    config = dict(config)
+    company_doc = api.get_doc("Company", config["company"])
+    config["stock_adjustment_account"] = (company_doc or {}).get(
+        "stock_adjustment_account"
+    )
+    if not config["stock_adjustment_account"]:
+        raise RuntimeError("Company stock adjustment account is required")
     opening_evidence = validate_opening_stock(api, config, dataset)
     tracked = config["expected_final_stock"]
     baseline = {

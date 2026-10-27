@@ -1,0 +1,16 @@
+{
+  "scope_version": "R1-scope-v1",
+  "system": {"language": "zh", "time_zone": "Asia/Shanghai"},
+  "global_defaults": {"default_currency": "CNY"},
+  "company": {"company_name": "R1合成发布验证公司", "abbr": "R1D", "country": "China", "default_currency": "CNY", "valuation_method": "Moving Average", "enable_perpetual_inventory": 1},
+  "warehouses": ["R1测试主仓", "R1测试分仓"],
+  "fiscal_start": "2026-01-01", "fiscal_end": "2026-12-31",
+  "supplier": "R1合成供应商", "customer": "R1合成客户",
+  "item": {"item_code": "R1-DEMO-SCREW", "item_name": "首版合成螺钉", "item_group": "R1合成五金", "stock_uom": "Piece", "is_stock_item": 1, "uoms": [{"uom": "Piece", "conversion_factor": 1}, {"uom": "Box", "conversion_factor": 50}]},
+  "buying_price_list": "R1合成采购价目表", "selling_price_list": "R1合成销售价目表",
+  "buying_rate": 60, "selling_rate": 100,
+  "credit_limit": 1000, "credit_days": 30,
+  "synthetic_tax_rate": 5,
+  "tax_note": "5% is an arbitrary synthetic calculation fixture, not a legal or production tax rate. Templates are not automatic defaults. Real tax/account mapping and approval are controlled P0.9/UAT inputs.",
+  "numbering_note": "Use native numbering; no global series or existing P0 transaction is modified. Opening stock, balances and migration are reserved for M1."
+}

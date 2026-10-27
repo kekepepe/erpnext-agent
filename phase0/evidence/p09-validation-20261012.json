@@ -1,0 +1,415 @@
+{
+  "date": "2026-10-12",
+  "scope": "R1-scope-v1.1",
+  "result": "N1-N4_TECHNICAL_COMPLETE_NOT_PRODUCTION_UAT",
+  "versions": {
+    "erpnext": "16.33.0",
+    "frappe": "16.31.0",
+    "erpnext_zh": "0.1.1",
+    "hardware_erp": "0.1.0"
+  },
+  "n2": {
+    "cases": 24,
+    "cancelled_positive_cases": 21,
+    "retained_negative_drafts": 3,
+    "expanded_checks": 67,
+    "repeat_checks": 54,
+    "repeat_created": [],
+    "repeat_reuses_cancelled_positives": true,
+    "final_checks": 54,
+    "final_created": []
+  },
+  "n3": {
+    "reports": 7,
+    "pdfs": 10,
+    "pdf_pages": 10,
+    "all_pages_visually_reviewed": true,
+    "ui_routes": 27,
+    "ui_captures": 54,
+    "viewports": [
+      [
+        1280,
+        720
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "fresh_console_errors_warnings": [],
+    "native_enable_onboarding": 0,
+    "three_exports_text_identical": true
+  },
+  "baseline": {
+    "AR_CNY": 75,
+    "AP_CNY": 60,
+    "stock_balances": 6,
+    "active_GL_vouchers": 11,
+    "cancelled_R1_GL_and_stock_net": 0,
+    "final_reporting_matches_round_2": true
+  },
+  "regression": [
+    {
+      "round": 1,
+      "validator": "purchase",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "stock",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "sales",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "access",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "reporting",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "release",
+      "exit_code": 0
+    },
+    {
+      "round": 1,
+      "validator": "realtime",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "purchase",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "stock",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "sales",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "access",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "reporting",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "release",
+      "exit_code": 0
+    },
+    {
+      "round": 2,
+      "validator": "realtime",
+      "exit_code": 0
+    }
+  ],
+  "offline": {
+    "python_tests": 21,
+    "node_display": "PASS",
+    "compileall": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "configuration": {
+    "final_access_apply_rounds": 2,
+    "access_changed": [],
+    "final_reports_apply_rounds": 2,
+    "reports_changed": []
+  },
+  "image": "erpnext-phase0-zh:16.33.0-0.1.1-approval0.1.0-p1",
+  "image_id": "sha256:8cfe34fd1b9e4c2beabe426a70233835eec9479a330ee88850a4b1eef60abc12",
+  "runtime_source_hashes": {
+    "apps/hardware_erp/hardware_erp/approval.py": "72ff464f8527fdb3cbe81ee46f718bfdf648e63f35d291d72318bea57b8a093b",
+    "apps/hardware_erp/hardware_erp/rules.py": "66f1cfac0bf9a84c6cec56fd5510ec4eda0a162b8879eae18a38cde68f0843b5",
+    "phase0/runtime/frappe.conf.template": "2b6658ca3b7d042366b88cc15b3c6a6771d36ad78c2d4628c048320807f16de8"
+  },
+  "ui_checks": [
+    {
+      "key": "Stock Balance",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Ledger",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Analytics",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Analytics",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Accounts Receivable",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Accounts Payable",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "General Ledger",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Quotation",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Order",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Receipt",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Invoice",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Order",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Delivery Note",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Invoice",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Payment Entry",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Entry",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Reconciliation",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Quotation-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Order-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Receipt-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Invoice-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Order-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Delivery Note-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Invoice-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Payment Entry-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Entry-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Reconciliation-list",
+      "viewport": "desktop",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Balance",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Ledger",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Analytics",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Analytics",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Accounts Receivable",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Accounts Payable",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "General Ledger",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Quotation",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Order",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Receipt",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Invoice",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Order",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Delivery Note",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Invoice",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Payment Entry",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Entry",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Reconciliation",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Quotation-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Order-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Receipt-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Purchase Invoice-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Order-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Delivery Note-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Sales Invoice-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Payment Entry-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Entry-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    },
+    {
+      "key": "Stock Reconciliation-list",
+      "viewport": "mobile",
+      "no_onboarding": true
+    }
+  ],
+  "final_health": "PASS"
+}

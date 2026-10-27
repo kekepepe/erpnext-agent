@@ -5,9 +5,12 @@ h1 { font-size: 23px; text-align: center; }
 table { width: 100%; border-collapse: collapse; margin: 16px 0; }
 th, td { border: 1px solid #d5dce3; padding: 8px; vertical-align: top; }
 th { background: #eef2f6; }
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
 .number { text-align: right; }
 .totals { margin-left: auto; width: 55%; }
 </style>
+{% set currency = doc.get('currency') or frappe.get_doc('Company', doc.company).default_currency %}
 <h1>{{ _(doc.doctype) }}</h1>
 <div class="meta">
   <div>单据编号：{{ doc.name | e }}</div>
@@ -26,8 +29,8 @@ th { background: #eef2f6; }
     <tr><td>{{ loop.index }}</td><td>{{ _(item.get('item_name') or item.item_code) | e }}</td>
     <td>{% if item.get('s_warehouse') or item.get('t_warehouse') %}来源：{{ _(item.get('s_warehouse') or '') | e }}<br>去向：{{ _(item.get('t_warehouse') or '') | e }}{% else %}{{ _(item.get('warehouse') or '') | e }}{% endif %}</td>
     <td class="number">{{ item.get('qty') or 0 }}</td><td>{{ _(item.get('uom') or item.get('stock_uom') or '') | e }}</td>
-    <td class="number">{{ item.get('rate') or item.get('valuation_rate') or 0 }}</td>
-    <td class="number">{{ item.get('amount') or 0 }}</td></tr>
+    <td class="number">{{ item.get('rate') if item.get('rate') is not none else (item.get('basic_rate') or item.get('valuation_rate') or 0) }}</td>
+    <td class="number">{{ item.get('amount') if item.get('amount') is not none else ((item.get('qty') or 0) * (item.get('valuation_rate') or 0)) }}</td></tr>
   {% endfor %}</tbody>
 </table>
 {% endif %}
@@ -41,11 +44,11 @@ th { background: #eef2f6; }
 </tbody></table>
 {% endif %}
 <table class="totals"><tbody>
-{% for field, label in [('net_total','净额'),('total_taxes_and_charges','税费合计'),('discount_amount','折扣金额'),('rounding_adjustment','舍入调整'),('grand_total','总计'),('rounded_total','舍入合计'),('outstanding_amount','未结金额'),('paid_amount','付款金额'),('received_amount','收款金额')] %}
-{% if doc.get(field) is not none %}<tr><td>{{ label }}</td><td class="number">{{ doc.get(field) }}</td></tr>{% endif %}
+{% for field, label in [('net_total','净额'),('total_taxes_and_charges','税费合计'),('discount_amount','折扣金额'),('rounding_adjustment','舍入调整'),('grand_total','总计'),('rounded_total','舍入合计'),('outstanding_amount','未结金额'),('paid_amount','付款金额'),('received_amount','收款金额'),('total_amount','库存移动总金额'),('difference_amount','盘点价值差额')] %}
+{% if doc.get(field) is not none and (field != 'difference_amount' or doc.doctype == 'Stock Reconciliation') and (field != 'total_amount' or doc.doctype == 'Stock Entry') %}<tr><td>{{ label }}</td><td class="number">{{ doc.get(field) }}</td></tr>{% endif %}
 {% endfor %}
 </tbody></table>
-{% if doc.get('currency') %}<div>币种：{{ _(doc.currency) | e }}</div>{% endif %}
+<div>币种：{{ _(currency) | e }}（{{ currency | e }}）</div>
 {% if doc.get('grand_total') is not none and doc.get('currency') == 'CNY' %}
 <div>金额大写：{{ chinese_money(doc.grand_total) }}</div>
 {% endif %}

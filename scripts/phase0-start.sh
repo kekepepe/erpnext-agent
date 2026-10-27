@@ -16,6 +16,8 @@ until ./scripts/phase0-check.sh >/dev/null 2>&1; do
   sleep 1
 done
 docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml exec -T backend bench --site frontend install-app erpnext_zh
+docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml exec -T backend bench --site frontend install-app hardware_erp
+docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml exec -T backend bench --site frontend set-config host_name http://frontend:8080
 docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml exec -T backend bench --site frontend clear-cache
 ./scripts/phase0-check.sh
 if [ ! -x .venv/bin/python ]; then

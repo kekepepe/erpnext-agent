@@ -92,9 +92,34 @@ python3 scripts/phase0-validate-reporting.py
 
 脚本读取 `phase0/reporting-validation.json`，通过原生报表 API 和 REST 只读验证库存余额与流水、采购/销售分析、应收应付、总账、撤销记录和采购/销售单据中英文 HTML 预览。它核对采购退货原单关联及具体科目冲回金额，不创建业务交易。报表日期固定为原始合成场景的 `2026-10-03`；复验日期单独记入证据文档。
 
-P0.7 技术检查已完成，推进评审尚未授权。当前按用户最新要求补齐简体中文界面，语言变更及验证见 `phase0/localization/README.md`。原生 PDF 下载失败仍待配置解决。
+P0.9 的 N1–N4 合成技术实施已完成：九类单据分级审批与最小权限、已批准的独立审批守卫、七类原生报表、十类中文 PDF、实时连接及操作 SOP 均有执行证据。见 [验收记录](docs/P09_ACCEPTANCE.md) 和 [操作 SOP](docs/OPERATOR_SOP.md)。当前下一步为 P0.10 的干净环境安装及守卫生命周期验收；真实映射、迁移、恢复和生产 UAT 仍未完成。
 
 中文扩展安装后，必须使用上述启动脚本或同时传入 `phase0/compose.zh.yaml`，不能仅用基础 Compose 重建服务。首次启动前创建 `.venv` 并执行 `.venv/bin/pip install -r phase0/localization/requirements.txt`。这是一次性 Phase 0 环境，不是生产部署方案。
+
+## 首版原生配置合成基线
+
+范围见 `docs/FIRST_RELEASE_SCOPE.md`，N1配置及受控生产映射流程见 `docs/NATIVE_CONFIGURATION.md`。
+
+```bash
+.venv/bin/python scripts/phase0-configure-release.py --apply
+.venv/bin/python scripts/phase0-configure-release.py
+.venv/bin/python scripts/phase0-validate-release.py --create-drafts
+.venv/bin/python scripts/phase0-validate-release.py
+```
+
+仅本机 R1 合成公司：默认只读，显式参数创建配置/草稿；不提交交易、不修改 P0余额或生产数据。合成5%税率、价格和信用额度不能用于真实业务。阈值和正式PDF已通过合成技术验收；实际财务/税务映射、迁移和UAT仍是后续发布门槛。
+
+## 权限、报表与输出验收
+
+```bash
+.venv/bin/python scripts/phase0-configure-access.py --apply
+.venv/bin/python scripts/phase0-configure-reports.py --apply
+.venv/bin/python scripts/phase0-validate-release-access.py --exercise
+.venv/bin/python scripts/phase0-validate-output.py
+.venv/bin/python scripts/phase0-validate-realtime.py
+```
+
+审批 exercise 仅运行本机合成环境，创建/复用受控案例，按依赖顺序撤销并保留审计。配置脚本不带 `--apply` 时只读。输出验证通过原生 PDF 接口下载并用 Poppler 渲染，文件保存在仓库外的本地临时目录；生成后仍须逐页视觉检查。不要在生产运行这些合成脚本或旧审批缺口探针。
 
 ## 停止
 
@@ -121,7 +146,7 @@ docker compose -f phase0/compose.yaml down -v
 - 创建 Agent、MCP Server 或让 Agent 直接访问数据库；
 - 把本 Compose 文件当作生产部署方案。
 
-测试公司、主数据、采购、库存、销售、退货、应收应付、语言、权限、审批、审计和报表已有合成场景执行证据，Gap Analysis 已形成。Phase 0 还包含 P0.8–P0.12 的范围冻结、必要开发与发布准备；Phase 1 才进入部署。下一步按 `docs/AI_HANDOFF.md` 完成 P0.7 推进评审。
+测试公司、主数据、采购、库存、销售、退货、应收应付、语言、权限、审批、审计和报表已有合成场景执行证据，Gap Analysis 已形成。P0.8 范围冻结已完成；Phase 0 仍须完成 P0.9–P0.12 的配置、必要开发与发布准备；Phase 1 才进入部署。下一步按 `docs/AI_HANDOFF.md` 执行 P0.10 / C0；P0.12 发布就绪评审通过前不进入部署。
 
 ## 来源
 

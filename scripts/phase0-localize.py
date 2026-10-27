@@ -99,11 +99,13 @@ def boot(api, force_chinese=True):
 def dictionary(api):
     convert = OpenCC("t2s").convert
     original = boot(api)["__messages"]
-    entries = {key: convert(value) for key, value in original.items()}
+    # Fresh sites can expose empty boot-message placeholders. They are not
+    # valid Translation documents and must never enter a first-install batch.
+    entries = {key: convert(value) for key, value in original.items() if key and value}
     for filename in ("frappe-zh-v15.csv", "erpnext-zh-v15.csv"):
       with (DATA / "vendor" / filename).open(encoding="utf-8") as f:
         for row in csv.reader(f):
-            if len(row) < 2 or not row[1]:
+            if len(row) < 2 or not row[0] or not row[1]:
                 continue
             source, target = row[0].replace("\\n", "\n"), convert(row[1].replace("\\n", "\n"))
             # Old templates with changed placeholders/markup are unsafe as overlays.
@@ -155,6 +157,7 @@ def dictionary(api):
         elif name.endswith(" with Item Image"):
             base = name[:-16]
             entries[name] = entries.get(base, base) + "（含商品图片）"
+    entries = {key: value for key, value in entries.items() if key and value}
     return original, entries
 
 
@@ -209,7 +212,9 @@ def apply(api, original, entries):
     existing = {(row["source_text"] + (":" + row["context"] if row.get("context") else "")): row for row in rows}
     new = []
     for key, target in entries.items():
-        if original.get(key) == target:
+        # Identity entries add no translation value. Markup-only identity keys
+        # are stripped to empty by Frappe's mandatory-field validation.
+        if original.get(key) == target or key == target:
             continue
         # Store exact contextual keys; Frappe resolves source:context verbatim.
         source, context = key, ""

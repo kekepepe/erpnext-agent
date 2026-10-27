@@ -2,8 +2,8 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: Complete owner-requested Simplified Chinese presentation and its regression checks
-last_updated: 2026-10-06
+current_task: P0.10 C0 - clean-install and lifecycle acceptance for the approved approval guard
+last_updated: 2026-10-27
 updated_by: Codex
 ---
 
@@ -11,13 +11,81 @@ updated_by: Codex
 
 ## Current Objective
 
-Native Quote-to-Cash validation is complete for `SAL-001` through `SAL-010`, including customer stock return, Sales Invoice credit-note evidence, full and partial customer payments, and transaction-level Accounts Receivable evidence.
+### Public repository synchronization — 2026-10-27
 
-The implementation used source-controlled synthetic scenarios and an idempotent REST validator. Two complete post-correction runs reused every matching document and reproduced identical stock, outstanding-balance, payment-allocation, and party-GL results.
+- Owner explicitly authorized committing and pushing all current project changes except sensitive information. This supersedes earlier no-commit/no-push statements for this synchronization only.
+- Publication scope: existing P0.9 implementation and synthetic evidence, incomplete C0 lifecycle work, release documentation and the new UI/Chinese terminology plan. C0 remains unaccepted and UI work remains planned, not implemented.
+- Pre-publication checks: 25 Python tests PASS; Node display checks PASS; lifecycle shell syntax and git diff whitespace checks PASS. Changed/untracked file inventory checked for secret patterns, non-example email addresses and personal local paths: none detected. Runtime evidence uses synthetic identities. Vendored font/wheel hashes match the Dockerfile and include licenses. Local secret/backup exclusions added to .gitignore. No full lifecycle/runtime acceptance is claimed by these checks.
 
-P0.5 and P0.6 were revalidated and completed on 2026-10-03. P0.7.1 through P0.7.7 are implemented; P0.7.8 technical closeout passed on 2026-10-06. The current task is now:
+### UI and Chinese business terminology planning — 2026-10-27
 
-**Complete the owner's 2026-10-06 Simplified Chinese presentation request, then return to the P0.7 progression review. This narrowly scoped request does not authorize P0.8 or Phase 1.**
+- Owner requested a plan first, with later coordinated implementation: fixed left business categories/right content, and terminology grounded in Chinese ERP usage (管家婆、金蝶), rather than literal translation. Plan: `docs/UI_CHINESE_WORKBENCH_PLAN.md` (U0 research → U1 terminology → U2 prototype → U3 native integration → U4 acceptance). No UI code or terminology replacements implemented in this planning turn.
+- Recommended architecture remains ERPNext business backend/native forms plus a bounded presentation extension in this repository; no independent ERP rebuild. Exact extension ownership and cross-route feasibility remain U3 validation items. Research/prototype can precede implementation; current technical execution priority remains C0, followed by UI implementation and affected lifecycle revalidation before M1/A1 final acceptance. Register the presentation scope amendment before implementation; historical P0.9 evidence does not accept the new UI.
+- Runtime update superseding the earlier offline inspection: existing local Docker services were started at the owner's request; frontend restart resolved HTTP 502, and an authenticated Chinese Desk rendered successfully. This is page availability evidence only, not C0 or full business regression acceptance.
+- Next planning deliverables are an evidence-backed terminology table and three linked prototype pages. All tasks are currently unchecked. No commit/push or deployment performed.
+
+### Progress inspection and pre-Phase-1 plan — 2026-10-27
+
+- Owner requested progress inspection and planning before further implementation. Plan: `docs/PRE_PHASE1_PLAN.md`; current execution priority remains P0.10/C0. No milestone was accepted by this planning pass.
+- P0.9 has the recorded 2026-10-12 synthetic technical acceptance. C0 is partially implemented: clean-site initialization, global CNY/language/time-zone, local-account resolution, seed dependencies and ordinary-session CSRF fixes are present. The last purchase-return GL account fix has no subsequent complete runtime acceptance; uninstall/reinstall and two-round full regression are still unproven.
+- Current read-only inspection: Docker socket absent, localhost8080/18080 unreachable; `/private/tmp/p010-lifecycle-accepted` absent. Offline execution: 25 Python tests PASS, Node display checks PASS, lifecycle shell syntax PASS, git diff --check PASS. HEAD f908acc; later work remains uncommitted/untracked; remote refs not refreshed.
+- Before Phase 1: finish C0; complete controlled real-company/identity/configuration mapping plus M1 migration tooling and **two** isolated migration rehearsals (the frozen scope is stricter than the generic checklist); then A1 production-like rebuild, full regression, whole-site recovery/version rollback, employee UAT and immutable RC approval. Existing localhost/R1-only fixtures/preflight are not the real-company release configuration path. External integration/Business API/MCP/Agent items are out of scope, not unfinished mandatory development.
+- This dated note supersedes stale historical next-action/production-readiness statements below. Next implementation action: verify available isolated runtime state, review/retest the final reporting fix, then run the complete C0 lifecycle and persist sanitized evidence outside temporary-only storage. No runtime mutation, commit or push was performed during this inspection.
+
+P0.7 capability discovery and its explicit presentation repair are closed for progression as of 2026-10-09. The owner requested progression to P0.8, confirmed the single-company/CNY/Chinese/core-trading scope and delegated the remaining release-design parameters. `docs/FIRST_RELEASE_SCOPE.md` freezes R1-scope-v1 with a requirement/evidence matrix, named owner roles, measurable acceptance criteria and ordered implementation packages. This is not independent Web GPT review, production UAT or deployment authorization.
+
+**P0.9 / N1–N4 technical implementation completed 2026-10-12 under R1-scope-v1.1. Recommended next task: P0.10 / C0, clean-site installation and lifecycle acceptance of the already-approved approval guard.** Real company/fiscal/tax/identity mapping, migration, employee UAT, full backup/restore/rollback and RC approval remain P0.11/P0.12 release gates. No deployment, commit or push is authorized or performed.
+
+### P0.9 closeout — 2026-10-12
+
+- N2: independent `hardware_erp`0.1.0 installed in the fixed image; nine native Workflows, nine isolated functional identities, Company/stock Warehouse User Permissions and native least-privilege permissions configured. Guard protects state/docstatus, current thresholds, company/creator identity, independent approvers and business-input integrity; return-to-Pending permits correction/reapproval. No new business Core patch, custom schema or external endpoint.
+- Acceptance: 24 synthetic cases. Final expanded exercise exit0 with67 checks (two new positive fixtures); second repeat exit0 with54 checks, created[]. Repeat rechecks persistent negatives and retained audit; cancelled positive fixtures are reused, not resubmitted. Both order boundaries10,000/10,000.01 and payment20,000/20,000.01, nine types, linked receipts/invoices/returns/credits, transfers/counts, reverse cancellation, dual-role self approval, client-save/flag mutation, direct submit/cancel, intermediate edits, cancellation price changes, credit1000.01/limit1000, company/warehouse/price/admin/audit rejection verified. Twenty-one positive cases cancelled; three deliberate negative drafts retained. Native Version/Comment/Permission Log absent from automatic cleanup; SR track_changes enabled and new SR Version verified.
+- N3: seven native reports assigned through Custom Role, preserving standard definitions/native role grants; stock/financial source ledgers and Journal Entry dependency are read-only. Proper functional roles run all seven; cross-company filters reject/return no business data. Ten controlled Chinese native PDF downloads/text-data checks and every rendered page reviewed; 10 PDFs/10 pages, repeated successfully. CJK font with pinned hash and native host_name internal Docker URL fix resources. Fixed NGINX socket topology validates external origins before matching private Host/Origin; authenticated native namespace passes, foreign origin403 and missing authentication rejected. Fresh browser has no error/warn messages.
+- Chinese UI: in-app browser technical checklist of ten details, ten R1-filtered lists and seven reports at1280×720 /390×844; dictionary additions close observed report/actions/onboarding/help/name omissions. Stored English business fields, internal identifiers and raw content remain preserved. Native System Settings.enable_onboarding=0 removes obstructing onboarding cards; fresh browser screenshots confirm this at both sizes; full role-by-role employee UAT remains A1. See `docs/P09_ACCEPTANCE.md` for precise evidence and limitations.
+- N4: `docs/OPERATOR_SOP.md` covers master/price/tax/credit, purchase/receipt/invoice/payment, stock/count, sales/shipping/receivable, returns/net-delivery explanation, reapproval/cancellation/audit, reconciliation/month close, manual legal-invoice reference, PDF and restart/recovery boundaries. Native API technical role walk-through performed; actual employee training/sign-off remains A1.
+- Rebuilt/restarted final image and verified deployed approval/rules/proxy hashes match repository. Versions ERPNext16.33.0/Frappe16.31.0/erpnext_zh0.1.1/hardware_erp0.1.0. Health passes. Existing purchase/stock/sales/access/reporting/release/realtime validators each ran twice exit0; P0 AR75/AP60, six stock balances and eleven active GL vouchers preserved. Python21 tests, Node display checks, compilation and diff whitespace checks pass.
+- Synthetic evidence in `phase0/evidence/`; binary PDFs/screenshots remain local outside public repository. `phase0-validate-release.py` now accepts retained cancelled N2 history while asserting zero active stock/GL balances; N1 four draft tax arithmetic fixtures still100+5=105. Unused pre-guard negative-payment draft removed; all submitted audit retained.
+- Reproduce: start.sh → configure-release --apply → configure-access --apply → configure-reports --apply → validate-release → validate-release-access --exercise → validate-output → validate-realtime. Native config defaults to read-only; exercise only disposable localhost. Do not rerun old native gap probe against the expanded active Workflows or switch to base-only Compose.
+- Remaining gates: clean site/migration/uninstall/upgrade lifecycle (C0), controlled real mapping, missing/incorrect actual tax applicability validation, return-tax/discount/period cases, migration rehearsal, backups/full-site version rollback, role UAT and immutable RC. Synthetic5% and untaxed threshold fixtures are not actual tax policy; neither real finance inputs nor production readiness is claimed.
+
+
+### P0.9.2 / N2 guard authorization and implementation — 2026-10-12
+
+The owner explicitly approved the minimum server-side approval guard proposal. DEC-012 and R1-scope-v1.1 record the narrow amendment. Independent `apps/hardware_erp` is installed in the disposable image; native roles/User Permissions/Workflows remain the workflow engine. N2 implementation and expanded normal/negative verification are complete; see the closeout above. The dated approval blocker below is resolved by this decision; do not request that permission again. No unrelated business customization, integration, API/MCP/Agent or Core change is authorized. N3/N4 follow after N2 acceptance.
+
+### P0.9.2 / N2 approval boundary investigation — 2026-10-11 (historical, scope approval now received)
+
+- **Blocked pending a concrete scope amendment:** frozen R1-09/R1-10 require server-side approval/self-approval/bypass rejection. Native Purchase Order Workflow does not enforce these across direct submit or amount changes in the same REST request. Do not mark N2 complete or silently begin N3/N4/P0.10.
+- Added `scripts/phase0-probe-approval.py` (readonly default, explicit localhost-only `--exercise`), two-run sanitized evidence in `phase0/evidence/n2-native-approval-20261011.json`, and `docs/NATIVE_APPROVAL_GAP.md` with actual cases, source explanation, temporary-configuration restoration and the smallest reviewable fix proposal.
+- Both six-case probes exit2 as expected gap evidence, NOT acceptance pass: normal10,000 approved; normal10,000.01 rejected; manager same-request amount increase+submit, manager direct submit, creator self-submit, and manager direct submit with native items permlevel2 guard all submit10,000.01. Only Purchase Order is evidenced; do not infer other document types have been tested.
+- Submitted probe orders are cancelled; unused drafts removed; the original Workflow semantics and absence of the temporary items Property Setter restored in both runs. Four unused earlier experiment drafts also removed. Cancelled synthetic orders/audit remain; no receipts/invoices/payments/stock/GL created. No unsafe release Workflow enabled.
+- Docker Desktop restarted; services started using the existing Chinese overlay with `--no-build`; frontend restart cleared initial502. Health passes with ERPNext16.33.0/Frappe16.31.0/erpnext_zh0.1.1. Original purchase/stock/sales/access validators exit0; reporting twice exit0 with identical stdout; N1 readonly config passes. AR75/AP60 and original stock/GL remain intact. P0.6 access success covers only its original narrow tests and does NOT override the new negative evidence.
+- Smallest unblock action: owner approval of the isolated server-side approval guard proposed in `docs/NATIVE_APPROVAL_GAP.md`, as an N2 dependency, followed by R1 scope/DEC amendment and implementation. No Core modification, external API/MCP/Agent, or mixing business controls into the Chinese presentation app is proposed. The confirmation request cites FIRST_RELEASE_SCOPE's explicit scope-amendment rule; approval is pending. Alternative: owner explicitly revises the server-side approval requirement; never silently weaken it.
+- After unblocking: complete least-privilege roles/company/warehouse restrictions, full tiered approval/return/cancellation/audit negative tests, then N3 PDF/realtime/scoped Chinese UAT and N4 SOP. Real configuration mapping, migration, recovery and production UAT remain later gates. No commit/push.
+
+### P0.9.1 / N1 execution — 2026-10-09
+
+- Source-controlled isolated `phase0/release-baseline.json`, native REST configure/validate scripts, three safety tests and `docs/NATIVE_CONFIGURATION.md` implement the company/two-warehouse/CNY/fiscal/account/tax/master/UOM/price/credit/terms baseline without Core, global settings, permissions or P0 transaction changes.
+- New R1D synthetic company uses native chart (96 accounts including one test-tax leaf), 2026 annual fiscal year, two active warehouses, four nondefault tax templates, one independent item/customer/supplier and CNY price lists. Synthetic tax5%, price60/100, limit1000 and terms30days are calculation fixtures, not real-business facts.
+- First customer root-group request failed with native validation; corrected to an independent leaf group and resumed without deleting records or overwriting drift. Corrected apply passed; two readonly configuration and tax readbacks passed with identical respective stdout; final reapply creates/changes nothing.
+- Four tax fixtures are draft0 only: quotations `SAL-QTN-2026-00002/00003`, purchase orders `PUR-ORD-2026-00006/00007`; included/excluded inputs both produce net100/tax5/gross105. R1D GL/stock ledger empty. Native numbering remains unchanged.
+- Full offline suite18 tests passes; JSON/Python compilation passes. Original P0 reporting after N1 passes and matches pre-N1 stdout apart from logger-added final newline; AR75/AP60, six stock balances, eleven active vouchers, cancellation/return evidence unchanged. Final health passes.
+- N1 technical configuration package is complete; real fiscal/account/tax/name/user mappings remain controlled deployment/UAT inputs. Missing-tax approval rejection, actual credit blocking, return/discount/period checks are not inferred from the four drafts.
+- Next N2: translate R1-scope-v1 thresholds and responsibility roles into native Workflow/Role/User Permission fixtures; prove boundary values, maker/approver separation and direct API rejection. Do not submit high-impact real transactions, introduce business customization without a native gap, or silently begin N3/M1/A1.
+
+### Latest closeout and review — 2026-10-09
+
+- `erpnext_zh` 0.1.1 uses native Item link/field formatting and `timeline_refresh` to translate composite item titles, CNY words and historical system Info status without rewriting records. No new Core patch; original three approved source changes remain bounded by DEC-010.
+- New files: `apps/erpnext_zh/erpnext_zh/display.py`, `public/js/form_display.js`, `scripts/test_phase0_form_display.js`; hooks/version/Chinese Compose image updated. Pure authenticated money conversion has no document lookup, database access or write.
+- Fixed container build dependency: pinned Flit wheel with SHA-256 verification and offline installation after two container PyPI DNS failures. Subsequent build/start succeeded. Prior amount display was overwritten by native refresh; scoped formatter correction passed rendered verification.
+- Actual 2026-10-09 checks: start and pre/post health exit 0; 15 Python tests; Node hook-contract checks; Node syntax/Python compilation; Chinese catalog and ten print previews; purchase, stock, sales, access and reporting validators; source UI audit; REST original-field readback all passed. Two full reporting stdout values identical. AR CNY 75 / AP CNY 60, six selected stock balances, eleven balanced active GL vouchers and cancelled-payment trace preserved. Commands/evidence are in `docs/PHASE0_VALIDATION.md`.
+- Native in-app CUA browser: 1280×720 procurement form and 390×844 fresh-load first viewport; item row expands, Chinese money/status render, no blank page/framework overlay. Resize initially retained a sidebar over content; fresh narrow reload resolved it. Existing socket.io Invalid origin remains. No full mobile workflow or complete site recovery was claimed.
+- P0.7 progression is recorded from the owner's direct instruction plus this local review. P0.8 is complete under delegated scope authority, not an approval of fictitious real-company facts.
+- Release conditions remain open: native PDF (not retried here), realtime origin, full frozen-screen language/mobile UAT, running-site recovery, real configuration data and migration. Protected standard templates and private/free business text remain unchanged. Optional whole-site language candidates are outside R1; retain the audit queue without claiming zero English.
+- Scope: one company/two warehouses/CNY/Chinese business PDF/core trading/seven native reports; no business `hardware_erp`, external integration, independent Business API/MCP/Agent. Existing presentation app remains approved. Purchase/sales thresholds 10,000; financial additional approval 20,000; all makers and approvers separated. Tax templates and real fiscal inputs require controlled P0.9 mapping and financial UAT, not a fabricated universal rate.
+- Git baseline `f908acc` matched local `origin/main` before this change; no commit/push has been performed in this task and remote refs were not refreshed. Historic repository paragraphs below are prior snapshots.
+
+The 2026-10-06 packages below are historical evidence. Their former P0.7-review and universal-language gates are superseded only by the dated R1 scope and this closeout; later release gates remain open.
 
 ### Owner-directed Chinese presentation package — 2026-10-06
 
@@ -129,8 +197,8 @@ Repository implementation and future observed runtime behaviour continue to outr
 - Repository: `kekepepe/erpnext-agent`.
 - Branch: `main`.
 - Latest verified and pushed main commit:
-  - `34ded94` — P0.7.7 Gap Analysis and purchase-return accounting assertions
-  - This P0.7.8 documentation closeout follows that commit; verify Git for its eventual hash.
+  - `f908acc` — guarded Chinese workflow/timeline presentation (local HEAD and local `origin/main` matched at task start).
+  - P0.7/P0.8/N1 changes in this turn are uncommitted/unpushed; remote refs were not refreshed.
 - Repository visibility is intentionally **public** for the current Web GPT → GitHub → Codex collaboration workflow.
 - Public visibility is a collaboration requirement only. It is not permission to commit real company data.
 - Only code, synthetic data, sanitized examples, non-sensitive documentation, and validation evidence may be committed.
@@ -440,7 +508,9 @@ These must remain incomplete until actual evidence exists.
 
 ## In Progress
 
-- [ ] Close P0.7.8 and obtain the recorded review decision before P0.8 scope freeze.
+- [x] P0.7.8 progression and P0.8 scope freeze recorded on 2026-10-09.
+- [x] P0.9.1 / N1 synthetic native configuration baseline completed.
+- [x] Execute P0.9.2 / N2 native role/approval package; real mapping and release UAT remain pending.
 
 ### P0.7.7 execution record — 2026-10-06
 
@@ -896,7 +966,7 @@ Execute the following work packages in order. Do not begin implementation of con
 - [x] Review `git diff`, `git diff --check`, and `git status`.
 - [x] Update `docs/PHASE0_VALIDATION.md`, this handoff, and the Gap Analysis with actual results and failures.
 - [x] Confirm the native-discovery subset of Phase 0 exit criteria in `docs/ROADMAP.md` has evidence; the complete development/release criteria remain pending P0.8–P0.12.
-- [ ] Obtain an explicit P0.7 review decision before advancing the handoff to P0.8 scope freeze; do not change the current phase to Phase 1.
+- [x] Owner-directed P0.7 progression and local evidence review recorded 2026-10-09; Phase remains 0.
 
 Expected P0.7 deliverables:
 
@@ -912,16 +982,16 @@ P0.7 must remain read-only with respect to validated business transactions where
 
 Begin only after P0.7 evidence and the Gap Analysis are reviewed. This gate turns evidence into an approved, testable first-release scope.
 
-- [ ] Build a requirement-to-evidence matrix for purchase, stock, sales, returns, AR, AP, reporting, language/print, permissions, approvals, audit, and required operating controls.
-- [ ] For every confirmed requirement, record one disposition: native configuration, process/SOP, `hardware_erp` customization, deployment-required integration, or explicit post-release deferral.
-- [ ] Label each item `Must`, `Should`, or `Deferred`; no `Must` item may have an unresolved owner, acceptance criterion, or implementation path.
-- [ ] Define measurable acceptance criteria and the validation layer for every `Must` and accepted `Should` item.
-- [ ] Freeze the first-release functional scope, supported organization structure, roles, approval matrix, language/print boundary, reports, and data-migration scope.
-- [ ] Decide whether `hardware_erp` is required. If no confirmed gap requires it, record that the first release remains native/configuration-only.
-- [ ] Explicitly decide whether any external integration or governed Business API is required for the first deployment. Keep MCP and Agent work deferred unless separately approved by the project owner.
-- [ ] Verify that the approved first-release scope remains consistent with the Phase 0 development / Phase 1 deployment boundary in `docs/ROADMAP.md`.
-- [ ] Refine `docs/DECISIONS.md` only if P0.8 introduces another durable architecture, security, or workflow decision beyond the recorded phase boundary.
-- [ ] Update this handoff so the first unchecked P0 item is the first approved implementation package.
+- [x] Build a requirement-to-evidence matrix for purchase, stock, sales, returns, AR, AP, reporting, language/print, permissions, approvals, audit, and required operating controls.
+- [x] For every confirmed requirement, record one disposition: native configuration, process/SOP, `hardware_erp` customization, deployment-required integration, or explicit post-release deferral.
+- [x] Label each item `Must`, `Should`, or `Deferred`; no `Must` item may have an unresolved owner, acceptance criterion, or implementation path.
+- [x] Define measurable acceptance criteria and the validation layer for every `Must` and accepted `Should` item.
+- [x] Freeze the first-release functional scope, supported organization structure, roles, approval matrix, language/print boundary, reports, and data-migration scope.
+- [x] Decide whether `hardware_erp` is required. If no confirmed gap requires it, record that the first release remains native/configuration-only.
+- [x] Explicitly decide whether any external integration or governed Business API is required for the first deployment. Keep MCP and Agent work deferred unless separately approved by the project owner.
+- [x] Verify that the approved first-release scope remains consistent with the Phase 0 development / Phase 1 deployment boundary in `docs/ROADMAP.md`.
+- [x] Refine `docs/DECISIONS.md` only if P0.8 introduces another durable architecture, security, or workflow decision beyond the recorded phase boundary.
+- [x] Update this handoff so the first unchecked P0 item is the first approved implementation package.
 
 P0.8 deliverables:
 
@@ -930,26 +1000,28 @@ P0.8 deliverables:
 - confirmed phase alignment across `docs/ROADMAP.md`, `docs/DECISIONS.md`, and this handoff
 - ordered Phase 0 implementation backlog with owners and acceptance evidence
 
+P0.8 completed 2026-10-09 under explicit delegated scope authority. Deliverable: `docs/FIRST_RELEASE_SCOPE.md` (R1-scope-v1). Implementation and production UAT are not completed by this scope freeze. First package is N1 / P0.9.1; all real data stays outside the public repository.
+
 ### P0.9 — Complete native ERP configuration and operating model
 
-Implement and source-control every approved native/configuration-first requirement before writing custom code for the same need.
+Implement and source-control every approved native/configuration-first requirement before writing custom code for the same need. N1–N4 technical packages completed 2026-10-12. Real-business mapping/acceptance remains a release gate, not a claimed N1 production deployment.
 
-- [ ] Finalize organization, company, fiscal, chart-of-accounts, tax, warehouse, item/UOM, pricing, customer, supplier, and numbering configuration required by the frozen scope.
-- [ ] Finalize least-privilege roles, User Permissions, approval thresholds, Workflows, segregation of duties, and audit retention settings.
-- [ ] Finalize required native reports, dashboards, print formats, language settings, and customer/supplier-facing output.
-- [ ] Store reproducible fixtures, exports, scripts, or documented configuration steps without committing secrets or real business records.
-- [ ] Write operator SOPs for master data, purchase, receiving, stock, sales, returns, AR/AP, approval, reconciliation, period operations, and exception handling.
-- [ ] Add automated or repeatable acceptance checks and rerun affected regression validators twice where idempotency applies.
-- [ ] Update validation evidence and close each native/configuration item against its requirement ID.
+- [x] P0.9.1 / N1: implement and twice verify the isolated native organization/fiscal/account/tax/master/UOM/pricing/terms/credit technical baseline; real mapping and UAT remain explicitly pending in `docs/NATIVE_CONFIGURATION.md`.
+- [x] Finalize least-privilege roles, User Permissions, approval thresholds, Workflows, segregation of duties, and audit retention settings. **Complete 2026-10-12:** native controls plus the approved guard dependency (DEC-012) verified; real UAT remains A1.
+- [x] Finalize required native reports, dashboards, print formats, language settings, and customer/supplier-facing output.
+- [x] Store reproducible fixtures, exports, scripts, or documented configuration steps without committing secrets or real business records.
+- [x] Write operator SOPs for master data, purchase, receiving, stock, sales, returns, AR/AP, approval, reconciliation, period operations, and exception handling.
+- [x] Add automated or repeatable acceptance checks and rerun affected regression validators twice where idempotency applies.
+- [x] Update validation evidence and close each native/configuration item against its requirement ID.
 
 ### P0.10 — Implement only approved customization gaps
 
 This package is conditional. Skip it with an explicit evidence-backed decision if P0.8 finds no required customization.
 
-- [ ] Create `hardware_erp` only for approved `Must`/accepted `Should` gaps that native configuration or an acceptable process cannot satisfy.
-- [ ] Trace every custom field, DocType, validation, report, hook, permission rule, and integration point to a frozen requirement and confirmed gap.
+- [x] Create `hardware_erp` only for approved `Must`/accepted `Should` gaps that native configuration or an acceptable process cannot satisfy.
+- [x] Trace every custom field, DocType, validation, report, hook, permission rule, and integration point to a frozen requirement and confirmed gap.
 - [ ] Preserve ERPNext Core; do not patch core files.
-- [ ] Add unit/integration/permission tests, fixtures, migration patches, uninstall/rollback notes, and upgrade-impact notes for each customization.
+- [x] Add unit/integration/permission tests, fixtures and lifecycle/rollback/upgrade notes for the approved guard; no app schema migration patch required.
 - [ ] Verify fresh installation and migration on a clean environment, not only the long-lived disposable Phase 0 site.
 - [ ] Run full affected workflow, accounting, stock, access, approval, audit, reporting, and print regressions.
 - [ ] Resolve all release-blocking defects in Phase 0 and record remaining non-blockers as explicitly accepted deferrals.
@@ -1402,7 +1474,7 @@ Important constraints:
 - The Web GPT review has accepted purchase/stock evidence for progression; it has not independently rerun the user's Docker environment.
 - P0.5 sales, return, and transaction-level AR evidence was revalidated and accepted on 2026-10-03.
 - P0.6 language, permissions, roles, approval, and audit validation completed on 2026-10-03. Use native ERPNext language settings; do not add a custom language switcher without evidence that native behaviour is insufficient.
-- The current task is the explicit P0.7 progression review; implementation and local technical checks are complete.
+- Current task is P0.10 / C0; P0.9 closeout and R1-scope-v1.1 supersede historical tasks.
 - Do not renumber or silently replace the existing Phase 0 validation cases.
 - Do not mark a test complete without actual execution evidence.
 - Use synthetic/sanitized data only.
@@ -1414,7 +1486,7 @@ Important constraints:
 - Preserve ERPNext Core.
 - Do not add customization to force a native validation case to pass.
 - Record native limitations as `Configurable`, `Gap`, or `Not Tested` according to evidence.
-- P0.7 is the current task and the first gate of the remaining Phase 0 plan; proceed to P0.8 after its explicit review, not to Phase 1.
+- P0.7/P0.8 and N1 technical baseline are closed for progression; execute N2 first. Phase 1 remains blocked until P0.12 deployment-readiness acceptance.
 - Do not begin `hardware_erp` or deployment-required integration development during P0.7. They may begin only if P0.8 approves them and orders them into P0.10/P0.11.
 - Do not begin Phase 1 until P0.7 through P0.12 are complete and deployment readiness is explicitly approved.
 - Keep MCP, Agent, and multi-Agent work deferred unless the project owner explicitly adds it to a future Phase 0 release scope.

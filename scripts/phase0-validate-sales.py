@@ -438,6 +438,11 @@ def party_gl_amount(
 
 
 def validate(api: ERPNextAPI, config: dict[str, Any]) -> None:
+    config = dict(config)
+    company_doc = api.get_doc("Company", config["company"])
+    config["cash_account"] = (company_doc or {}).get("default_cash_account")
+    if not config["cash_account"]:
+        raise RuntimeError("Company default cash account is required")
     scenarios = config["scenarios"]
     baseline = {
         scenario["item_code"]: stock_balance(

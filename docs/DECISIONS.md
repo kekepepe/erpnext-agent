@@ -86,11 +86,31 @@ This file records durable decisions, not routine implementation notes. New entri
 - **Consequence:** The previous claim that all Core hashes are unchanged is historical only once a patched image is activated. Record the exact approved changed files and leave broad language coverage open until verified. P0.8 scope approval and Phase 1 readiness are not inferred.
 - **Revisit when:** Native fixes land, hooks cover the demonstrated gaps, dependency versions change, or a patch touches anything beyond presentation.
 
+## DEC-011 — Freeze R1 core-trading scope under delegated owner authority
+
+- **Status:** Accepted scope design; implementation and deployment acceptance pending.
+- **Date:** 2026-10-09
+- **Authority:** Owner explicitly requested P0.7→P0.8 progression, confirmed the proposed functional boundary, and delegated organization/approval/accounting/migration parameters to Codex.
+- **Decision:** `docs/FIRST_RELEASE_SCOPE.md` R1-scope-v1 fixes one company/two warehouses/CNY/Chinese UI and business PDFs/core trading/seven native reports. Use native configuration/SOP first, retain the approved `erpnext_zh` presentation extension, and do not create `hardware_erp` business customization or external integrations/independent Business API/MCP/Agent. Migrate master data, opening inventory, unresolved AR/AP and reconciled opening GL; keep completed historical transactions in a controlled read-only archive.
+- **Consequences:** Scope authority is not evidence of real-company configuration, tax rates, production UAT or deployability. Finance-owned native tax/account mapping and actual data are controlled implementation inputs. PDF, realtime, full scoped-language/mobile UAT, migration and complete recovery remain release-blocking Must acceptance conditions. Standard-template protections and user-authored business content stay intact. P0.9–P0.12 implement in the frozen package order before Phase 1.
+- **Revisit when:** A tested Must cannot be satisfied natively, organization/currency/required integration scope changes, or UAT identifies a necessary release requirement. Version the scope change and revalidate affected gates.
+
 ## Open Decisions (remaining)
 
 The following are intentionally undecided pending evidence:
 
-- Exact ERP MVP scope and rollout environment
-- Which Phase 0 gaps require `hardware_erp` customization
+- Exact staging/production rollout environment (R1 functional scope is frozen)
+- Any additional proven Must gap beyond the approved bounded approval guard
 - Business API surface and authentication model
 - First Agent pilot, model/provider, orchestration framework, and success metrics
+
+
+## DEC-012 — Bounded server-side approval guard as an N2 dependency (2026-10-12)
+
+Status: owner approved 2026-10-12; implemented and synthetically validated during N2. Scope version R1-scope-v1.1.
+
+Two native Purchase Order probe runs reproduced direct over-limit submit, creator self-submit, and simultaneous price mutation+approval; native field-level input protection did not force approval transitions. See `docs/NATIVE_APPROVAL_GAP.md` and the sanitized JSON evidence. These executed Must gaps supersede the earlier no-business-customization conclusion only at the approval boundary.
+
+Keep Workflow, roles, User Permissions, transactions and accounting native. Add an isolated `hardware_erp` application containing document-event validation of state/docstatus, current threshold inputs, maker/approver identity and business-input changes during approval. Do not patch Core, add external API/MCP/Agent or put business validation into `erpnext_zh`. The guard is a necessary N2 dependency, not permission to start unrelated roadmap phases. Ordinary business and ownership parameters remain synthetic until controlled real-data mapping/UAT.
+
+Negative tests must exercise native REST/submit/cancel and normal Workflow routes; app removal/configuration drift must block deployment. The original P0 company remains an explicit disposable discovery fixture exception, not a production bypass namespace. A production preflight must reject P0 fixtures and verify all scoped companies/roles/workflows/app presence.

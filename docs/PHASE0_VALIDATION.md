@@ -994,3 +994,86 @@ Native capability validation is complete for the current synthetic scope: enviro
 No evidence currently requires ERPNext Core modification or a `hardware_erp` Custom App. Confirmed first-release work is configuration/process oriented: production role/workflow design, bilingual master/print decisions, native PDF generation/networking, and an SOP for the net Sales Order state after a full return. These dispositions are detailed in `docs/PHASE0_GAP_ANALYSIS.md`.
 
 This closes native capability discovery, not Phase 0 development. P0.8 through P0.12 remain required before deployment.
+
+## P0.7 reconnect closeout and P0.8 scope gate — 2026-10-09
+
+Owner authorized P0.7→P0.8, selected the proposed functional scope and delegated organization/approval/accounting/migration parameter design. `docs/FIRST_RELEASE_SCOPE.md` R1-scope-v1 is the frozen deliverable; DEC-011 records this decision. This is local review/owner-directed progression, not independent hosted CI, Web GPT rerun, production UAT or Phase 1 authorization.
+
+Fresh runtime: Docker was stopped (socket absent, then `db` not running). `docker desktop start` and `./scripts/phase0-start.sh` restored the disposable stack with the Chinese overlay and preserved data volumes. ERPNext 16.33.0 / Frappe 16.31.0 / `erpnext_zh` 0.1.1, nine services and healthy ping passed. Two subsequent builds failed on container PyPI DNS; pinned Flit wheel/hash plus offline installation resolved the build. The first money rendering was overwritten during native refresh; a per-document/currency/amount-scoped formatter fixed it. Failed attempts are not passing evidence.
+
+| Executed command | Actual outcome |
+|---|---|
+| `./scripts/phase0-start.sh` | final build/start exit 0; repeat language/list/translation changes 0 |
+| `.venv/bin/python -m unittest discover -s scripts -p 'test_phase0*.py' -v` | 15 tests pass |
+| `node scripts/test_phase0_form_display.js` | pass: code/private text preservation, native money formatter, zero/stale/currency guards, system Info-only translation |
+| `node --check apps/erpnext_zh/erpnext_zh/public/js/form_display.js` | exit 0 |
+| `PYTHONPYCACHEPREFIX=/private/tmp/erpnext-p07-pycache .venv/bin/python -m compileall -q apps/erpnext_zh scripts` | exit 0; initial default cache path was sandbox-denied, redirected cache succeeded |
+| `.venv/bin/python scripts/phase0-localize.py --verify` | Chinese fresh session/catalog and ten HTML print previews pass |
+| `.venv/bin/python scripts/phase0-validate-purchase.py` | exit 0, existing fixtures reused |
+| `.venv/bin/python scripts/phase0-validate-stock.py` | exit 0, existing fixtures reused |
+| `.venv/bin/python scripts/phase0-validate-sales.py` | exit 0, existing fixtures reused |
+| `.venv/bin/python scripts/phase0-validate-access.py` | exit 0, existing cancelled approval fixtures reused |
+| `.venv/bin/python scripts/phase0-validate-reporting.py` (twice) | both exit 0; complete stdout identical |
+| `.venv/bin/python scripts/phase0-audit-language-ui.py` | exit 0; same three approved Core changes, no new source patch |
+| original PO REST readback and pure money API | `P0 Claw Hammer`, original English `in_words`, docstatus 1 preserved; before/after complete original PO equal; 152→壹佰伍拾贰元整, 0→零元整 |
+| `./scripts/phase0-check.sh` before/after | both exit 0 |
+
+Reporting: stock rows 20, ledger 32, each purchase/sales grouping 4, AR 4, AP 2, GL 47; AR CNY 75 and AP CNY 60; six selected stock balances and eleven active balanced GL vouchers unchanged. Cancelled-payment/default-report exclusion and CNY 17.5 purchase-return linkage/account reversal passed. Report scenario dates remain 2026-10-03, independent of the rerun date.
+
+Rendered flow via supported native in-app CUA (Browser plugin absent): procurement form→item row expansion→reload→amount/activity inspection. URL/title correct, meaningful content, no framework overlay, Chinese composite item title/CNY words/system Info status shown. Item href retains original code; row detail retains raw stored business name. Desktop 1280×720 screenshot `/private/tmp/p07-zh-money-activity.png`; narrow fresh-load 390×844 `/private/tmp/p07-zh-mobile.png`. Resize initially retained an overlaid sidebar, resolved by fresh narrow reload; temporary viewport reset after checks. Narrow first screen is readable; full narrow workflow and all seven hooked DocTypes have not been browser-accepted. Existing `socket.io Invalid origin` persists; no new localization console error. Screenshot files are temporary local QA artifacts, not committed release evidence.
+
+P0.7 closes discovery and the observed three presentation residuals within the new frozen language boundary. PDF was not retried and is Must pending N3/A1; realtime, full scoped language/mobile, complete running-site recovery, migration and real fiscal inputs remain pending release gates. Protected standard templates and external free text are retained; no whole-site zero-English claim.
+
+## P0.9.1 / N1 native synthetic configuration — 2026-10-09
+
+Implemented `phase0/release-baseline.json`, `scripts/phase0-configure-release.py`, `scripts/phase0-validate-release.py`, `scripts/test_phase0_release_config.py` and `docs/NATIVE_CONFIGURATION.md`. Scope R1-scope-v1 / R1-01–05: local REST-only, independent R1D synthetic company, two active warehouses, CNY/perpetual inventory/Moving Average, read-only reused 2026 annual fiscal year, native accounts with AR/AP and stock posting defaults, four nondefault synthetic tax templates, independent Chinese master data, UOM conversion, two price lists/prices, 30-day terms and synthetic credit limit.
+
+The first `--apply` stopped when ERPNext rejected Customer Group root `All Customer Groups`; no customer or transaction was inserted by that failing request. Corrected to an independent leaf group and reran, retaining existing matching configuration. `--apply` corrected run exited0. Two `.venv/bin/python scripts/phase0-configure-release.py` read-only runs exited0 with identical stdout and `created_or_changed=[]`; no duplicates or overwrites. Native account count96 includes the dedicated synthetic tax account. Extra generated empty warehouse leaves are disabled, not deleted, after a Stock Ledger Entry absence check.
+
+`.venv/bin/python scripts/phase0-validate-release.py --create-drafts` exited0. Two subsequent read-only validator runs exited0 with identical stdout. Native tax evidence (arbitrary synthetic 5%, not production/legal rates):
+
+| Draft | Input convention | Native net/tax/gross | Status |
+|---|---|---|---|
+| SAL-QTN-2026-00002 | quotation未税单价100 | 100 / 5 / 105 | draft0 |
+| SAL-QTN-2026-00003 | quotation含税单价105 | 100 / 5 / 105 | draft0 |
+| PUR-ORD-2026-00006 | procurement未税单价100 | 100 / 5 / 105 | draft0 |
+| PUR-ORD-2026-00007 | procurement含税单价105 | 100 / 5 / 105 | draft0 |
+
+R1D has no Stock Ledger Entry or GL Entry; no submitted R1 transaction. Native numbering generated the draft IDs; no existing/global numbering configuration changed. Customer synthetic credit limit1000 and30-day terms read back; actual credit blocking, missing-tax-template approval rejection, return tax/discount/close-period behavior are pending N2/N4/A1, not claimed passed.
+
+JSON parsing and `PYTHONPYCACHEPREFIX=/private/tmp/erpnext-p09-pycache .venv/bin/python -m compileall -q scripts/phase0-configure-release.py scripts/phase0-validate-release.py` passed. Entire offline Python suite now18 tests pass, including non-synthetic namespace rejection before API, existing currency conflict with no write, and readonly missing-company mode with no create. Existing Node display checks remain passed from P0.7.
+
+Post-N1 original `.venv/bin/python scripts/phase0-validate-reporting.py` exited0. Pre/post stdout is identical after removing the orchestration logger's added trailing newline; P0 six stock balances, AR75/AP60, eleven GL vouchers and cancellation/return trace unchanged. Final health exit0. Real parameter mapping, complete role controls, migration, PDF/realtime/recovery and production UAT remain pending as described in the frozen scope. N1 technical baseline is complete; this does not accept actual business configuration or deployment.
+
+Final N1 `.venv/bin/python scripts/phase0-configure-release.py --apply` also exited0 with `created_or_changed=[]`. `git diff --check` passed after closeout; all new/modified files were reviewed and no commit/push was performed.
+
+
+## P0.9.2 / N2 native approval negative evidence — 2026-10-11
+
+Actual runtime: ERPNext16.33.0, Frappe16.31.0, erpnext_zh0.1.1; disposable localhost site. `docker desktop start`, existing base+Chinese Compose `up -d --no-build`, and frontend restart restored services after an initial502. Health passed afterward. No image/Core/business code change in this batch.
+
+Executed `.venv/bin/python scripts/phase0-probe-approval.py --exercise --output /private/tmp/r1-n2-probe-{1,2}.json` twice. **Each exit2, reproduced release blocker**; same six outcomes in both runs. 10,000 normal approval allowed; 10,000.01 normal approval rejected; same-request mutation+submit, manager direct submit, maker direct self-submit and direct submit with native items permlevel2 restriction all allowed10,000.01. These are failures of R1-09/R1-10, not passing approval checks. Sanitized persistent evidence: `phase0/evidence/n2-native-approval-20261011.json`. Source explanation and minimal proposed guard: `docs/NATIVE_APPROVAL_GAP.md`.
+
+Both runs restored original Workflow semantics and absence of temporary Property Setter; cancelled all submitted orders and removed unsubmitted probe drafts. Cancelled records retain audit. Ad-hoc probe orders before the durable script are also cancelled, and four unused drafts00009/00012/00015/00018 removed. No new stock/GL/invoice/payment entries. Probe order numbering is intentionally non-idempotent; reruns are explicit experiments, not startup configuration. Frozen native configuration has not been replaced by the probe's unsafe release candidate.
+
+After cleanup, actual commands and results:
+
+- `./scripts/phase0-check.sh`: exit0.
+- `.venv/bin/python scripts/phase0-probe-approval.py`: exit0, READ_ONLY_READY; no mutation.
+- `.venv/bin/python scripts/phase0-validate-purchase.py`: exit0.
+- `.venv/bin/python scripts/phase0-validate-stock.py`: exit0.
+- `.venv/bin/python scripts/phase0-validate-sales.py`: exit0.
+- `.venv/bin/python scripts/phase0-validate-access.py`: exit0; original basic role/action tests, does not establish the new server-bypass requirements.
+- `.venv/bin/python scripts/phase0-validate-reporting.py`: twice exit0, complete stdout identical; original stock balances, AR75/AP60, GL/cancellation/return evidence unchanged.
+- `.venv/bin/python scripts/phase0-configure-release.py`: readonly exit0, N1 configuration intact, created_or_changed=[]; no active submitted R1 transaction or ledger change.
+
+N2 remains blocked pending the explicit minimal scope amendment; N3/N4 not started. Sales/payment/stock extended approval cases are unrun, not inferred. No commit/push.
+
+
+## P0.9 N1–N4 technical closeout — 2026-10-12
+
+Owner-approved R1-scope-v1.1 minimal hardware_erp guard resolves the dated N2 blocker above. Technical acceptance details and actual commands are in `P09_ACCEPTANCE.md`; sanitized machine evidence is `phase0/evidence/p09-validation-20261012.json`. N2 24 synthetic cases: expanded run67 checks, repeat54, no new repeat fixtures; 21 positive cancelled/audited and3 deliberate negative drafts. Native threshold/self-approval/mutation/cancel/company/warehouse/audit and linked business flows passed. Nine native roles/Workflows configured, final applies twice empty.
+
+Seven functional-role reports and ten native Chinese PDFs/ten pages pass text/data and full rendered-page checks, repeated. Native CJK font/internal host resources and restricted-origin NGINX resolve the PDF and realtime failures. Final browser54 captures cover27 pages at1280x720/390x844, with enable_onboarding=0; all visually reviewed and fresh consoleerror/warn empty. Binary artifacts stay outside repository. Seven baseline validators each two rounds exit0; AR75/AP60, six stock balances,11 active GL vouchers preserved.21 Python tests, Node display checks, compileall and whitespace checks pass. N4 operator SOP saved.
+
+Technical closeout is not real tax/finance/identity acceptance, employee UAT, migration, full restore/rollback or production release. C0 clean-site/lifecycle is next. No commit/push/deployment.

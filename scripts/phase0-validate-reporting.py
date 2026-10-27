@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import urllib.parse
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,13 @@ def load_config(path: Path) -> dict[str, Any]:
     missing = required - set(config)
     if missing:
         raise ValueError(f"Reporting configuration is missing: {sorted(missing)}")
+    # Transaction validators create their synthetic evidence on the execution
+    # date.  Keep the historical fixture start but close reports at this run,
+    # rather than silently excluding a clean lifecycle run after the JSON's
+    # original evidence date.
+    report_date = os.environ.get("PHASE0_REPORT_DATE", date.today().isoformat())
+    config["to_date"] = report_date
+    config["report_date"] = report_date
     if config["from_date"] > config["to_date"]:
         raise ValueError("Reporting from_date must not be after to_date")
     return config
@@ -470,6 +478,19 @@ def validate_general_ledger(
         or return_source.get("return_against") != purchase_return["return_against"]
     ):
         raise RuntimeError(f"Purchase return source/link mismatch: {return_no}")
+    company = api.get_doc("Company", config["company"])
+    inventory_account = (company or {}).get("default_inventory_account")
+    received_not_billed = (company or {}).get("stock_received_but_not_billed")
+    if not inventory_account or not received_not_billed:
+        raise RuntimeError("Company stock posting accounts are missing")
+    configured_postings = list(purchase_return["postings"].values())
+    purchase_return = {
+        **purchase_return,
+        "postings": {
+            inventory_account: next(row for row in configured_postings if row["credit"]),
+            received_not_billed: next(row for row in configured_postings if row["debit"]),
+        },
+    }
     return_rows = [row for row in report_rows if row.get("voucher_no") == return_no]
     if {row.get("account") for row in return_rows} != set(purchase_return["postings"]):
         raise RuntimeError(f"Purchase return GL account mismatch: {return_no}")

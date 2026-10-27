@@ -6,9 +6,13 @@ This file describes phase goals and exit criteria, not daily task status. Daily 
 
 ## Phase 0 — Development and Deployable Release Preparation (Current)
 
+Planning addition (2026-10-27): the owner requested a plan for a fixed left-category/right-content workbench and Chinese ERP business terminology based on 管家婆/金蝶 usage. See `UI_CHINESE_WORKBENCH_PLAN.md` and `PRE_PHASE1_PLAN.md`. Research, glossary and prototype precede UI implementation; affected lifecycle checks and final UAT must precede Phase 1. This records planned work, not completed UI delivery or a replacement for the open C0/M1/A1 gates. Register the presentation scope amendment before implementation.
+
 **Goal:** complete, validate, and package the full approved first ERP release before deployment begins.
 
 Language scope directive (2026-10-06): the owner now requires Simplified Chinese system display names and active-user language. Technical identifiers and externally entered identity/content remain unchanged. This approves the bounded presentation package only; it does not accept P0.7 progression or freeze all P0.8 release requirements. See DEC-009.
+
+First-release scope frozen 2026-10-09 under owner-delegated authority: R1-scope-v1.1 in `docs/FIRST_RELEASE_SCOPE.md`. One company, two warehouses, CNY, Chinese UI and ten business PDFs, core trading and seven native reports. Existing bounded Chinese presentation app/patches remain included; The owner-approved bounded hardware_erp approval guard is an N2 dependency (DEC-012); all other business customization, external integrations, independent Business API/MCP/Agent remain deferred. P0.7 discovery and P0.8 scope gates are closed; P0.9 native configuration/SOP and bounded guard technical implementation closed 2026-10-12; P0.10 clean-install/lifecycle, P0.11 migration and P0.12 real UAT/recovery/RC gates remain open. See DEC-011.
 
 Scope:
 

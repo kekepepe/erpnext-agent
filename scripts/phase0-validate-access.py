@@ -156,6 +156,17 @@ def ensure_workflow(admin: ERPNextAPI, workflow: dict[str, Any]) -> dict[str, An
         ],
     }
     existing = admin.get_doc("Workflow", name)
+    if existing and any(row.get("allowed", "").startswith("R1") for row in existing.get("transitions", [])):
+        # N2 owns the combined native Workflow. A legacy regression must not
+        # overwrite the R1 approval boundary while checking cancelled P0 fixtures.
+        legacy = [row for row in existing["transitions"] if row.get("allowed") == workflow["approver_role"]]
+        expected = {(row["state"], row["action"], row["next_state"]) for row in legacy}
+        if expected != {("Pending", "Approve", "Approved"), ("Approved", "Reject", "Rejected")} or any(
+            row.get("allow_self_approval") or row.get("condition") != "doc.company == 'Phase Zero Hardware Trading Demo'" for row in legacy
+        ) or not existing.get("is_active"):
+            raise RuntimeError(f"N2 Workflow lost its isolated P0 branches: {name}")
+        print(f"EXISTS  N2-managed Workflow (readonly P0 regression): {name}")
+        return existing
     if existing:
         document = admin.update("Workflow", name, payload)
         print(f"EXISTS  Workflow: {name}")
@@ -266,8 +277,8 @@ def fixture_payload(doctype: str, config: dict[str, Any]) -> dict[str, Any]:
             "company": fixture["company"],
             "party_type": "Customer",
             "party": fixture["customer"],
-            "paid_from": "Debtors - PZH",
-            "paid_to": "Cash - PZH",
+            "paid_from": fixture["receivable_account"],
+            "paid_to": fixture["cash_account"],
             "paid_amount": 1,
             "received_amount": 1,
             "source_exchange_rate": 1,
@@ -373,6 +384,20 @@ def validate(
     config: dict[str, Any],
     role_password: str,
 ) -> None:
+    config = dict(config)
+    config["transaction_fixtures"] = dict(config["transaction_fixtures"])
+    company = admin.get_doc("Company", config["transaction_fixtures"]["company"])
+    config["transaction_fixtures"]["receivable_account"] = (company or {}).get(
+        "default_receivable_account"
+    )
+    config["transaction_fixtures"]["cash_account"] = (company or {}).get(
+        "default_cash_account"
+    )
+    if not all(
+        config["transaction_fixtures"].get(key)
+        for key in ("receivable_account", "cash_account")
+    ):
+        raise RuntimeError("Company receivable and cash accounts are required")
     ensure_language(admin, config)
     users = {
         name: ensure_user(admin, user, role_password)

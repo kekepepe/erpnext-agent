@@ -37,6 +37,20 @@ class ChineseMoneyTests(unittest.TestCase):
 
 
 class PresentationTextTests(unittest.TestCase):
+    def test_controlled_translation_sources_and_targets_are_nonempty(self):
+        for filename in (
+            "overrides.json",
+            "catalog-names.json",
+            "field-labels.json",
+            "ui-overrides.json",
+        ):
+            entries = json.loads((ROOT / "phase0/localization" / filename).read_text())
+            self.assertTrue(all(key and value for key, value in entries.items()), filename)
+
+    def test_markup_only_identity_is_not_a_translation(self):
+        source = '<div id="stock-levels-placeholder"></div>'
+        self.assertEqual(source, localize.localize_help_prose(source))
+
     def test_native_help_prose_and_examples(self):
         sources = json.loads((ROOT / "phase0/localization/print-help-source.json").read_text())
         prose = json.loads((ROOT / "phase0/localization/print-help-prose.json").read_text())

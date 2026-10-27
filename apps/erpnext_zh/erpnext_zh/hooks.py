@@ -6,5 +6,5 @@ app_email = "localization@example.invalid"
 app_license = "MIT"
 required_apps = ["erpnext"]
 boot_session = "erpnext_zh.boot.localize_titles"
-app_include_js = ["/assets/erpnext_zh/js/presentation.js"]
+app_include_js = ["/assets/erpnext_zh/js/presentation.js", "/assets/erpnext_zh/js/form_display.js"]
 jinja = {"methods": ["erpnext_zh.printing.chinese_money"]}

@@ -1,0 +1,5 @@
+# P0.10 clean-install overlay. Always use with an isolated Compose project name.
+services:
+  frontend:
+    ports: !override
+      - "18080:8080"

@@ -1,0 +1,930 @@
+{
+  "company": "R1合成发布验证公司",
+  "documents": {
+    "Purchase Order boundary 10000": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00043",
+      "owner": "r1.purchase@example.invalid"
+    },
+    "Purchase Order boundary 10000.01": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00044",
+      "owner": "r1.purchase@example.invalid"
+    },
+    "Purchase Order negative draft": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00045",
+      "owner": "r1.purchase@example.invalid"
+    },
+    "Sales Order boundary 10000": {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00005",
+      "owner": "r1.sales@example.invalid"
+    },
+    "Sales Order boundary 10000.01": {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00006",
+      "owner": "r1.sales@example.invalid"
+    },
+    "Sales Order negative draft": {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00007",
+      "owner": "r1.sales@example.invalid"
+    },
+    "payment boundary 20000": {
+      "doctype": "Payment Entry",
+      "name": "ACC-PAY-2026-00006",
+      "owner": "r1.finance@example.invalid"
+    },
+    "payment boundary 20000.01": {
+      "doctype": "Payment Entry",
+      "name": "ACC-PAY-2026-00007",
+      "owner": "r1.finance@example.invalid"
+    },
+    "flow purchase order": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00046",
+      "owner": "r1.purchase@example.invalid"
+    },
+    "flow purchase receipt": {
+      "doctype": "Purchase Receipt",
+      "name": "MAT-PRE-2026-00006",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow purchase invoice": {
+      "doctype": "Purchase Invoice",
+      "name": "ACC-PINV-2026-00003",
+      "owner": "r1.finance@example.invalid"
+    },
+    "flow sales order": {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00008",
+      "owner": "r1.sales@example.invalid"
+    },
+    "flow delivery note": {
+      "doctype": "Delivery Note",
+      "name": "MAT-DN-2026-00008",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow sales invoice": {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00005",
+      "owner": "r1.finance@example.invalid"
+    },
+    "flow delivery return": {
+      "doctype": "Delivery Note",
+      "name": "MAT-DN-2026-00009",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow sales credit": {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00006",
+      "owner": "r1.finance@example.invalid"
+    },
+    "flow purchase return": {
+      "doctype": "Purchase Receipt",
+      "name": "MAT-PRE-2026-00007",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow purchase debit": {
+      "doctype": "Purchase Invoice",
+      "name": "ACC-PINV-2026-00004",
+      "owner": "r1.finance@example.invalid"
+    },
+    "flow material receipt": {
+      "doctype": "Stock Entry",
+      "name": "MAT-STE-2026-00002",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow transfer": {
+      "doctype": "Stock Entry",
+      "name": "MAT-STE-2026-00003",
+      "owner": "r1.stock@example.invalid"
+    },
+    "flow stock reconciliation": {
+      "doctype": "Stock Reconciliation",
+      "name": "MAT-RECO-2026-00003",
+      "owner": "r1.stock@example.invalid"
+    },
+    "credit limit draft": {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00009",
+      "owner": "r1.sales@example.invalid"
+    },
+    "approval return reentry": {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00047",
+      "owner": "r1.purchase@example.invalid"
+    },
+    "flow stock audit": {
+      "doctype": "Stock Reconciliation",
+      "name": "MAT-RECO-2026-00004",
+      "owner": "r1.stock@example.invalid"
+    }
+  },
+  "checks": [
+    {
+      "check": "Purchase Order mutate during approve",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "Purchase Order client save bypass",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "Purchase Order company escape",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Purchase Order maker approve",
+      "result": "DENIED",
+      "error_type": "WorkflowTransitionError"
+    },
+    {
+      "check": "Purchase Order delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Sales Order mutate during approve",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "Sales Order client save bypass",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "Sales Order company escape",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Sales Order maker approve",
+      "result": "DENIED",
+      "error_type": "WorkflowTransitionError"
+    },
+    {
+      "check": "Sales Order delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "dual role self approval",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "credit limit native block",
+      "result": "DENIED",
+      "error_type": "信用额度已超过"
+    },
+    {
+      "check": "negative payment amount",
+      "result": "DENIED",
+      "error_type": "ApprovalBoundaryError"
+    },
+    {
+      "check": "purchase cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "purchase user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "purchase_manager cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "purchase_manager user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "sales cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "sales user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "sales_manager cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "sales_manager user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "stock cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "stock user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "stock_manager cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "stock_manager user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "finance cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "finance user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "finance_reviewer cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "finance_reviewer user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "owner cross-company read",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "owner user administration",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "stock outside warehouse",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "maker price maintenance",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Purchase Order boundary 10000 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Purchase Order boundary 10000.01 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Sales Order boundary 10000 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "Sales Order boundary 10000.01 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "payment boundary 20000 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "payment boundary 20000.01 audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow purchase order audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow purchase receipt audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow purchase invoice audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow sales order audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow delivery note audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow sales invoice audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow delivery return audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow sales credit audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow purchase return audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow purchase debit audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow material receipt audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow transfer audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow stock reconciliation audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "approval return reentry audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    },
+    {
+      "check": "flow stock audit audit delete",
+      "result": "DENIED",
+      "error_type": "PermissionError"
+    }
+  ],
+  "audits": {
+    "Purchase Order boundary 10000": {
+      "versions": 2,
+      "workflow_comments": [
+        {
+          "name": "v0t7mgd52s",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:12:50.944217",
+          "content": "已批准"
+        },
+        {
+          "name": "v0us4ta9vs",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:12:51.059154",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "Purchase Order boundary 10000.01": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "v100ldjt5r",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:12:51.273968",
+          "content": "待负责人复核"
+        },
+        {
+          "name": "v11rpphr9v",
+          "owner": "r1.owner@example.invalid",
+          "creation": "2026-10-12 08:12:51.361408",
+          "content": "已批准"
+        },
+        {
+          "name": "v12v01kobf",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:12:51.427583",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "Sales Order boundary 10000": {
+      "versions": 2,
+      "workflow_comments": [
+        {
+          "name": "v18lspd3qf",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:12:52.044578",
+          "content": "已批准"
+        },
+        {
+          "name": "v1aqcbhkj4",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:12:52.213786",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "Sales Order boundary 10000.01": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "v1cfe65e50",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:12:52.421313",
+          "content": "待负责人复核"
+        },
+        {
+          "name": "v1d57mkvvv",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:12:52.576543",
+          "content": "拒绝"
+        },
+        {
+          "name": "v1dtclrpm7",
+          "owner": "r1.owner@example.invalid",
+          "creation": "2026-10-12 08:12:52.512902",
+          "content": "已批准"
+        }
+      ]
+    },
+    "payment boundary 20000": {
+      "versions": 2,
+      "workflow_comments": [
+        {
+          "name": "02cq9bkpb4",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:14:38.007042",
+          "content": "已批准"
+        },
+        {
+          "name": "02dqup0dkb",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:14:38.100182",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "payment boundary 20000.01": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "02e4ma7ggk",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:14:38.231163",
+          "content": "待负责人复核"
+        },
+        {
+          "name": "02elj3dgbs",
+          "owner": "r1.owner@example.invalid",
+          "creation": "2026-10-12 08:14:38.296426",
+          "content": "已批准"
+        },
+        {
+          "name": "02fvu65r2l",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:14:38.396710",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow purchase order": {
+      "versions": 2,
+      "workflow_comments": [
+        {
+          "name": "1n0f1lorl0",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:17:26.418020",
+          "content": "已批准"
+        },
+        {
+          "name": "2nut8bmjrg",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.884151",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow purchase receipt": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "1n5stb7qm4",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:26.906811",
+          "content": "已批准"
+        },
+        {
+          "name": "2nsttbtdqr",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.680922",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2nt2gjevog",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:11.779822",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow purchase invoice": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "1n89q8vt4k",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:17:27.271620",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1nabpl58iu",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:27.466983",
+          "content": "已批准"
+        },
+        {
+          "name": "2nr9t5qifa",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.505104",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2nsaiqritr",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:11.602517",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow sales order": {
+      "versions": 2,
+      "workflow_comments": [
+        {
+          "name": "1ncqm0bqvq",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:27.698033",
+          "content": "已批准"
+        },
+        {
+          "name": "2nqc5pdn1b",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.417588",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow delivery note": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "1nh7qne086",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:28.122261",
+          "content": "已批准"
+        },
+        {
+          "name": "2norssnjqd",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.202463",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2npmqdsk2u",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:11.304064",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow sales invoice": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "1nk8009599",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:28.418280",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1nm3uumjkf",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:28.692287",
+          "content": "已批准"
+        },
+        {
+          "name": "2nm68fdfo5",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:19:11.023383",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2nn591re6c",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:11.123460",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow delivery return": {
+      "versions": 5,
+      "workflow_comments": [
+        {
+          "name": "1npg3rpng5",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:28.943028",
+          "content": "待业务经理复核"
+        },
+        {
+          "name": "1nq79c4u4k",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:29.034985",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1nsq06nmrl",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:29.220805",
+          "content": "已批准"
+        },
+        {
+          "name": "1olbrb1du4",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:31.720103",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2nl20bqjcv",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:10.927378",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow sales credit": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "1nui1l4h2v",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:29.463375",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1nv9s88u4p",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:29.592033",
+          "content": "已批准"
+        },
+        {
+          "name": "1ojpdifsm0",
+          "owner": "r1.sales-manager@example.invalid",
+          "creation": "2026-10-12 08:17:31.501173",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "1ok6viv5ft",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:31.637980",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow purchase return": {
+      "versions": 5,
+      "workflow_comments": [
+        {
+          "name": "1o1nosujvj",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:29.778928",
+          "content": "待业务经理复核"
+        },
+        {
+          "name": "1o21cf0226",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:17:29.854138",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1o3h4vi6nv",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:29.994100",
+          "content": "已批准"
+        },
+        {
+          "name": "2ni22iihgj",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:19:10.673750",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "2njfd5e9k2",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:10.771296",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow purchase debit": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "1o6t47ouvr",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:17:30.227793",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1o7ua3mc12",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:30.351851",
+          "content": "已批准"
+        },
+        {
+          "name": "2nh1drip41",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:19:10.596959",
+          "content": "拒绝"
+        },
+        {
+          "name": "2nhh2bt82g",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:19:10.500935",
+          "content": "待财务撤销复核"
+        }
+      ]
+    },
+    "flow material receipt": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "1o95rcmota",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:30.546327",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1oarqgjd56",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:30.630137",
+          "content": "已批准"
+        },
+        {
+          "name": "1ohi77js3q",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:31.321258",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "1oi896ikus",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:31.401114",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow transfer": {
+      "versions": 3,
+      "workflow_comments": [
+        {
+          "name": "1ob1sa7ase",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:30.747507",
+          "content": "已批准"
+        },
+        {
+          "name": "1ofjf48cmd",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:31.165602",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "1og9rqv2r1",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:31.255412",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow stock reconciliation": {
+      "versions": 0,
+      "workflow_comments": [
+        {
+          "name": "1ocv8chol5",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:30.840223",
+          "content": "待财务复核"
+        },
+        {
+          "name": "1od7i2blq0",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:30.906856",
+          "content": "已批准"
+        },
+        {
+          "name": "1odtvhp59e",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:17:30.967174",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "1oed0647ej",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:17:31.098030",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "approval return reentry": {
+      "versions": 6,
+      "workflow_comments": [
+        {
+          "name": "gjgd36nlk8",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:42:51.221402",
+          "content": "待负责人复核"
+        },
+        {
+          "name": "gji20atvnv",
+          "owner": "r1.owner@example.invalid",
+          "creation": "2026-10-12 08:42:51.485366",
+          "content": "待审批"
+        },
+        {
+          "name": "gjkrclfvl2",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:42:51.679726",
+          "content": "待负责人复核"
+        },
+        {
+          "name": "gjm8gs9u8r",
+          "owner": "r1.owner@example.invalid",
+          "creation": "2026-10-12 08:42:51.857110",
+          "content": "已批准"
+        },
+        {
+          "name": "gjvtt8a9t2",
+          "owner": "r1.purchase-manager@example.invalid",
+          "creation": "2026-10-12 08:42:52.736105",
+          "content": "拒绝"
+        }
+      ]
+    },
+    "flow stock audit": {
+      "versions": 4,
+      "workflow_comments": [
+        {
+          "name": "gk3od5sne5",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:42:53.135766",
+          "content": "待财务复核"
+        },
+        {
+          "name": "gk447saa6k",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:42:53.239439",
+          "content": "已批准"
+        },
+        {
+          "name": "gk4gfmlsrn",
+          "owner": "r1.stock-manager@example.invalid",
+          "creation": "2026-10-12 08:42:53.294368",
+          "content": "待财务撤销复核"
+        },
+        {
+          "name": "gk6ie4lvmi",
+          "owner": "r1.finance-reviewer@example.invalid",
+          "creation": "2026-10-12 08:42:53.424811",
+          "content": "拒绝"
+        }
+      ]
+    }
+  }
+}

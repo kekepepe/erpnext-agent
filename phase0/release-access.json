@@ -1,0 +1,18 @@
+{
+  "scope_version": "R1-scope-v1.1",
+  "company": "R1合成发布验证公司",
+  "warehouses": ["R1测试主仓 - R1D", "R1测试分仓 - R1D"],
+  "order_threshold": 10000,
+  "payment_threshold": 20000,
+  "users": {
+    "purchase": {"email": "r1.purchase@example.invalid", "role": "R1采购经办"},
+    "purchase_manager": {"email": "r1.purchase-manager@example.invalid", "role": "R1采购经理"},
+    "sales": {"email": "r1.sales@example.invalid", "role": "R1销售经办"},
+    "sales_manager": {"email": "r1.sales-manager@example.invalid", "role": "R1销售经理"},
+    "stock": {"email": "r1.stock@example.invalid", "role": "R1库存经办"},
+    "stock_manager": {"email": "r1.stock-manager@example.invalid", "role": "R1库存复核"},
+    "finance": {"email": "r1.finance@example.invalid", "role": "R1财务经办"},
+    "finance_reviewer": {"email": "r1.finance-reviewer@example.invalid", "role": "R1财务复核"},
+    "owner": {"email": "r1.owner@example.invalid", "role": "R1业务负责人"}
+  }
+}

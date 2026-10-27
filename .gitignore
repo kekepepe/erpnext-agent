@@ -4,3 +4,15 @@
 __pycache__/
 *.py[cod]
 .venv/
+
+# Local secrets and site backup material must never enter the public repository.
+.env.*
+!.env.example
+site_config.json
+common_site_config.json
+*.sql
+*.sql.gz
+*.pem
+*.key
+*.p12
+*.pfx

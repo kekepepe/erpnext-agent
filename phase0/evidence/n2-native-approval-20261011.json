@@ -1,0 +1,378 @@
+{
+  "runtime": {
+    "frappe": "16.31.0",
+    "erpnext": "16.33.0"
+  },
+  "date": "2026-10-11",
+  "synthetic_only": true,
+  "runs": [
+    {
+      "bypass_cases": [
+        "rest_mutate_and_submit",
+        "manager_direct_submit",
+        "maker_direct_submit",
+        "manager_direct_submit_with_items_locked"
+      ],
+      "cases": [
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.0,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00020",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.0,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00020",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "normal_10000",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00021",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00021",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "normal_10000_01",
+          "error_type": "WorkflowTransitionError",
+          "result": "DENIED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00022",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.0,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00022",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "rest_mutate_and_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00023",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00023",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "manager_direct_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00024",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00024",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "maker_direct_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00025",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00025",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "manager_direct_submit_with_items_locked",
+          "result": "ALLOWED"
+        }
+      ],
+      "cleanup": [
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00020"
+        },
+        {
+          "draft_deleted": true,
+          "name": "PUR-ORD-2026-00021"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00022"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00023"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00024"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00025"
+        }
+      ],
+      "field_guard_restored": true,
+      "status": "BLOCKED_NATIVE_APPROVAL",
+      "workflow_restored": true
+    },
+    {
+      "bypass_cases": [
+        "rest_mutate_and_submit",
+        "manager_direct_submit",
+        "maker_direct_submit",
+        "manager_direct_submit_with_items_locked"
+      ],
+      "cases": [
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.0,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00026",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.0,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00026",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "normal_10000",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00027",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00027",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "normal_10000_01",
+          "error_type": "WorkflowTransitionError",
+          "result": "DENIED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00028",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.0,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00028",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "rest_mutate_and_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00029",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00029",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "manager_direct_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00030",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00030",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "maker_direct_submit",
+          "result": "ALLOWED"
+        },
+        {
+          "after": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 1,
+            "grand_total": 10000.01,
+            "modified_by": "p0.approver@example.invalid",
+            "name": "PUR-ORD-2026-00031",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Approved"
+          },
+          "before": {
+            "company": "R1合成发布验证公司",
+            "currency": "CNY",
+            "docstatus": 0,
+            "grand_total": 10000.01,
+            "modified_by": "p0.purchase@example.invalid",
+            "name": "PUR-ORD-2026-00031",
+            "owner": "p0.purchase@example.invalid",
+            "workflow_state": "Pending"
+          },
+          "case": "manager_direct_submit_with_items_locked",
+          "result": "ALLOWED"
+        }
+      ],
+      "cleanup": [
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00026"
+        },
+        {
+          "draft_deleted": true,
+          "name": "PUR-ORD-2026-00027"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00028"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00029"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00030"
+        },
+        {
+          "docstatus": 2,
+          "name": "PUR-ORD-2026-00031"
+        }
+      ],
+      "field_guard_restored": true,
+      "status": "BLOCKED_NATIVE_APPROVAL",
+      "workflow_restored": true
+    }
+  ]
+}
