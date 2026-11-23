@@ -1,0 +1,46 @@
+{
+  "batch": "M1-DEMO-20261101",
+  "stock": [
+    {
+      "item": "示例商品",
+      "warehouse": "示例仓",
+      "unit": "件",
+      "quantity": 2,
+      "unit_cost": 10
+    },
+    {
+      "item": "示例商品",
+      "warehouse": "示例分仓",
+      "unit": "箱",
+      "quantity": 1,
+      "unit_cost": 500,
+      "stock_unit": "件",
+      "factor": 50
+    }
+  ],
+  "receivable": [
+    {
+      "ref": "M1-DEMO-SI-A",
+      "party": "示例客户",
+      "gross": 19,
+      "settled": 4,
+      "payment_ref": "M1-DEMO-R-A"
+    },
+    {
+      "ref": "M1-DEMO-SI-B",
+      "party": "示例客户",
+      "gross": 32,
+      "settled": 2,
+      "payment_ref": "M1-DEMO-R-B"
+    }
+  ],
+  "payable": [
+    {
+      "ref": "M1-DEMO-PI-A",
+      "party": "示例供应商",
+      "gross": 14,
+      "settled": 6,
+      "payment_ref": "M1-DEMO-P-A"
+    }
+  ]
+}

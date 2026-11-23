@@ -1,0 +1,35 @@
+{
+  "source_company": "示例公司",
+  "company": "R1合成发布验证公司",
+  "cutoff": "2026-11-01",
+  "currency": "CNY",
+  "source_sha256": "906a567a2b316a088b1228ef958b51eb6fed3c0b2d037534d418c96f804746aa",
+  "warehouses": {
+    "示例仓": "R1测试主仓 - R1D",
+    "示例分仓": "R1测试分仓 - R1D"
+  },
+  "units": {
+    "件": "Piece",
+    "箱": "Box"
+  },
+  "stock": {
+    "示例商品": "R1-DEMO-SCREW"
+  },
+  "ar": {
+    "示例客户": "R1合成客户"
+  },
+  "ap": {
+    "示例供应商": "R1合成供应商"
+  },
+  "gl": {
+    "库存控制": "Stock In Hand - R1D",
+    "应收控制": "Debtors - R1D",
+    "应付控制": "Creditors - R1D",
+    "期初权益": "Opening Balance Equity - R1D"
+  },
+  "controls": {
+    "stock": "库存控制",
+    "ar": "应收控制",
+    "ap": "应付控制"
+  }
+}

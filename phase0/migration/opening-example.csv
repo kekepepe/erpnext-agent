@@ -1,0 +1,6 @@
+kind,company,key,warehouse,unit,quantity,debit,credit,amount
+stock,示例公司,示例商品,示例仓,件,2,,,20.00
+ar,示例公司,示例客户,,,,,,15.00
+ap,示例公司,示例供应商,,,,,,8.00
+gl,示例公司,示例借方科目,,,,35.00,0.00,
+gl,示例公司,示例贷方科目,,,,0.00,35.00,

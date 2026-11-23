@@ -1,0 +1,6 @@
+{
+  "batch": "M1-DEMO-20261031",
+  "stock": {"item": "示例商品", "warehouse": "示例仓", "unit": "件", "quantity": 2, "unit_cost": 10},
+  "receivable": {"ref": "M1-DEMO-SI-01", "party": "示例客户", "gross": 19, "settled": 4, "payment_ref": "M1-DEMO-RECEIVE-01"},
+  "payable": {"ref": "M1-DEMO-PI-01", "party": "示例供应商", "gross": 12, "settled": 4, "payment_ref": "M1-DEMO-PAY-01"}
+}
