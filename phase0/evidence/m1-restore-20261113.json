@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-13",
+  "scope": "dedicated disposable single-company synthetic M1 batch; no production acceptance",
+  "cutoff": "2026-10-31",
+  "currency": "CNY",
+  "inputs": {
+    "mapping-clean-site.json": "e15c13ba138216fd3a8be68946364083c8ffa7dac2bd38fe98fdc6cfe07d6b3c",
+    "opening-mapping-example.csv": "a4a7a9777576fc619eb26342495e3bd24b78430f2073dabebde71abe262ed91a",
+    "opening-vouchers-example.json": "ceca5e781d51ec4008d9cd291af3cd4d4baade8c73ff2da1f31ee83e2fafdc13"
+  },
+  "runs": [
+    {
+      "port": 18082,
+      "empty_start_sha256": "2d1432f82635942d52fba60848cd7f8c8b46cf26469ae545d4f94651d2ccb32e",
+      "final_balances_sha256": "0790032a908734052b899d490722d59efebd194e5f563201623ed6714eb578dd",
+      "raw_reports_sha256": "cff793db51d6ee4f5b374f922edf9e1737e7e3e7a8dcae299e9cba8a54657e52",
+      "first_post": 1,
+      "created_on_resume": 5,
+      "replay": {
+        "submitted": 6,
+        "created": 0,
+        "reconciled_rows": 7,
+        "cutoff": "2026-10-31"
+      },
+      "report_filters": {
+        "Stock Balance": {
+          "company": "R1合成发布验证公司",
+          "from_date": "2026-01-01",
+          "to_date": "2026-10-31"
+        },
+        "Accounts Receivable": {
+          "company": "R1合成发布验证公司",
+          "report_date": "2026-10-31",
+          "ageing_based_on": "Due Date",
+          "range1": 30,
+          "range2": 60,
+          "range3": 90,
+          "range4": 120
+        },
+        "Accounts Payable": {
+          "company": "R1合成发布验证公司",
+          "report_date": "2026-10-31",
+          "ageing_based_on": "Due Date",
+          "range1": 30,
+          "range2": 60,
+          "range3": 90,
+          "range4": 120
+        },
+        "Trial Balance": {
+          "company": "R1合成发布验证公司",
+          "from_date": "2026-01-01",
+          "to_date": "2026-10-31",
+          "fiscal_year": "R1合成财年2026",
+          "show_zero_values": 1,
+          "show_net_values": 1,
+          "show_unclosed_fy_pl_balances": 1,
+          "with_period_closing_entry_for_opening": 1,
+          "with_period_closing_entry_for_current_period": 1,
+          "include_default_book_entries": 1
+        }
+      }
+    },
+    {
+      "port": 18083,
+      "empty_start_sha256": "2d1432f82635942d52fba60848cd7f8c8b46cf26469ae545d4f94651d2ccb32e",
+      "final_balances_sha256": "0790032a908734052b899d490722d59efebd194e5f563201623ed6714eb578dd",
+      "raw_reports_sha256": "3867579f83ba440cca0a534928941fd71807ee36dcbf5d7495d756ec56912c40",
+      "first_post": 6,
+      "created_on_resume": null,
+      "replay": {
+        "submitted": 6,
+        "created": 0,
+        "reconciled_rows": 7,
+        "cutoff": "2026-10-31"
+      },
+      "report_filters": "same as first site"
+    }
+  ],
+  "restore": {
+    "port": 18084,
+    "backup": "Bench database, public and private files, site crypto config; distinct volumes and identical backend image ID",
+    "source_fingerprint": {
+      "posted": 6,
+      "users": 9,
+      "audit_versions": 9,
+      "files": 2,
+      "state_sha256": "e7de34427e7eb51f952e0661d280553c6ecd4cb77835037be3d79aaea06de18d"
+    },
+    "verification": {
+      "posted": 6,
+      "users": 9,
+      "audit_versions": 9,
+      "files": 2,
+      "state_sha256": "e7de34427e7eb51f952e0661d280553c6ecd4cb77835037be3d79aaea06de18d",
+      "smoke": {
+        "reports": 7,
+        "role_logins": 9,
+        "sales_read_purchase": "DENIED",
+        "native_pdf_bytes": 30714
+      }
+    },
+    "final_balances_sha256": "0790032a908734052b899d490722d59efebd194e5f563201623ed6714eb578dd",
+    "seconds_restore_start_to_data_verification_only": 29,
+    "pdf_fix": "Container-local host_name was missing: native PDF failed with ConnectionRefusedError. Set http://frontend:8080 and verified native Standard PDF invoice number, reference and CNY 19.00. Timing excludes this follow-up.",
+    "attachment_access": {
+      "guest-public": "READ",
+      "finance-public": "READ",
+      "purchase-public": "READ",
+      "guest-private": "DENIED",
+      "finance-private": "READ",
+      "purchase-private": "DENIED"
+    }
+  },
+  "return_field_browser": {
+    "doctype": "Delivery Note",
+    "synthetic_name": "MAT-DN-2026-00007",
+    "viewports": [
+      "1280x720",
+      "390x844 (reload)"
+    ],
+    "visible": [
+      "办理销售贷项",
+      "用于退货账务处理，不表示已经退还资金。",
+      "原销售出库单"
+    ]
+  },
+  "expanded_batch": {
+    "fixture": "phase0/migration/mapping-expanded.json",
+    "date": "2026-11-01",
+    "inputs_sha256": {
+      "mapping-expanded.json": "7bc87874716e52bfd7f3cac8a1d205feb75d9b146c170096dcbe17925963318d",
+      "vouchers-expanded.json": "4e0a31bbdbf4418cf6bab5eec813bebf28ea4e36d3eaec3f9c95a519cb0da945",
+      "opening-expanded.csv": "906a567a2b316a088b1228ef958b51eb6fed3c0b2d037534d418c96f804746aa"
+    },
+    "first": {
+      "submitted": 8,
+      "created": 8,
+      "reconciled_rows": 8,
+      "cutoff": "2026-11-01"
+    },
+    "replay": {
+      "submitted": 8,
+      "created": 0,
+      "reconciled_rows": 8,
+      "cutoff": "2026-11-01"
+    },
+    "target_sha256": "17a342a0b05b32ab51208fdc1a9a22e87dd8a643ef6121905428ee1385407a84",
+    "stock_by_warehouse": {
+      "main": {
+        "pieces": 2,
+        "CNY": 20
+      },
+      "secondary": {
+        "boxes": 1,
+        "pieces": 50,
+        "CNY": 500
+      }
+    },
+    "outstanding_by_invoice": {
+      "M1-DEMO-SI-A": 15,
+      "M1-DEMO-SI-B": 30,
+      "M1-DEMO-PI-A": 8
+    },
+    "equity_credit": 557
+  }
+}

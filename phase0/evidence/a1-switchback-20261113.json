@@ -1,0 +1,226 @@
+{
+  "test": "local synthetic candidate rejection and same-port rollback",
+  "executed": "2026-11-13",
+  "source": "C0 pre-uninstall 20261104_155711, native full backup, new volumes at each stage",
+  "port": 18085,
+  "candidate_image_id": "sha256:8a212cf33780cecabd5b87c674630d8a3b150c79995ea374512c3f7a1de0ba98",
+  "original_index_sha256": "sha256:f159cbad04f1d00785e8b2cd9328624631e03439610a9262e8a0211f80711d1e",
+  "restored_linux_arm64_manifest": "sha256:09ecf63a58770de06c9b1a04ec40feac6f899e4ee864e2be4b63fc65f3f713a5",
+  "build_ref": "pobjo1tpek22amlm0qe1gipsu",
+  "retained_platform_oci_tar_sha256": "a0c75d4c278673b067fc0172763b238565bc4fd32fe73c0c676027f12c08d7c0",
+  "verified_blobs": 30,
+  "missing_historical_attestation": "sha256:8354e030e58331806e4f98867f45826f66842cf2eb10ff609f4d18abcd7bedff",
+  "candidate_preflight": {
+    "audit_retention": "NO_AUTOMATIC_BUSINESS_AUDIT_PURGE",
+    "installed_apps": [
+      "erpnext",
+      "erpnext_zh",
+      "frappe",
+      "hardware_erp"
+    ],
+    "p0_fixture_policy": "ALLOWED_FOR_C0",
+    "result": "PASS",
+    "roles": 9,
+    "workflows": 9
+  },
+  "fault": "candidate clone: deactivate P0 Sales Order Approval (R1 uses this native name)",
+  "candidate_rejection": "ERROR: Missing/drifted Workflow: P0 Sales Order Approval",
+  "rollback_preflight": {
+    "audit_retention": "NO_AUTOMATIC_BUSINESS_AUDIT_PURGE",
+    "installed_apps": [
+      "erpnext",
+      "erpnext_zh",
+      "frappe",
+      "hardware_erp"
+    ],
+    "p0_fixture_policy": "ALLOWED_FOR_C0",
+    "result": "PASS",
+    "roles": 9,
+    "workflows": 9
+  },
+  "seconds_from_fault_rejection_through_recovery_validation": 509,
+  "timing_includes": "first failed start, image recovery, new site, backup restore, both data and output verification on rollback",
+  "balance_checksums": {
+    "candidate": "5ed8660b50d27f0ab6210bab0c95eafadb7c5c6fc7622864d309d47f11a9e174",
+    "rollback": "5ed8660b50d27f0ab6210bab0c95eafadb7c5c6fc7622864d309d47f11a9e174"
+  },
+  "candidate_pdf_checks": [
+    {
+      "doctype": "Quotation",
+      "name": "SAL-QTN-2026-00001",
+      "format": "报价（简体中文）",
+      "sha256": "7b40d206d2aa3ff529266a9f9093731ca9c7a6c541f4e004b24c40a239fed956",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00001",
+      "format": "采购订单（简体中文）",
+      "sha256": "49f313fc9618b35bf66b7d43686d0c11a05af0bde41a11f09d06e8ca962e7b7b",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Receipt",
+      "name": "MAT-PRE-2026-00001",
+      "format": "采购入库（简体中文）",
+      "sha256": "a9a248f25658fe4d314911f00d3372f7b3be5a0fc838698896e85c22fe82163b",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Invoice",
+      "name": "ACC-PINV-2026-00001",
+      "format": "采购发票（简体中文）",
+      "sha256": "7164028b5a852788998d5eeab75e5a6a57a7580dd4b2b36606f7e7593a57ceb6",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00001",
+      "format": "销售订单（简体中文）",
+      "sha256": "accecd680704c49d72a14c79df67c7a04f7f56caa60e55d59ff6bfacd52f8c20",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Delivery Note",
+      "name": "MAT-DN-2026-00001",
+      "format": "销售出库（简体中文）",
+      "sha256": "c010cf31e16107da68a9b2250f773097770176dc787bad9e9f6ed627ef073718",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00001",
+      "format": "销售发票（简体中文）",
+      "sha256": "cd9e451e0d293532fca9e8d510723cc0ffadda842c202593d5f74f1430400834",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Payment Entry",
+      "name": "ACC-PAY-2026-00001",
+      "format": "收付款凭证（简体中文）",
+      "sha256": "bec1acd4f55809b99f560a873e23028ea468a0ed3b9f7edbb42ef95cd1dc246e",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Entry",
+      "name": "MAT-STE-2026-00001",
+      "format": "物料移动（简体中文）",
+      "sha256": "d295ad4daadea212b52868adec3bd0c010af9e9a3e0627bd90eb44e91362be0d",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Reconciliation",
+      "name": "MAT-RECO-2026-00001",
+      "format": "库存调账（简体中文）",
+      "sha256": "59110d62f057ec3e509c13ca861eb76ce9cee4f0b28aaed3a06dbf92e5ea01c9",
+      "pages": 1,
+      "text_data_check": "PASS"
+    }
+  ],
+  "candidate_pdf_rendered_visual_review": "10 pages inspected; titles, tables, totals and footer visible",
+  "rollback_pdf_checks": [
+    {
+      "doctype": "Quotation",
+      "name": "SAL-QTN-2026-00001",
+      "format": "报价（简体中文）",
+      "sha256": "2e5051dcda428054603e4e116d687b8d1e0a479cda7d61c76bf2eeeacb79d68e",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00001",
+      "format": "采购订单（简体中文）",
+      "sha256": "55b6d421a5c110ebfe38ddf74ccadd2b70332a73faa23284ee016aaa4e3fa8a0",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Receipt",
+      "name": "MAT-PRE-2026-00001",
+      "format": "采购入库（简体中文）",
+      "sha256": "bae1cf14eeb84053ce8095fe3044a85cf63cc1ec3671c6ce780a5b10e02eb4d8",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Invoice",
+      "name": "ACC-PINV-2026-00001",
+      "format": "采购发票（简体中文）",
+      "sha256": "719061321c2d5a019b6a8f558c6c9db3f2703612bbe108e9c42be0b5e926c6ae",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00001",
+      "format": "销售订单（简体中文）",
+      "sha256": "4831510554c21c97719f2173b1c36627053d08fda0e868dfc7282e1a2b34a568",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Delivery Note",
+      "name": "MAT-DN-2026-00001",
+      "format": "销售出库（简体中文）",
+      "sha256": "ccddb4f57cd6f008f6686b8102b5e693f371933c5c90c39574e0fd1dce490f3d",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00001",
+      "format": "销售发票（简体中文）",
+      "sha256": "87af48b07c7f14a3710820e95ad2326745ed89d320a664fe570b178c4a4cf556",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Payment Entry",
+      "name": "ACC-PAY-2026-00001",
+      "format": "收付款凭证（简体中文）",
+      "sha256": "83720ea273c6ec74bef59336e73a2f4c77b5e23d7e87c87f5b4667dffdd36a4b",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Entry",
+      "name": "MAT-STE-2026-00001",
+      "format": "物料移动（简体中文）",
+      "sha256": "4ec83c2fa6c38f3c140145d53bc946e35959365d3d2bef298262ffd0277b30c4",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Reconciliation",
+      "name": "MAT-RECO-2026-00001",
+      "format": "库存调账（简体中文）",
+      "sha256": "01c00ceb5e36d499426607112042deab3f60491fc3af9a394ef1f3eb33972ba7",
+      "pages": 1,
+      "text_data_check": "PASS"
+    }
+  ],
+  "rollback_reference_check": "doctype, document name, saved format and page count equal to archived C0 10-document list; text/data verified",
+  "rollback_role_report_checks": 7,
+  "rollback_guest_and_role_readback": [
+    "PASS guest rejected",
+    "PASS purchase: 9 entries, 3 authorized recent documents",
+    "PASS purchase_manager: 14 entries, 7 authorized recent documents",
+    "PASS sales: 9 entries, 3 authorized recent documents",
+    "PASS sales_manager: 14 entries, 7 authorized recent documents",
+    "PASS stock: 18 entries, 12 authorized recent documents",
+    "PASS stock_manager: 20 entries, 12 authorized recent documents",
+    "PASS finance: 21 entries, 12 authorized recent documents",
+    "PASS finance_reviewer: 28 entries, 12 authorized recent documents",
+    "PASS owner: 25 entries, 12 authorized recent documents"
+  ]
+}

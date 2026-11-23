@@ -1,0 +1,197 @@
+{
+  "reports": [
+    {
+      "report": "Stock Balance",
+      "actor": "stock_manager",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "from_date": "2026-01-01",
+        "to_date": "2026-12-31"
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "Stock Ledger",
+      "actor": "stock_manager",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "from_date": "2026-01-01",
+        "to_date": "2026-12-31"
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "Purchase Analytics",
+      "actor": "purchase_manager",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "from_date": "2026-01-01",
+        "to_date": "2026-12-31",
+        "value_quantity": "Quantity",
+        "range": "Monthly",
+        "tree_type": "Supplier",
+        "doc_type": "Purchase Order"
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "Sales Analytics",
+      "actor": "sales_manager",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "from_date": "2026-01-01",
+        "to_date": "2026-12-31",
+        "value_quantity": "Quantity",
+        "range": "Monthly",
+        "tree_type": "Customer",
+        "doc_type": "Sales Order",
+        "curves": "select"
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "Accounts Receivable",
+      "actor": "finance_reviewer",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "report_date": "2026-12-31",
+        "ageing_based_on": "Due Date",
+        "range1": 30,
+        "range2": 60,
+        "range3": 90,
+        "range4": 120
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "Accounts Payable",
+      "actor": "finance_reviewer",
+      "rows": 0,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "report_date": "2026-12-31",
+        "ageing_based_on": "Due Date",
+        "range1": 30,
+        "range2": 60,
+        "range3": 90,
+        "range4": 120
+      },
+      "cross_company": "EMPTY"
+    },
+    {
+      "report": "General Ledger",
+      "actor": "finance_reviewer",
+      "rows": 3,
+      "filters": {
+        "company": "R1合成发布验证公司",
+        "from_date": "2026-01-01",
+        "to_date": "2026-12-31",
+        "categorize_by": "Categorize by Voucher (Consolidated)"
+      },
+      "cross_company": "EMPTY"
+    }
+  ],
+  "pdfs": [
+    {
+      "doctype": "Quotation",
+      "name": "SAL-QTN-2026-00001",
+      "format": "报价（简体中文）",
+      "sha256": "c7d7974d7f7539dd3a78ecba1e2f3e3dd3c300be97b04f85a61ff2733c7a2f7e",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Order",
+      "name": "PUR-ORD-2026-00001",
+      "format": "采购订单（简体中文）",
+      "sha256": "478c52c244600bfbe2f0c857fd214c85ddf03df2f4c0c231a3178582fe067481",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Receipt",
+      "name": "MAT-PRE-2026-00001",
+      "format": "采购入库（简体中文）",
+      "sha256": "1eb3cd7eb993462a412452b1aee76b30edc65b1bf92cf10a1bc9689e5f0dd019",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Purchase Invoice",
+      "name": "ACC-PINV-2026-00001",
+      "format": "采购发票（简体中文）",
+      "sha256": "ffa3bca727fba877eeb0415d327eb105265deaea64fdcc66faf7cc0dee4ebf7c",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Order",
+      "name": "SAL-ORD-2026-00001",
+      "format": "销售订单（简体中文）",
+      "sha256": "9045d07c171dc6dc9f2327801471410a17aea3ff5b5b313b4bbbb74e30e5a293",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Delivery Note",
+      "name": "MAT-DN-2026-00001",
+      "format": "销售出库（简体中文）",
+      "sha256": "e97c7d0534ee8cba713a970ac5760644d2f4713bb64aa436992d986d922f312d",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Sales Invoice",
+      "name": "ACC-SINV-2026-00001",
+      "format": "销售发票（简体中文）",
+      "sha256": "ffb882076cda77156c3dc54873e72e0416a1e483df8cbfb3b4b59e1cd3e0f763",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Payment Entry",
+      "name": "ACC-PAY-2026-00001",
+      "format": "收付款凭证（简体中文）",
+      "sha256": "1f5ed30dc5f3ff4c8ae54dab13bcdf8451402ccf18d3c012ca2baf0811c91a8e",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Entry",
+      "name": "MAT-STE-2026-00001",
+      "format": "物料移动（简体中文）",
+      "sha256": "37f653b203042b3d2b199b83b7a36900d2255565b287a2d353c89c0111a9b952",
+      "pages": 1,
+      "text_data_check": "PASS"
+    },
+    {
+      "doctype": "Stock Reconciliation",
+      "name": "MAT-RECO-2026-00001",
+      "format": "库存调账（简体中文）",
+      "sha256": "bfc4734c688d0a45eed5f36ac71ef1454c80d328be0d55db74beda01c019e3ac",
+      "pages": 1,
+      "text_data_check": "PASS"
+    }
+  ],
+  "date": "2026-11-06",
+  "scope": "Presentation-only print semantics regression after C0 snapshot",
+  "semantics": {
+    "unsaved_native_previews": 13,
+    "cancelled_print_denied": 1,
+    "source_documents_unchanged": 8,
+    "result": "PASS"
+  },
+  "pdf_visual_review": "All 10 pages reviewed; no clipping or missing Chinese glyphs",
+  "reporting": "PASS: fixed P0 inventory, AR75/AP60 and GL assertions",
+  "offline_python_tests": 33,
+  "limitations": [
+    "HTML variants are unsaved previews, not approved transactions",
+    "Cancelled printing remains denied by native policy",
+    "Full field vocabulary and employee finance review remain open"
+  ]
+}

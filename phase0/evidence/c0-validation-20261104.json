@@ -1,0 +1,686 @@
+{
+  "executed_date": "2026-11-04",
+  "reviewed_date": "2026-11-06",
+  "scope": "C0 fixed-version synthetic lifecycle; not production release",
+  "result": "PASS",
+  "image_id": "sha256:f159cbad04f1d00785e8b2cd9328624631e03439610a9262e8a0211f80711d1e",
+  "versions": [
+    "erpnext 16.33.0  ()",
+    "erpnext_zh 0.1.1  ()",
+    "frappe 16.31.0  ()",
+    "hardware_erp 0.1.0  ()"
+  ],
+  "initial_apps": {
+    "frontend": [
+      "frappe",
+      "erpnext"
+    ]
+  },
+  "uninstalled_apps": {
+    "frontend": [
+      "frappe",
+      "erpnext",
+      "erpnext_zh"
+    ]
+  },
+  "final_apps": {
+    "frontend": [
+      "frappe",
+      "erpnext",
+      "erpnext_zh",
+      "hardware_erp"
+    ]
+  },
+  "preflight_before": {
+    "audit_retention": "NO_AUTOMATIC_BUSINESS_AUDIT_PURGE",
+    "installed_apps": [
+      "erpnext",
+      "erpnext_zh",
+      "frappe",
+      "hardware_erp"
+    ],
+    "p0_fixture_policy": "ABSENT",
+    "result": "PASS",
+    "roles": 9,
+    "workflows": 9
+  },
+  "preflight_after": {
+    "audit_retention": "NO_AUTOMATIC_BUSINESS_AUDIT_PURGE",
+    "installed_apps": [
+      "erpnext",
+      "erpnext_zh",
+      "frappe",
+      "hardware_erp"
+    ],
+    "p0_fixture_policy": "ALLOWED_FOR_C0",
+    "result": "PASS",
+    "roles": 9,
+    "workflows": 9
+  },
+  "missing_configuration_reason": "ERROR: Missing/drifted Role: R1采购经办",
+  "write_barrier": {
+    "result": "PASS: ingress and workers stopped throughout guard removal",
+    "services": [
+      {
+        "Service": "backend",
+        "State": "running"
+      },
+      {
+        "Service": "configurator",
+        "State": "exited"
+      },
+      {
+        "Service": "create-site",
+        "State": "exited"
+      },
+      {
+        "Service": "db",
+        "State": "running"
+      },
+      {
+        "Service": "frontend",
+        "State": "exited"
+      },
+      {
+        "Service": "queue-long",
+        "State": "exited"
+      },
+      {
+        "Service": "queue-short",
+        "State": "exited"
+      },
+      {
+        "Service": "redis-cache",
+        "State": "running"
+      },
+      {
+        "Service": "redis-queue",
+        "State": "running"
+      },
+      {
+        "Service": "scheduler",
+        "State": "exited"
+      },
+      {
+        "Service": "websocket",
+        "State": "exited"
+      }
+    ]
+  },
+  "rounds": [
+    {
+      "reports": [
+        {
+          "report": "Stock Balance",
+          "actor": "stock_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Stock Ledger",
+          "actor": "stock_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Purchase Analytics",
+          "actor": "purchase_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "value_quantity": "Quantity",
+            "range": "Monthly",
+            "tree_type": "Supplier",
+            "doc_type": "Purchase Order"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Sales Analytics",
+          "actor": "sales_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "value_quantity": "Quantity",
+            "range": "Monthly",
+            "tree_type": "Customer",
+            "doc_type": "Sales Order",
+            "curves": "select"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Accounts Receivable",
+          "actor": "finance_reviewer",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "report_date": "2026-12-31",
+            "ageing_based_on": "Due Date",
+            "range1": 30,
+            "range2": 60,
+            "range3": 90,
+            "range4": 120
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Accounts Payable",
+          "actor": "finance_reviewer",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "report_date": "2026-12-31",
+            "ageing_based_on": "Due Date",
+            "range1": 30,
+            "range2": 60,
+            "range3": 90,
+            "range4": 120
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "General Ledger",
+          "actor": "finance_reviewer",
+          "rows": 3,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "categorize_by": "Categorize by Voucher (Consolidated)"
+          },
+          "cross_company": "EMPTY"
+        }
+      ],
+      "pdfs": [
+        {
+          "doctype": "Quotation",
+          "name": "SAL-QTN-2026-00001",
+          "format": "报价（简体中文）",
+          "sha256": "2e5051dcda428054603e4e116d687b8d1e0a479cda7d61c76bf2eeeacb79d68e",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Order",
+          "name": "PUR-ORD-2026-00001",
+          "format": "采购订单（简体中文）",
+          "sha256": "55b6d421a5c110ebfe38ddf74ccadd2b70332a73faa23284ee016aaa4e3fa8a0",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Receipt",
+          "name": "MAT-PRE-2026-00001",
+          "format": "采购入库（简体中文）",
+          "sha256": "bae1cf14eeb84053ce8095fe3044a85cf63cc1ec3671c6ce780a5b10e02eb4d8",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Invoice",
+          "name": "ACC-PINV-2026-00001",
+          "format": "采购发票（简体中文）",
+          "sha256": "719061321c2d5a019b6a8f558c6c9db3f2703612bbe108e9c42be0b5e926c6ae",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Sales Order",
+          "name": "SAL-ORD-2026-00001",
+          "format": "销售订单（简体中文）",
+          "sha256": "4831510554c21c97719f2173b1c36627053d08fda0e868dfc7282e1a2b34a568",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Delivery Note",
+          "name": "MAT-DN-2026-00001",
+          "format": "销售出库（简体中文）",
+          "sha256": "ccddb4f57cd6f008f6686b8102b5e693f371933c5c90c39574e0fd1dce490f3d",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Sales Invoice",
+          "name": "ACC-SINV-2026-00001",
+          "format": "销售发票（简体中文）",
+          "sha256": "87af48b07c7f14a3710820e95ad2326745ed89d320a664fe570b178c4a4cf556",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Payment Entry",
+          "name": "ACC-PAY-2026-00001",
+          "format": "收付款凭证（简体中文）",
+          "sha256": "83720ea273c6ec74bef59336e73a2f4c77b5e23d7e87c87f5b4667dffdd36a4b",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Stock Entry",
+          "name": "MAT-STE-2026-00001",
+          "format": "物料移动（简体中文）",
+          "sha256": "4ec83c2fa6c38f3c140145d53bc946e35959365d3d2bef298262ffd0277b30c4",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Stock Reconciliation",
+          "name": "MAT-RECO-2026-00001",
+          "format": "库存调账（简体中文）",
+          "sha256": "01c00ceb5e36d499426607112042deab3f60491fc3af9a394ef1f3eb33972ba7",
+          "pages": 1,
+          "text_data_check": "PASS"
+        }
+      ],
+      "round": 1,
+      "approval": {
+        "cases": 24,
+        "checks": 173,
+        "created": [
+          "Purchase Order boundary 10000",
+          "Purchase Order boundary 10000.01",
+          "Purchase Order negative draft",
+          "Sales Order boundary 10000",
+          "Sales Order boundary 10000.01",
+          "Sales Order negative draft",
+          "credit limit draft",
+          "approval return reentry",
+          "payment boundary 20000",
+          "payment boundary 20000.01",
+          "flow purchase order",
+          "flow purchase receipt",
+          "flow purchase invoice",
+          "flow sales order",
+          "flow delivery note",
+          "flow sales invoice",
+          "flow delivery return",
+          "flow sales credit",
+          "flow purchase return",
+          "flow purchase debit",
+          "flow material receipt",
+          "flow transfer",
+          "flow stock reconciliation",
+          "flow stock audit"
+        ]
+      },
+      "workbench_roles": 9,
+      "guest": "REJECTED",
+      "realtime": {
+        "authenticated": "PASS",
+        "foreign_origin": "403",
+        "guest": "REJECTED"
+      },
+      "pdf_visual_review": "TEXT_DATA_ONLY"
+    },
+    {
+      "reports": [
+        {
+          "report": "Stock Balance",
+          "actor": "stock_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Stock Ledger",
+          "actor": "stock_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Purchase Analytics",
+          "actor": "purchase_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "value_quantity": "Quantity",
+            "range": "Monthly",
+            "tree_type": "Supplier",
+            "doc_type": "Purchase Order"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Sales Analytics",
+          "actor": "sales_manager",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "value_quantity": "Quantity",
+            "range": "Monthly",
+            "tree_type": "Customer",
+            "doc_type": "Sales Order",
+            "curves": "select"
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Accounts Receivable",
+          "actor": "finance_reviewer",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "report_date": "2026-12-31",
+            "ageing_based_on": "Due Date",
+            "range1": 30,
+            "range2": 60,
+            "range3": 90,
+            "range4": 120
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "Accounts Payable",
+          "actor": "finance_reviewer",
+          "rows": 0,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "report_date": "2026-12-31",
+            "ageing_based_on": "Due Date",
+            "range1": 30,
+            "range2": 60,
+            "range3": 90,
+            "range4": 120
+          },
+          "cross_company": "EMPTY"
+        },
+        {
+          "report": "General Ledger",
+          "actor": "finance_reviewer",
+          "rows": 3,
+          "filters": {
+            "company": "R1合成发布验证公司",
+            "from_date": "2026-01-01",
+            "to_date": "2026-12-31",
+            "categorize_by": "Categorize by Voucher (Consolidated)"
+          },
+          "cross_company": "EMPTY"
+        }
+      ],
+      "pdfs": [
+        {
+          "doctype": "Quotation",
+          "name": "SAL-QTN-2026-00001",
+          "format": "报价（简体中文）",
+          "sha256": "2e5051dcda428054603e4e116d687b8d1e0a479cda7d61c76bf2eeeacb79d68e",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Order",
+          "name": "PUR-ORD-2026-00001",
+          "format": "采购订单（简体中文）",
+          "sha256": "55b6d421a5c110ebfe38ddf74ccadd2b70332a73faa23284ee016aaa4e3fa8a0",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Receipt",
+          "name": "MAT-PRE-2026-00001",
+          "format": "采购入库（简体中文）",
+          "sha256": "bae1cf14eeb84053ce8095fe3044a85cf63cc1ec3671c6ce780a5b10e02eb4d8",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Purchase Invoice",
+          "name": "ACC-PINV-2026-00001",
+          "format": "采购发票（简体中文）",
+          "sha256": "719061321c2d5a019b6a8f558c6c9db3f2703612bbe108e9c42be0b5e926c6ae",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Sales Order",
+          "name": "SAL-ORD-2026-00001",
+          "format": "销售订单（简体中文）",
+          "sha256": "4831510554c21c97719f2173b1c36627053d08fda0e868dfc7282e1a2b34a568",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Delivery Note",
+          "name": "MAT-DN-2026-00001",
+          "format": "销售出库（简体中文）",
+          "sha256": "ccddb4f57cd6f008f6686b8102b5e693f371933c5c90c39574e0fd1dce490f3d",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Sales Invoice",
+          "name": "ACC-SINV-2026-00001",
+          "format": "销售发票（简体中文）",
+          "sha256": "87af48b07c7f14a3710820e95ad2326745ed89d320a664fe570b178c4a4cf556",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Payment Entry",
+          "name": "ACC-PAY-2026-00001",
+          "format": "收付款凭证（简体中文）",
+          "sha256": "83720ea273c6ec74bef59336e73a2f4c77b5e23d7e87c87f5b4667dffdd36a4b",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Stock Entry",
+          "name": "MAT-STE-2026-00001",
+          "format": "物料移动（简体中文）",
+          "sha256": "4ec83c2fa6c38f3c140145d53bc946e35959365d3d2bef298262ffd0277b30c4",
+          "pages": 1,
+          "text_data_check": "PASS"
+        },
+        {
+          "doctype": "Stock Reconciliation",
+          "name": "MAT-RECO-2026-00001",
+          "format": "库存调账（简体中文）",
+          "sha256": "01c00ceb5e36d499426607112042deab3f60491fc3af9a394ef1f3eb33972ba7",
+          "pages": 1,
+          "text_data_check": "PASS"
+        }
+      ],
+      "round": 2,
+      "approval": {
+        "cases": 24,
+        "checks": 54,
+        "created": []
+      },
+      "workbench_roles": 9,
+      "guest": "REJECTED",
+      "realtime": {
+        "authenticated": "PASS",
+        "foreign_origin": "403",
+        "guest": "REJECTED"
+      },
+      "pdf_visual_review": "PASS"
+    }
+  ],
+  "balances_equal": true,
+  "balances_sha256": "5ed8660b50d27f0ab6210bab0c95eafadb7c5c6fc7622864d309d47f11a9e174",
+  "balances": {
+    "STOCK": {
+      "balances": {
+        "P0-AC-GOGGLES @ P0 Main Warehouse - PZH": 12.0,
+        "P0-AC-GOGGLES @ P0 Secondary Warehouse - PZH": 3.0,
+        "P0-AC-TOOLBOX @ P0 Main Warehouse - PZH": 5.0,
+        "P0-CO-SCREW @ P0 Main Warehouse - PZH": 650.0,
+        "P0-HT-HAMMER @ P0 Main Warehouse - PZH": 28.0,
+        "P0-HT-SCREWDRIVER @ P0 Main Warehouse - PZH": 58.0
+      },
+      "voucher_row_counts": {
+        "MAT-DN-2026-00001": 1,
+        "MAT-DN-2026-00007": 1,
+        "MAT-PRE-2026-00001": 1,
+        "MAT-PRE-2026-00005": 1,
+        "MAT-RECO-2026-00001": 18,
+        "MAT-RECO-2026-00002": 1,
+        "MAT-STE-2026-00001": 2
+      }
+    },
+    "TRADE": {
+      "purchase_by_item": {
+        "P0-CO-SCREW": 100.0,
+        "P0-HT-HAMMER": 4.0,
+        "P0-HT-SCREWDRIVER": 10.0
+      },
+      "purchase_by_supplier": {
+        "P0 Alternate Tool Supply": 10.0,
+        "P0 General Hardware Supply": 4.0,
+        "P0 Specialty Consumables Supply": 2.0
+      },
+      "sales_by_customer": {
+        "P0 Credit Trade Customer": 5.0,
+        "P0 Repeat Trade Customer": 1.0,
+        "P0 Standard Retail Customer": 2.0
+      },
+      "sales_by_item": {
+        "P0-CO-SCREW": 50.0,
+        "P0-HT-PLIERS": 2.0,
+        "P0-HT-TAPE": 5.0
+      }
+    },
+    "ACCOUNTS": {
+      "accounts_payable": {
+        "invoiced": 120.0,
+        "outstanding": 60.0,
+        "paid": 60.0,
+        "party": "P0 Alternate Tool Supply",
+        "voucher_no": "ACC-PINV-2026-00002"
+      },
+      "accounts_receivable": {
+        "invoiced": 125.0,
+        "outstanding": 75.0,
+        "paid": 50.0,
+        "party": "P0 Credit Trade Customer",
+        "voucher_no": "ACC-SINV-2026-00002"
+      },
+      "general_ledger": {
+        "active_vouchers": {
+          "ACC-PAY-2026-00001": {
+            "credit": 152.0,
+            "debit": 152.0
+          },
+          "ACC-PAY-2026-00002": {
+            "credit": 60.0,
+            "debit": 60.0
+          },
+          "ACC-PAY-2026-00003": {
+            "credit": 84.0,
+            "debit": 84.0
+          },
+          "ACC-PAY-2026-00004": {
+            "credit": 50.0,
+            "debit": 50.0
+          },
+          "ACC-PINV-2026-00001": {
+            "credit": 152.0,
+            "debit": 152.0
+          },
+          "ACC-PINV-2026-00002": {
+            "credit": 120.0,
+            "debit": 120.0
+          },
+          "ACC-SINV-2026-00001": {
+            "credit": 84.0,
+            "debit": 84.0
+          },
+          "ACC-SINV-2026-00002": {
+            "credit": 125.0,
+            "debit": 125.0
+          },
+          "ACC-SINV-2026-00003": {
+            "credit": 32.5,
+            "debit": 32.5
+          },
+          "ACC-SINV-2026-00004": {
+            "credit": 32.5,
+            "debit": 32.5
+          },
+          "MAT-PRE-2026-00005": {
+            "credit": 17.5,
+            "debit": 17.5
+          }
+        },
+        "cancelled_payment": {
+          "cancelled_report_rows": 2,
+          "credit": 2.0,
+          "debit": 2.0,
+          "default_report_rows": 0,
+          "resource_rows": 4,
+          "voucher_no": "ACC-PAY-2026-00005"
+        },
+        "purchase_return": {
+          "postings": {
+            "存货 - PZH": {
+              "credit": 17.5,
+              "debit": 0
+            },
+            "暂估库存(已收货，未开票) - PZH": {
+              "credit": 0,
+              "debit": 17.5
+            }
+          },
+          "return_against": "MAT-PRE-2026-00004",
+          "voucher_no": "MAT-PRE-2026-00005"
+        }
+      }
+    }
+  },
+  "source_patch_reverse_check": {
+    "apps/frappe/frappe/public/js/frappe/form/workflow.js": "710e34902a53e546aacd995b516e953cc8fb86dea42f4d7938303cddb08fdd0e",
+    "apps/frappe/frappe/public/js/frappe/form/footer/version_timeline_content_builder.js": "ffa25671d1147fb048acca79a8b5fb1eff047210aaf7607d337a12c8e2d1f402",
+    "apps/frappe/frappe/public/js/frappe/ui/tags.js": "582002ff37ba59aa36cbeb8f886679a0493b14982c6ba71b7c28d564eceab890"
+  },
+  "offline_python_tests": 32,
+  "offline_node_display": "PASS",
+  "browser": {
+    "viewports": [
+      [
+        1280,
+        720
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "unsaved_confirm_both_choices": "PASS",
+    "native_navigation_toggle": "PASS",
+    "payment_filter_and_reload_highlight": "PASS"
+  },
+  "limitations": [
+    "No cross-version upgrade validation",
+    "No whole-site restore or production stop-write validation",
+    "No full U1 terminology acceptance or employee UAT",
+    "No real opening import or financial sign-off"
+  ]
+}
