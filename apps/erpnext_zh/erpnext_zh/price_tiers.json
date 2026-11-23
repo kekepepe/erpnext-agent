@@ -1,0 +1,8 @@
+[
+  {"number": 0, "name": "零售价", "label": "零售价"},
+  {"number": 1, "name": "预设售价一档", "label": "预设售价1"},
+  {"number": 2, "name": "预设售价二档", "label": "预设售价2"},
+  {"number": 3, "name": "预设售价三档", "label": "预设售价3"},
+  {"number": 4, "name": "预设售价四档", "label": "预设售价4"},
+  {"number": 5, "name": "预设售价五档", "label": "预设售价5"}
+]

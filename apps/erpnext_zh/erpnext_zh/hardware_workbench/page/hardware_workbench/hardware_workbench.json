@@ -1,0 +1,13 @@
+{
+  "doctype": "Page",
+  "name": "hardware-workbench",
+  "page_name": "hardware-workbench",
+  "module": "Hardware Workbench",
+  "standard": "Yes",
+  "title": "工作台",
+  "roles": [
+    {
+      "role": "Desk User"
+    }
+  ]
+}

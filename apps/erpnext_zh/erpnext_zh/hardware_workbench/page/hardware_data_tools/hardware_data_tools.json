@@ -1,0 +1,9 @@
+{
+  "doctype": "Page",
+  "name": "hardware-data-tools",
+  "page_name": "hardware-data-tools",
+  "module": "Hardware Workbench",
+  "standard": "Yes",
+  "title": "资料工具",
+  "roles": [{"role": "Desk User"}]
+}

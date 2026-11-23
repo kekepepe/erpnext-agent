@@ -3,6 +3,20 @@ from decimal import Decimal, ROUND_HALF_UP
 DIGITS = "零壹贰叁肆伍陆柒捌玖"
 
 
+def business_title(doc):
+    """Reviewed document semantics; never change the native type or numbering."""
+    doctype = doc.get("doctype")
+    if doctype == "Payment Entry":
+        return {"Receive": "收款单", "Pay": "付款单", "Internal Transfer": "资金转账单"}.get(doc.get("payment_type"), "收付款凭证")
+    if doctype == "Stock Entry":
+        return {"Material Transfer": "库存调拨单", "Material Receipt": "其他入库单", "Material Issue": "其他出库单"}.get(doc.get("purpose"), "库存变动单")
+    if doc.get("is_return") in (1, "1", True):
+        returns = {"Purchase Receipt": "采购退货单", "Delivery Note": "销售退货单", "Purchase Invoice": "采购退货账务单", "Sales Invoice": "销售贷项通知单"}
+        if doctype in returns:
+            return returns[doctype]
+    return {"Quotation": "报价单", "Purchase Order": "采购订单", "Purchase Receipt": "采购入库单", "Purchase Invoice": "采购发票", "Sales Order": "销售订单", "Delivery Note": "销售出库单", "Sales Invoice": "销售发票", "Stock Reconciliation": "库存盘点调整单"}.get(doctype, doctype or "业务单据")
+
+
 def integer_words(value):
     if value == 0:
         return "零"

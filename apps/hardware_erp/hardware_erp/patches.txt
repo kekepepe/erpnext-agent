@@ -1,0 +1,5 @@
+[pre_model_sync]
+
+[post_model_sync]
+hardware_erp.patches.configure_trade_forms
+hardware_erp.patches.configure_data_tools
