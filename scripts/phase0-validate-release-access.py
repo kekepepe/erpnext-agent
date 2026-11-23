@@ -141,7 +141,7 @@ def main():
         finally:admin.update('User',email,{'roles':original_roles})
     credit=ensure('credit limit draft','Sales Order','sales',order('Sales Order',1000.01,customer='R1合成客户'))
     if args.exercise:
-        deny('credit limit native block',lambda:sessions['sales_manager'].call('frappe.model.workflow.apply_workflow',{'doc':credit,'action':'批准'}),('信用额度已超过',))
+        deny('credit limit native block',lambda:sessions['sales_manager'].call('frappe.model.workflow.apply_workflow',{'doc':credit,'action':'批准'}),('信用额度已超过', '请联系管理员延长R1合成客户的信用额度'))
     if admin.get_doc('Sales Order',credit['name'])['docstatus']!=0:raise ValueError('Credit limit unexpectedly submitted')
     returned=ensure('approval return reentry','Purchase Order','purchase',order('Purchase Order',10000.01))
     if args.exercise and returned['docstatus']==0:

@@ -12,12 +12,13 @@ def load(name,path):
  s=importlib.util.spec_from_file_location(name,ROOT/path);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
 
 def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output-dir',default='/private/tmp/p09-output');args=p.parse_args()
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--archived-c0', action='store_true', help='Verify the original C0 saved templates on the C0 rollback clone only');p.add_argument('--output-dir',default='/private/tmp/p09-output');args=p.parse_args()
  out=Path(args.output_dir).resolve()
  if out==ROOT or ROOT in out.parents:raise ValueError('Runtime PDFs must remain outside public repository')
  out.mkdir(parents=True,exist_ok=True)
  url=os.environ.get('PHASE0_BASE_URL','http://localhost:8080')
  validate_disposable_url(url)
+ if args.archived_c0 and url!='http://localhost:18085':raise ValueError('Archived template check requires dedicated rollback endpoint')
  a=ERPNextAPI(url);a.login('Administrator',os.environ.get('PHASE0_PASSWORD','admin'))
  reports=load('reports','scripts/phase0-configure-reports.py');reports.configure(a)
  reporting=load('reporting','scripts/phase0-validate-reporting.py')
@@ -52,14 +53,17 @@ def main():
   prefix=out/f'{i:02d}';pdf=prefix.with_suffix('.pdf');pdf.write_bytes(data)
   subprocess.run(['pdftotext','-layout',str(pdf),str(prefix.with_suffix('.txt'))],check=True)
   text=prefix.with_suffix('.txt').read_text();compact=unicodedata.normalize('NFKC',''.join(text.split())).translate(str.maketrans({'⻆':'角','⺠':'民','⻛':'风','⻓':'长','㬵':'胶'}))
-  expected=[title,doc['name'],'CNY']
+  expected=[title if args.archived_c0 else localize._printing.business_title(doc),doc['name'],'CNY']
   for row in doc.get('items',[]):
    expected.append(dictionary.get(row.get('item_name'),row.get('item_name') or row['item_code']))
    for field in ('warehouse','s_warehouse','t_warehouse'):
     if row.get(field):expected.append(dictionary.get(row[field],row[field]))
    for value in (row.get('qty'),row.get('rate',row.get('basic_rate',row.get('valuation_rate'))),row.get('amount')):
     if value is not None:expected.append(str(float(value)))
-  for field in ('grand_total','paid_amount','received_amount','total_amount','difference_amount'):
+  amount_fields=['grand_total','total_amount','difference_amount']
+  if dt=='Payment Entry':
+   amount_fields += (['paid_amount'] if doc['payment_type']=='Pay' else ['received_amount'] if doc['payment_type']=='Receive' else ['paid_amount','received_amount'])
+  for field in amount_fields:
    if doc.get(field) is not None:expected.append(str(float(doc[field])))
   if doc.get('return_against'):expected.append(doc['return_against'])
   if any(unicodedata.normalize('NFKC',''.join(value.split())) not in compact for value in expected):raise ValueError('PDF data missing '+dt+' '+str([v for v in expected if unicodedata.normalize('NFKC',''.join(v.split())) not in compact]))

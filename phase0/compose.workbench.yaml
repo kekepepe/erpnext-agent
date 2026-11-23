@@ -1,0 +1,18 @@
+# Opt-in development overlay; preserves the accepted P0 image tag for rollback.
+services:
+  backend:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  configurator:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  create-site:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  frontend:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  queue-long:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  queue-short:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  scheduler:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1
+  websocket:
+    image: erpnext-phase0-zh:16.33.0-workbench-dev1

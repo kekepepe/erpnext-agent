@@ -11,17 +11,23 @@ tr { page-break-inside: avoid; }
 .totals { margin-left: auto; width: 55%; }
 </style>
 {% set currency = doc.get('currency') or frappe.get_doc('Company', doc.company).default_currency %}
-<h1>{{ _(doc.doctype) }}</h1>
+<h1>{{ business_title(doc) | e }}</h1>
 <div class="meta">
   <div>单据编号：{{ doc.name | e }}</div>
   <div>日期：{{ (doc.get('posting_date') or doc.get('transaction_date') or '') | e }}</div>
   <div>公司：{{ _(doc.get('company') or '') | e }}</div>
-  <div>状态：{{ _(doc.get('workflow_state') or doc.get('status') or '') | e }}</div>
+  <div>状态：{% if doc.docstatus == 2 %}已撤销{% else %}{{ _(doc.get('workflow_state') or doc.get('status') or '') | e }}{% endif %}</div>
   {% if doc.get('supplier') %}<div>供应商：{{ _(doc.get('supplier_name') or doc.supplier) | e }}</div>{% endif %}
   {% if doc.get('customer') %}<div>客户：{{ _(doc.get('customer_name') or doc.customer) | e }}</div>{% endif %}
   {% if doc.get('party') %}<div>往来单位：{{ _(doc.get('party_name') or doc.party) | e }}</div>{% endif %}
   {% if doc.get('return_against') %}<div>原单编号：{{ doc.return_against | e }}</div>{% endif %}
 </div>
+{% if doc.doctype in ['Purchase Invoice', 'Sales Invoice'] %}
+<p>本单用于采购应付或销售应收记账，不代表已开具税务发票。{% if doc.get('is_return') %}本单为退货账务凭证；{% if doc.get('update_stock') %}同时更新库存。{% else %}不更新库存，实物退货请核对关联出入库单。{% endif %}{% endif %}</p>
+{% endif %}
+{% if doc.doctype == 'Payment Entry' %}
+<p>资金方向：{% if doc.payment_type == 'Pay' %}{% if doc.get('party_type') == 'Customer' %}退还客户{% elif doc.get('party_type') == 'Supplier' %}支付供应商{% else %}资金支出{% endif %}{% elif doc.payment_type == 'Receive' %}{% if doc.get('party_type') == 'Supplier' %}供应商退款{% elif doc.get('party_type') == 'Customer' %}客户付款{% else %}资金收入{% endif %}{% else %}企业内部账户划转{% endif %}</p>
+{% endif %}
 {% if doc.get('items') %}
 <table>
   <thead><tr><th>序号</th><th>商品名称</th><th>仓库</th><th>数量</th><th>单位</th><th>单价</th><th>金额</th></tr></thead>
@@ -44,9 +50,13 @@ tr { page-break-inside: avoid; }
 </tbody></table>
 {% endif %}
 <table class="totals"><tbody>
-{% for field, label in [('net_total','净额'),('total_taxes_and_charges','税费合计'),('discount_amount','折扣金额'),('rounding_adjustment','舍入调整'),('grand_total','总计'),('rounded_total','舍入合计'),('outstanding_amount','未结金额'),('paid_amount','付款金额'),('received_amount','收款金额'),('total_amount','库存移动总金额'),('difference_amount','盘点价值差额')] %}
+{% for field, label in [('net_total','净额'),('total_taxes_and_charges','税费合计'),('discount_amount','折扣金额'),('rounding_adjustment','舍入调整'),('grand_total','含税总额'),('rounded_total','舍入后金额'),('outstanding_amount','未结金额'),('total_amount','库存变动总金额'),('difference_amount','盘点价值差额')] %}
 {% if doc.get(field) is not none and (field != 'difference_amount' or doc.doctype == 'Stock Reconciliation') and (field != 'total_amount' or doc.doctype == 'Stock Entry') %}<tr><td>{{ label }}</td><td class="number">{{ doc.get(field) }}</td></tr>{% endif %}
 {% endfor %}
+{% if doc.doctype == 'Payment Entry' %}
+{% if doc.payment_type in ['Pay', 'Internal Transfer'] %}<tr><td>{{ '转出金额' if doc.payment_type == 'Internal Transfer' else '付款金额' }}</td><td class="number">{{ doc.paid_amount }}</td></tr>{% endif %}
+{% if doc.payment_type in ['Receive', 'Internal Transfer'] %}<tr><td>{{ '转入金额' if doc.payment_type == 'Internal Transfer' else '收款金额' }}</td><td class="number">{{ doc.received_amount }}</td></tr>{% endif %}
+{% endif %}
 </tbody></table>
 <div>币种：{{ _(currency) | e }}（{{ currency | e }}）</div>
 {% if doc.get('grand_total') is not none and doc.get('currency') == 'CNY' %}

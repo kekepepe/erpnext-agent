@@ -2,4 +2,4 @@
 services:
   frontend:
     ports: !override
-      - "18080:8080"
+      - "127.0.0.1:${PHASE0_LIFECYCLE_PORT:-18080}:8080"

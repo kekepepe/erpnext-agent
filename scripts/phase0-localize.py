@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 import json
 import os
 import re
@@ -21,6 +22,9 @@ from phase0_api import ERPNextAPI
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "phase0" / "localization"
+_printing_spec = importlib.util.spec_from_file_location("zh_printing", ROOT / "apps/erpnext_zh/erpnext_zh/printing.py")
+_printing = importlib.util.module_from_spec(_printing_spec)
+_printing_spec.loader.exec_module(_printing)
 LATIN = re.compile(r"[A-Za-z]")
 TECHNICAL_VALUE = re.compile(r"(?:.*(?:\.YYYY\.|\.YY\.|\.MM\.|#{2,}).*|[AB][0-9]{1,2}|[ABO]{1,2}[+-]|C5E|DT-|HR-EMP-|PMO-|POS-CLO-|CODE-39|EAN(?:-8|-13)?|GS1|GTIN-14|ISBN-10|ISBN-13|UPC-A)")
 PLACEHOLDER = re.compile(r"\{\d+[^}]*\}")
@@ -96,6 +100,21 @@ def boot(api, force_chinese=True):
     return json.JSONDecoder().raw_decode(html.split("frappe.boot = ", 1)[1])[0]
 
 
+def field_help_entries():
+    return json.loads((DATA / "field-help.zh.json").read_text(encoding="utf-8"))
+
+
+def verify_field_help(messages):
+    entries = field_help_entries()
+    missing = [
+        key for key, target in entries.items()
+        if presentation_signature(messages.get(key, "")) != presentation_signature(target)
+    ]
+    if missing:
+        raise RuntimeError(f"实际中文会话仍有 {len(missing)} 条字段说明与词库不符")
+    print(json.dumps({"actual_field_help_verified": len(entries)}))
+
+
 def dictionary(api):
     convert = OpenCC("t2s").convert
     original = boot(api)["__messages"]
@@ -143,6 +162,7 @@ def dictionary(api):
             entries[label] = target
     entries.update(json.loads((DATA / "field-labels.json").read_text(encoding="utf-8")))
     entries.update(json.loads((DATA / "ui-overrides.json").read_text(encoding="utf-8")))
+    entries.update(field_help_entries())
     # Official translated help corrupts some example punctuation. Build these
     # two keys from pinned native originals, translating prose only.
     help_prose = json.loads((DATA / "print-help-prose.json").read_text(encoding="utf-8"))
@@ -199,14 +219,14 @@ def verify_prints(api, entries):
         name = rows[0]["name"]
         query = urllib.parse.urlencode({"doctype": dt, "name": name, "format": entries[dt] + "（简体中文）", "no_letterhead": 1, "_lang": "zh"})
         rendered = api.get_text("/printview?" + query)
-        for marker in [entries[dt], name, "单据编号", "公司", "状态"]:
+        for marker in [_printing.business_title(api.get_doc(dt, name)), name, "单据编号", "公司", "状态"]:
             if marker not in rendered:
                 raise RuntimeError("Chinese print is missing " + marker)
         results[dt] = {"fixture": name, "bytes": len(rendered.encode("utf-8"))}
     print(json.dumps({"chinese_print_previews": results}, ensure_ascii=False))
 
 
-def apply(api, original, entries):
+def sync_translations(api, original, entries):
     count = 0
     rows = api.list_docs("Translation", ["name", "source_text", "translated_text", "context"], [["language", "=", "zh"]], 20000)
     existing = {(row["source_text"] + (":" + row["context"] if row.get("context") else "")): row for row in rows}
@@ -231,6 +251,11 @@ def apply(api, original, entries):
         api.call("frappe.client.insert_many", {"docs": new[start:start+200]})
         count += len(new[start:start+200])
         print(f"TRANSLATIONS applied={count}", flush=True)
+    return count
+
+
+def apply(api, original, entries):
+    count = sync_translations(api, original, entries)
     api.update("System Settings", "System Settings", {"language": "zh"})
     users = api.list_docs("User", ["name", "language", "enabled", "first_name"], [], 1000)
     user_changes = 0
@@ -262,12 +287,16 @@ def apply(api, original, entries):
         script += "frappe.listview_settings[dt] = settings;\n"
         scripts += upsert(api, "Client Script", "简体中文列表名称-" + dt, {"dt": dt, "view": "List", "enabled": 1, "script": script})
     print(json.dumps({"translation_changes": count, "user_language_changes": user_changes, "list_script_changes": scripts}, ensure_ascii=False))
-    template = (DATA / "print.html").read_text(encoding="utf-8")
     for row in api.list_docs("Print Format", ["name", "default_print_language", "standard"], [], 1000):
         # Native standard formats are protected; editing them exports into Core.
         # Controlled Chinese formats/defaults below replace them for business use.
         if row.get("standard") != "Yes" and row.get("default_print_language") != "zh":
             api.update("Print Format", row["name"], {"default_print_language": "zh"})
+    apply_print_templates(api, entries)
+
+
+def apply_print_templates(api, entries):
+    template = (DATA / "print.html").read_text(encoding="utf-8")
     for dt in ["Quotation", "Purchase Order", "Purchase Receipt", "Purchase Invoice", "Sales Order", "Delivery Note", "Sales Invoice", "Payment Entry", "Stock Entry", "Stock Reconciliation"]:
         name = entries[dt] + "（简体中文）"
         upsert(api, "Print Format", name, {"doc_type": dt, "standard": "No", "custom_format": 1, "print_format_type": "Jinja", "default_print_language": "zh", "html": template})
@@ -276,12 +305,24 @@ def apply(api, original, entries):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply-print-templates", action="store_true", help="Apply only the ten controlled native print formats and their defaults")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--apply-field-help", action="store_true", help="Only install and verify Chinese field help")
     parser.add_argument("--verify", action="store_true", help="Fail on untranslated installed names/field labels in the actual session")
     args = parser.parse_args()
     api = ERPNextAPI(os.environ.get("PHASE0_BASE_URL", "http://localhost:8080"))
     api.login(os.environ.get("PHASE0_USERNAME", "Administrator"), os.environ.get("PHASE0_PASSWORD", "admin"))
+    if args.apply_field_help and not args.apply:
+        count = sync_translations(api, boot(api)["__messages"], field_help_entries())
+        print(json.dumps({"field_help_translation_changes": count}))
+        verify_field_help(boot(api, force_chinese=False)["__messages"])
+        if not args.verify:
+            return
     original, entries = dictionary(api)
+    if args.apply_print_templates and not args.apply:
+        apply_print_templates(api, entries)
+        if not args.verify:
+            return
     print(json.dumps({"native_translations": len(original), "overlay_translations": len(entries), "catalog_audit": audit(api, entries)}, ensure_ascii=False, indent=2), flush=True)
     if args.apply:
         apply(api, original, entries)
@@ -311,6 +352,7 @@ def main():
                for key, target in required_ui.items()):
             raise RuntimeError("Actual session UI translations differ from the controlled overlay")
         print(json.dumps({"actual_ui_translations_verified": len(required_ui)}))
+        verify_field_help(actual["__messages"])
         verify_prints(api, actual["__messages"])
         print("OK: installed Simplified Chinese catalog and field coverage verified")
 
