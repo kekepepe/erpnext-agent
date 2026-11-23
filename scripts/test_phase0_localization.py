@@ -18,6 +18,27 @@ spec.loader.exec_module(localize)
 
 
 class ChineseMoneyTests(unittest.TestCase):
+    def test_business_titles_preserve_transaction_direction(self):
+        cases = [
+            ({"doctype":"Payment Entry","payment_type":"Pay","party_type":"Customer"}, "付款单"),
+            ({"doctype":"Payment Entry","payment_type":"Receive","party_type":"Supplier"}, "收款单"),
+            ({"doctype":"Payment Entry","payment_type":"Internal Transfer"}, "资金转账单"),
+            ({"doctype":"Stock Entry","purpose":"Material Transfer"}, "库存调拨单"),
+            ({"doctype":"Stock Entry","purpose":"Material Receipt"}, "其他入库单"),
+            ({"doctype":"Stock Entry","purpose":"Material Issue"}, "其他出库单"),
+            ({"doctype":"Purchase Receipt","is_return":1}, "采购退货单"),
+            ({"doctype":"Delivery Note","is_return":1}, "销售退货单"),
+            ({"doctype":"Purchase Invoice","is_return":1}, "采购退货账务单"),
+            ({"doctype":"Sales Invoice","is_return":1}, "销售贷项通知单"),
+            ({"doctype":"Sales Invoice","is_return":0}, "销售发票"),
+            ({"doctype":"Stock Reconciliation"}, "库存盘点调整单"),
+        ]
+        for doc, expected in cases:
+            original = doc.copy()
+            with self.subTest(doc=doc):
+                self.assertEqual(printing.business_title(doc), expected)
+                self.assertEqual(doc, original)
+
     def test_currency_values(self):
         cases = {
             "0": "零元整", "0.01": "零元零壹分", "1": "壹元整",
@@ -88,6 +109,18 @@ class PresentationTextTests(unittest.TestCase):
         expected = '<h3>自定义 样式 帮助</h3><a href="https://example.com/Jinja">打印模板 模板</a><pre><code>CSS &lt;doc&gt; Jinja</code></pre><!--CSS-->'
         self.assertEqual(localize.localize_help_prose(value), expected)
         self.assertEqual(localize.localize_help_prose(expected), expected)
+
+    def test_field_help_translates_prose_preserving_technical_values(self):
+        entries = localize.field_help_entries()
+        self.assertTrue(any("over-billing" in source for source in entries))
+        for source, target in entries.items():
+            with self.subTest(source=source):
+                self.assertEqual(sorted(localize.PLACEHOLDER.findall(source)),
+                                 sorted(localize.PLACEHOLDER.findall(target)))
+                self.assertEqual(re.findall(r'href="([^"]+)"', source),
+                                 re.findall(r'href="([^"]+)"', target))
+                prose = re.sub(r"<code>.*?</code>", "", target, flags=re.DOTALL)
+                self.assertNotRegex(re.sub(r"<[^>]+>", "", prose), r"[A-Za-z]")
 
     def test_ui_overlay_placeholders_and_chinese(self):
         entries = json.loads((ROOT / "phase0/localization/ui-overrides.json").read_text())
