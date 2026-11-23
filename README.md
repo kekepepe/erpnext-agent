@@ -15,20 +15,44 @@
 
 测试凭据来自 Frappe 官方 disposable demo 配置，只允许用于本机 Phase 0。不得复用于 staging 或 production。
 
-## 启动
+## 启动现有中文工作台
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r phase0/localization/requirements.txt
-./scripts/phase0-start.sh
+./scripts/phase0-workbench-start.sh
 ./scripts/phase0-check.sh
 ```
 
-首次启动需要拉取镜像并创建 Site，通常需要几分钟。查看进度：
+上述工作台脚本用于已有的本地 Site，会构建镜像并迁移，不负责从空卷创建站点。全新隔离验证使用 `./scripts/phase0-validate-lifecycle.sh`，在独立项目和 18081 端口建站；请先确认该端口未被其他演练占用，保留旧卷。查看现有站点服务进度：
 
 ```bash
-docker compose -f phase0/compose.yaml logs -f create-site
+docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml -f phase0/compose.workbench.yaml logs -f backend
 ```
+
+## 商品价格档位与订单核对
+
+在本机测试工作台迁移完成后，可以初始化零售价和五个人民币预设售价档位。重复执行会核对现有档位。
+
+```bash
+python3 scripts/phase0-configure-trade-tiers.py --apply
+```
+
+完整商品表单的「档位价格」页可随商品保存时录入多档价格，按库存计量单位计价。额外档位可通过原生价目表启用。客户可选择「默认报价档位」，报价与销售开单时由 ERPNext 取价。采购价使用启用的采购价目表。
+
+在单据中展开商品行，可填写英文订单要求和标记。商品核对与金额明细集中显示中英文商品资料、单位、折扣及行金额。普通交易在编辑时可预览逐行含税值和整单合计，保存后可核对正式金额。使用运输规则、POS 或合并发票的草稿以保存后的原生金额为准。
+
+## 库存状况表与商品档位
+
+在「库存管理」打开「库存状况表－商品库存」。按公司、截止日、仓库或分类查询，也可按商品编号、名称、规格和型号筛选。分类沿用商品分类树。账面库存和库存金额来自有权限仓库的原生库存余额，预估售价按报告截止日的通用商品价格读取。
+
+可按报表指定辅助计量单位，留空时使用商品首个辅助单位换算。预估计价档位决定参考销售总价和参考毛利率，未配置的价格留空。使用「下载商品库存 Excel」可输出财务库存数据和预估收益的双层表头。价格由商品上的「档位价格」或原生价目表维护。新增编号 6 以上的档位时，可创建名称为「预设售价6」或「预设售价6档」的启用销售价目表，报表将按编号增加相应列。
+
+## 按业务分类使用资料工具
+
+在中文工作台打开「资料工具」，按采购、销售、库存、收付款、基础资料或报表查找对应工具。单据列表的「资料操作」提供导入文件、下载空白模板、导出当前筛选或勾选的数据、批量 PDF 和打印。保存后的单据可从「资料操作」导出或下载本单。报表通过原生报表菜单导出、下载 PDF 或打印。
+
+导入时先下载对应单据的 Excel/CSV 模板，保留表头及子表关联，先预览校验结果，再执行导入。退货、调拨及收付款的方向和原单关系按模板填写。业务单据导入为草稿，提交时沿用原有审批。各账号可用操作取决于 ERPNext 原生权限及有效单据状态。
 
 ## 初始化 Phase 0 合成数据
 
@@ -92,9 +116,9 @@ python3 scripts/phase0-validate-reporting.py
 
 脚本读取 `phase0/reporting-validation.json`，通过原生报表 API 和 REST 只读验证库存余额与流水、采购/销售分析、应收应付、总账、撤销记录和采购/销售单据中英文 HTML 预览。它核对采购退货原单关联及具体科目冲回金额，不创建业务交易。报表日期固定为原始合成场景的 `2026-10-03`；复验日期单独记入证据文档。
 
-P0.9 的 N1–N4 合成技术实施已完成：九类单据分级审批与最小权限、已批准的独立审批守卫、七类原生报表、十类中文 PDF、实时连接及操作 SOP 均有执行证据。见 [验收记录](docs/P09_ACCEPTANCE.md) 和 [操作 SOP](docs/OPERATOR_SOP.md)。当前下一步为 P0.10 的干净环境安装及守卫生命周期验收；真实映射、迁移、恢复和生产 UAT 仍未完成。
+P0.9 的 N1–N4 合成技术实施已完成：九类单据分级审批与最小权限、已批准的独立审批守卫、七类原生报表、十类中文 PDF、实时连接及操作 SOP 均有执行证据。见 [验收记录](docs/P09_ACCEPTANCE.md) 和 [操作 SOP](docs/OPERATOR_SOP.md)。P0.10/C0 固定版本合成生命周期已通过，见 [C0验收记录](docs/C0_ACCEPTANCE.md)。中文工作台入口为 `/desk/hardware-workbench`；完整语义/操作验收、真实映射、全量迁移、恢复和岗位 UAT 仍未完成。
 
-中文扩展安装后，必须使用上述启动脚本或同时传入 `phase0/compose.zh.yaml`，不能仅用基础 Compose 重建服务。首次启动前创建 `.venv` 并执行 `.venv/bin/pip install -r phase0/localization/requirements.txt`。这是一次性 Phase 0 环境，不是生产部署方案。
+中文扩展安装后，必须使用上述启动脚本或同时传入 `phase0/compose.zh.yaml` 与 `phase0/compose.workbench.yaml`，不能仅用基础 Compose 重建服务。首次启动前创建 `.venv` 并执行 `.venv/bin/pip install -r phase0/localization/requirements.txt`。这是一次性 Phase 0 环境，不是生产部署方案。
 
 ## 首版原生配置合成基线
 
@@ -146,7 +170,7 @@ docker compose -f phase0/compose.yaml down -v
 - 创建 Agent、MCP Server 或让 Agent 直接访问数据库；
 - 把本 Compose 文件当作生产部署方案。
 
-测试公司、主数据、采购、库存、销售、退货、应收应付、语言、权限、审批、审计和报表已有合成场景执行证据，Gap Analysis 已形成。P0.8 范围冻结已完成；Phase 0 仍须完成 P0.9–P0.12 的配置、必要开发与发布准备；Phase 1 才进入部署。下一步按 `docs/AI_HANDOFF.md` 执行 P0.10 / C0；P0.12 发布就绪评审通过前不进入部署。
+测试公司、主数据、采购、库存、销售、退货、应收应付、语言、权限、审批、审计和报表已有合成场景执行证据，Gap Analysis 已形成。P0.8 范围冻结已完成；Phase 0 仍须完成 P0.9–P0.12 的配置、必要开发与发布准备；Phase 1 才进入部署。下一步按 `docs/AI_HANDOFF.md` 执行工作台验收及 M1/A1；P0.12 发布就绪评审通过前不进入部署。
 
 ## 来源
 

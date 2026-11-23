@@ -2,14 +2,145 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0.10 C0 - clean-install and lifecycle acceptance for the approved approval guard
-last_updated: 2026-10-27
-updated_by: Codex
+current_task: P0 - verify and prepare the checkpoint plan, then define the internal Business API contract for the staged frontend pilot
+last_updated: 2026-11-23
+updated_by: MCode
 ---
 
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-23 所有者复核：渐进试点与英文原单录单顺序
+
+W6 已选丙。先以采购入库、销售出库为试点，按实际岗位的开单频次确认。先定义试点所需的内部 Business API 契约。两张试点单据及对应权限列为首发候选，正式范围发布前与 R1 对齐。
+
+英文原单流程已确认：上传原单 → 匹配中文商品并人工确认 → 生成中英对照新单 → 业务人员依据新单录入 ERP 草稿 → 按普通订单走权限、审批、提交与后续履约。待确认原单来自客户还是供应商、ERP 目标单据类型，再收集 3–5 家对应来源的脱敏样本。是否列为首发门槛取决于客户日常操作是否依赖该流程。
+
+本次同步 `OWNER_DIRECTION_20261123.md` 第 5、7、8、11、12 节和 DEC-016/019/021，修正 Git 检查点的价格档位配置依赖。`git diff --check` 及总纲第 7、8 节流程顺序检查通过。本次为文档更新，未运行 ERP 测试。近期 P0 仍是复核检查点文件清单、敏感信息和测试，再按仓库授权规则提交。
+
+### 2026-11-23 第二轮补充想法：底座替换路线与三项新增需求（历史记录，执行口径以上方复核为准）
+
+所有者补充四类想法：逐步换掉 ERPNext 底座改自研、只服务这一家客户、英文采购单导入并模糊匹配中文后导出中英对照单、分级权限前端一致但按岗位锁住、以及多家供应商订单格式不同需按供应商匹配。全部内容已合并进 `docs/OWNER_DIRECTION_20261123.md`（该文件为本项目唯一方向总纲，第二轮内容并入第 4、6、7、8 节），并落成 DEC-018（单租户）、DEC-019（英文匹配与中英对照）、DEC-020（岗位视图预设）、DEC-021（供应商导入 profile 配置化）、DEC-022（底座替换采用分层抽离，已于 2026-11-23 确认）。本轮只更新项目文档，未改代码、未提交。
+
+评估要点：重新实现与 ERPNext 等价的核算、库存、税务、审批、权限、报表与表单内核约需 15–20 人月（熟练团队口径），且 C0/M1/A1 三道演练、9 个证据文件、十类 PDF 与九岗位权限矩阵全部建立在现有内核之上，换底座等于证据链归零。而已记录的具体抱怨几乎全在表现层与交互层，DEC-016 本就要重做。因此已定 DEC-022 分层抽离：L1 表现层与 L2 业务编排层自研，L3 定义自有 Business API 契约作为隔离层，L4 核算内核暂用 ERPNext；L1/L2 只依赖契约不依赖 DocType 结构，将来换内核只需写新适配器。终局替换设四条触发门槛（真实订单后仍无法表达、上游升级断裂、客户要求数据自主且愿担维护、有人力与预算重写并全量重验）。当下唯一低成本动作就是先定义该契约。
+
+工程基础核实：主数据已有 `custom_trade_name_en`（英文商品名称）、`custom_trade_requirement_en`、`custom_trade_line_requirement_en`，是别名库的现成起点；`apps/hardware_erp/hardware_erp/approval.py` 已确立"前端呈现与后端校验分离、后端为准"的范式，是岗位权限锁定机制的可复用先例；`phase0/migration/mapping-*.json` 与 `scripts/phase0-preflight-migration.py` 是供应商导入 profile 可复用的配置化结构。
+
+已识别两个 blocker：一是 3–5 家供应商的真实英文采购单样本未到手，英文匹配与导入 profile 只能停在设计；二是岗位视图预设的粒度依赖客户真实岗位与人数（Q4）。已定方案不单独征询的项：匹配输出候选与置信度并支持人工确认后回写别名库，绝不自动替换；导入 profile 保持配置化、客户自助维护，导入一律进草稿走原有审批。
+
+下一步：（1）按 `docs/OWNER_DIRECTION_20261123.md` 第 2.2 节把 75 个文件切成 10 个 checkpoint commit，提交前须完成敏感信息扫描、`compileall` 与 42 项 Python 测试全绿；（2）请所有者确认 W6 前端改造走甲/乙/丙哪条路径，并提供真实岗位清单与人数；（3）向客户索取 3–5 家供应商真实采购单（脱敏）。是否 push 到 origin 需所有者明确授权。
+
+### 2026-11-23 所有者方向整理与交付路线确定
+
+所有者就「与管家婆／金蝶差距」评审提出的六个问题给出答复，已整理为 `docs/OWNER_DIRECTION_20261123.md`，并落成三条决策：DEC-015（ERPNext 自建、为一家指定的五金工具公司定制、后期部署到 Web 域名）、DEC-016（前端形态按国内进销存习惯重做，含核心单据自定义高密度录入表单）、DEC-017（成本算法、毛利口径、折算税费率、折扣分摊、运费与尾差等财务口径延后，待客户财务部确认）。本轮只更新项目文档，未改代码、未提交。
+
+新发现并已写入方向文档的事实：最后提交为 2026-10-27 17:18（`5aef96b`），至 11-23 工作区累积 75 个未提交文件（23 修改、52 未跟踪），`origin/main` 停在同一提交。11-04 至 11-22 的 C0 验收、M1 两轮期初迁移、A1 异站恢复、中文工作台实现、管家婆差距分析、库存状况表与含税预览引擎全部只存在于工作区，尚无 git 记录。方向文档第 2 节给出 10 组 checkpoint commit 的完整分组方案与文件归属。
+
+方向文档同时识别出两处合并与分叉：D-3（单据手感与批量录入）与 D-6（界面偏西方、用词英译中）实为同一交付物，合并为「前端形态重做」，避免重复施工；DEC-015 留有未闭合分叉——本次仅服务这一家客户，还是需按可复制多家的架构约束设计，该答案决定租户与权限架构，越晚回答返工代价越高。另需注意 D-4 的连带风险：若先按真实财务习惯做完录入界面再与财务部对齐口径，会因输入侧锁定口径而返工，故录单应先做字段与交互顺序、计算规则留待财务确认后填充。
+
+下一步：（1）按方向文档第 2.2 节把 75 个文件切成 10 个 checkpoint commit，提交前须完成敏感信息扫描、`compileall` 与 42 项 Python 测试全绿；（2）请所有者确认单客户 vs 可复制多家的租户模型，以及前端改造走「核心单据全定制 / 原生表单增强 / 两张单据渐进试点」哪条路；（3）与财务部开会确认方向文档第 9.1 节的口径清单。是否 push 到 origin 需所有者明确授权。
+
+### 2026-11-22 本机期初库存草稿准备
+
+用户确认建专用期初仓，先准备正常记录草稿，异常单列。通过本地原生服务导入所需商品资料，生成期初库存盘点草稿，并逐行回读仓库、数量、估值金额与草稿状态。负数量、正数量零金额、正数量负金额列入本机受控异常清单，零量行无需入库。未提交期初单，复核该批未创建库存流水及库存盘点总账记录。原始文件、异常记录、导入日志和单号清单留在受控环境，未写入仓库。实际过账与库存对账仍按既有审批完成，本次不构成 M1/A1 正式签核。
+
+### 2026-11-22 商品库存格式与预设售价
+
+用管家婆库存导出的表头核对布局，按「库存管理 → 库存状况表－商品库存」提供新报表。列包含商品图片、四级分类、编号/名称/规格/型号/品牌、零售和参考成本、财务库存数据、五档预设售价及预估收益。原生库存余额按有权访问的仓库汇总，支持仓库、日期、商品分类和快速查询。辅助成本按商品单位换算计算。参考销售总价为所选档位价乘账面库存，参考毛利率为参考销售总价扣库存金额后除参考销售总价。缺价留空，价目表记录有效期按报表截止日。下载 Excel 提供双层合并表头。新增商品价格维护按「零售价、预设售价1–5」排序，既有价目表内部名称继续使用。仅在本机新增缺少的第五档价目表及一条合成试价，附件未导入。
+
+本机迁移和健康检查通过。合成商品跨仓汇总及单仓账面库存、金额与原生 Stock Balance 相等。检查 50 倍辅助单位换算、空白一档、第五档价格、参考收入和毛利、Excel 合并表头及实际价格位置。库存复核测试角色可读报表，销售测试角色被拒绝。Chrome 实测中文标题、筛选后下载合并表头 Excel、新增商品显示有序的零售价和五档售价均通过。41 项 Python、JS 检查和 Git 空白检查通过。
+
+### 2026-11-22 资料工具与导入导出
+
+在中文工作台新增「资料工具」，按采购、销售、库存、收付款、基础资料和报表分类。新增列表和已保存表单的「资料操作」，复用原生 Data Import、DataExporter、Print 和 PDF。按当前筛选或勾选记录导出，向导提供空白 Excel/CSV 模板。启用盘点单的原生整单导入配置，禁止业务导入任务启用自动提交，仍走原有审批。工具显示由目标单据及 Data Import 原生权限决定。未改变岗位授权。
+
+本机迁移通过。Chrome 可打开六类、33 个入口的资料工具，下载报价 Excel 模板和按列表筛选的 Excel 数据、预填原生导入向导、进入报价打印，390×844 下操作按钮正常换行。通过原生接口完成合成商品 CSV 导入和筛选导出、报价及盘点 CSV 导入为草稿、PDF 文件校验以及导入自动提交拒绝。管理员的 18 个交易入口显示导入、导出和打印能力。九岗位工作台访问及访客拒绝通过，41 项 Python、原展示 Node 检查、JS 语法和 git diff 检查通过。下一步可在岗位验收时逐个验证本岗位所需交易模板和导出范围，继续[功能补齐计划](ERP_TRADE_GAP_COMPLETION_PLAN.md)的价格来源与批量录单。
+
+### 2026-11-22 首批补齐开始执行
+
+按[功能补齐计划](ERP_TRADE_GAP_COMPLETION_PLAN.md)启动 1A/1B。新增 `hardware_erp/trade_preview.py` 与草稿表单联动，在编辑时通过原生只读计算显示逐行含税值与整单合计。采购/销售取价通过 18081 隔离站 12 个原生场景，覆盖客户/供应商专价、数量门槛、优先级、时效、通用档位及按盒换算。两个可重复执行的验证脚本为 `scripts/phase0-validate-trade-pricing.py` 和 `scripts/phase0-validate-trade-preview.py`。本机 8080 已重建。四张合成报价通过逐行和整单预览与保存对账，验证脚本只读重跑通过。另只读复算原采购入库 36 元、采购退货 -17.50 元、销售退货 -32.50 元。Chrome 实测改数量由 2 到 3，预览从 170.10 元变为 255.15 元，实际保存同额，Desk 启动仍有已知非阻断 404。40 项 Python 测试和 Node 展示验证通过。真实顺序和历史取价决策仍需业务确认。下一步继续 1A 价格来源与历史价边界、1B 批量录单和岗位验收。管家婆保持只读，本轮无界面操作。
+
+### 2026-11-22 本地 ERP 功能补齐计划
+
+新增[本地 ERP 功能补齐计划](ERP_TRADE_GAP_COMPLETION_PLAN.md)，涵盖取价、录单、来源关联、同屏结算、物流成本、报表和主数据迁移。将调拨申请、智能补货、组装、外部开票等列为待确认范围。首个可执行任务为在隔离站用既有五档商品建立取价冲突与含税预览样例。计划尚未实施，本轮仅更新项目文档。
+
+### 2026-11-22 管家婆功能对照
+
+用户要求只读查看管家婆并逐项对比本地 ERP。查看了采购/销售开单表单、两种价格策略、往来资料及库存/财务菜单，并核对本机采购订单、ERP 原生对象定义、工作台入口和现有验收证据。新增 [网上管家婆与本地 ERP 功能差距](GUANJIAPO_ERP_GAP_ANALYSIS.md)，记录出入库与收付操作的边界、取价顺序、保存前含税核对、运费成本、开票及报表等差异。仅更新项目文档。下一步请采购、销售和财务在 W4 优先确认结算时点、取价顺序与折扣税费样例，再判断配置或开发范围。
+
+### 2026-11-22 订单词条与档位定价
+
+按用户提供的旧系统参考图，在报价、采购订单/入库/发票、销售订单/出库/发票补齐标记、简称、规格、型号、英文名称、英文订单要求、摘要和金额核对视图。复用原生品牌、计量单位及换算、仓库、折扣和逐行税费。新增中文操作词条，英文集中在商品及交易的名称和要求。新增品时用完整商品表单，在「档位价格」按库存单位一次录入多个原生价格，客户用「默认报价档位」设置一次，原生开单选价。实现见 `hardware_erp/trade_fields.py`、`erpnext_zh/public/js/trade_forms.js` 和 DEC-014。本机迁移已执行，`scripts/phase0-configure-trade-tiers.py --apply` 创建五档，随后只读复核新增零档。
+
+验证通过：`scripts/phase0-check.sh`、40 项 Python 测试、Node 展示检查、九岗工作台权限及访客拒绝。Chrome 新商品保存五档，客户档位在原生报价表单带出 90 元并成功保存。1440×920 和重新加载的 390×844 均显示核对明细，窄屏可横向滚动。原生销售订单取价接口也返回 90 元。原生 API 草稿验证：采购两盒、每盒 50 件、九折、含税金额 36 元，Chrome 入库单复核中文单位「盒」、换算系数和英文备注。报价两件、档位 90 元、九折及合成税率 5%，不含税单价 81 元，含税单价 85.05 元，含税金额 170.10 元，并保存商品型号及英文要求。提交非法档位会回滚整个首次商品保存。N1 全量配置预检遇到现站合成供应商默认币种差异，现有配置保留，另取四张已存采购/报价合成草稿只读验证含税/未税金额均为 100 + 5 = 105 元。Chrome 启动阶段返回一条 `/undefined` 404，受测表单及业务交互通过。
+
+行含税金额在保存后显示。历史单据可按留存的原生行税明细核对，缺失的商品规格或其他主数据快照留空。参考成本和最低售价是商品资料，实际价格、税务模板、角色验收及发布准入继续由业务确认。下一步以实际使用的品类、计量单位和客户档位走 W4 岗位验收，再复核正式候选全生命周期和权限矩阵。
+
+### 2026-11-13 晚间复核与下一步
+
+W3 业务入口及 W5 技术回归完成。修复 `workbench.js` 首次进入原生列表丢失单据类型以及报表切换串用筛选的问题。1280×720 与 390×844 各走完 38 个入口，所有列表筛选、原生目的地及高亮通过。退货办理按钮能引导到已提交普通原单。访客被拒绝、九岗菜单及近期单据权限均通过。[导航证据](../phase0/evidence/workbench-navigation-20261113.json)
+
+M1 扩展实施并验证。另一全新站点使用 11 月 1 日截止、两仓和原生包装单位换算，一箱 50 件；同一客户两张期初发票分别核销，逐张未结 15 和 30 元。库存总值 520 元、应收 45 元、应付 8 元，八行对账相等。八张已过账单重放零新增，前一批次的数据结构仍受支持。公私附件补验通过：财务可下载合成销售发票私有附件，采购与访客被拒。[迁移与附件证据](../phase0/evidence/m1-restore-20261113.json)
+
+A1 同端口切回已实测。候选构建从 C0 备份恢复并同步十类中文打印模板，实际导出十页并核看排版。合成候选站停用销售订单审批后，预检按其工作流名称拒绝。另建空卷，恢复 C0 的 linux/arm64 执行镜像、匹配配置与数据库/公私文件。两代库存、业务及账务对账摘要一致，恢复后七类岗位报表、十份历史模板 PDF 和九岗位权限通过。实测 509 秒，含首次找不到旧镜像、找回执行层、恢复和回读。构建证明附件已从历史缓存淘汰；归档保留经验证的平台清单、配置及执行层。已将镜像可用性预检和候选打印同步纳入演练脚本。详见[回退证据](../phase0/evidence/a1-switchback-20261113.json)及[运行手册](M1_SYNTHETIC_RUNBOOK.md)。
+
+本地验证：40 项 Python、Node 展示检查和相关 shell 语法通过。正式验收仍缺真实组织/身份与税务映射、岗位签核、实际容量和恢复目标、独立保管的不可变候选包及部署批准。下一阶段先执行[发布计划](WORKBENCH_RELEASE_PLAN.md)中“发布评审前”的材料与缺陷核对。真实开账前继续使用合成环境；本轮未提交或推送。
+
+### 2026-11-13 下午合成期初迁移与异站恢复
+
+用户选择先用合成数据。C0、W1/W2 已有验收，本轮完成 M1 固定批次的两次独立迁移及一次中断续跑。18082 和 18083 为新建的独立站，不同数据库卷、同一中文来源、同一截止日（10 月 31 日）。每站六张过账单：期初库存、销售和采购期初发票、逐发票收付核销、期初权益结转。两站重放均新增零张；四份原生报表对齐七行，库存 2 件/20 元、应收 15 元、应付 8 元，过渡科目及现金净额为零。第一站已过账库存后中断，续跑只建剩余五张。此工具仅适用于给定单公司/单商品/两笔未结发票样例，不是旧系统通用导入器。
+
+A1 已开始：对第一站停入口和后台任务，用 Bench 完整备份，并在仅含初始系统的第三站 18084 恢复。源/目标镜像一致，数据库卷和站点卷不同。实际核对七行余额、六张凭证、九条版本记录、九个岗位及公私附件；数据复验耗时 29 秒（从启动恢复计，不含备份、环境准备、后续 PDF 配置及质量检查）。另验七类原生报表、九个岗位登录及销售越权拒绝。原生 PDF 首次失败为容器内地址不可达；配置内部打印地址后，Standard 销售发票 PDF 单号、外部引用和 19 元金额通过，尚未据此验收恢复后的十类正式 PDF。
+
+新增入口：`phase0-export-opening.py`、`phase0-rehearse-opening.py`、`phase0-new-migration-site.sh`、`phase0-restore-opening.sh`、`phase0-verify-opening-restore.py`（均在 scripts）。对账现在同时验证目标包截止日、币种、时区及两份文件摘要。复现步骤见 [演练手册](M1_SYNTHETIC_RUNBOOK.md)，脱敏实测结果见 [证据](../phase0/evidence/m1-restore-20261113.json)。39 项 Python 测试、Node 原有展示检查通过。真实资料/审批人不参与本轮；不以合成过账或技术恢复代替正式签核。
+
+销售退货字段已在 8080 独立浏览器以 1280×720 和 390×844（刷新）确认：“办理销售贷项”“用于退货账务处理，不表示已经退还资金。”以及“原销售出库单”均出现。下一阶段计划与剩余发布条件见 [交付计划](WORKBENCH_RELEASE_PLAN.md)。
+
+### 2026-11-13 工作台复核与期初迁移预检
+
+C0 的两轮生命周期已在 11 月 4 日完成并归档。11 月 6 日的 W4 增量完成十类中文 PDF、收付款和退货方向及原生报表复核，证据见 `phase0/evidence/u1-output-20261106.json`。付款与销售退货详情打开、刷新后高亮通过。销售退货页的原生 issue_credit_note 字段已由“退款”改为“办理销售贷项”，该最后一次措辞修改的浏览器显示仍待复核。
+
+11 月 13 日实测 8080 健康、四应用版本、访客拒绝、九类工作台账号与近期记录权限。13 个只读打印预览通过，已撤销单据触发预期原生拒绝，8 份来源单据回读相同。本次内置浏览器建立连接及恢复标签均超时，保留屏幕复核项。
+
+M1 开始实施来源到目标的期初映射预检。新增 `scripts/phase0-preflight-migration.py`、`phase0/migration/mapping-example.json` 和七行标准化样例；校验源文件摘要、公司/两仓、编码和单位，核对库存/应收/应付明细与试算控制科目。原生 API 实际校验演示公司、库存商品和单位、往来、两座仓库及叶科目类型通过。第二套名称映射、源文件被替换、总账平衡但明细差一分和重复仓库映射已测试。36 项 Python 和 Node 展示检查通过。迁移预检的目标报表快照、真实身份与税务映射、受控期初单据导入及两次独立重放仍待完成。真实源账及岗位确认是正式验收输入。
+
+当前优先项为复核退货字段在桌面和窄屏上的显示、完成 W3–W5 剩余页面与岗位清单，再按 [M1 执行计划](WORKBENCH_RELEASE_PLAN.md) 进行目标快照导出与隔离导入。A1 全站恢复和发布准入仍在后续队列。
+
+### 2026-11-06 当前执行状态（优先于下方历史记录）
+
+- C0 固定版本合成技术验收完成，执行日期 11 月 4 日，11 月 6 日归档复核。最终新站点完整脚本退出 0，卸载守卫期间入口及后台任务停止；重装前后双轮业务回归通过且库存/AR75/AP60/GL一致。见 [C0验收](C0_ACCEPTANCE.md) 和 `phase0/evidence/c0-validation-20261104.json`。这不是跨版本升级、完整恢复或生产准入。
+- W1/W2 已实现权限后端和中文工作台。修复列表标准筛选匹配、工作台与列表加载时序，JS/CSS 资源使用内容版本防止缓存旧代码。实际浏览器收付款切换和刷新后高亮通过，采购表头/子表、未保存两种选择、原生回退、390×844和1280×720已有验证。所有首版组件仍使用原生业务对象和接口。
+- M1 已启动：合成商品导入两条，重放新增零条；整批校验缺失单位及已有字段冲突，拒绝前不写入。期初CSV离线对账拒绝重复键、非法数值、不平衡试算和一分钱差异。尚未实现完整期初交易导入、真实映射、两次独立全量迁移或失败恢复。
+- 当前继续 W3/W4/W5：十类打印中已发现收付款金额方向混淆及标题不统一，正在实施语义修复和原生打印回归。技术验证不代替业务/财务用词签核。接下来的队列见 [交付与迁移计划](WORKBENCH_RELEASE_PLAN.md)。真实源数据、税务口径、期初对账基准和岗位签核尚无输入；可以继续技术准备，不能虚构这些事实来关闭 M1/A1。
+- 本轮保留已有未提交修改，不提交或推送；用户原有8080未保存采购草稿没有操作。源代码、应用配置和测试是进度依据。
+
+
+### 2026-11-04 工作台与发布验证
+
+本地工作台路径为 `/desk/hardware-workbench`。已部署的展示扩展包含真实权限目录、近期单据和跨路由导航。浏览器复核了新采购订单的订单日期、要求到货日期、商品编码与收货仓库。未保存提醒的“否”保留修改，“是”返回工作台。390×844 可展开导航、退回原生 Desk、重新启用中文工作台。1280×720 的侧栏与内容边界同为 194px。库存余额表可打开原生筛选和后台报表入口，返回后工作台可刷新。
+
+本轮 `scripts/phase0-validate-workbench.py` 通过访客拒绝、九类账号页面访问、授权列表与近期单据回读。8080 的实时连接、异源拒绝与匿名拒绝通过。离线 Python 32 项及 Node 原有表单检查通过。M1 已有脱敏期初模板与离线对账工具，样例五行一致通过，改一分钱返回失败。详见 [下一阶段执行计划](WORKBENCH_RELEASE_PLAN.md)。
+
+C0 使用新项目、新卷、127.0.0.1:18081 和逐次独立证据目录。已完成应用安装、迁移、缺少审批角色的特定原因拒绝，以及配置九类角色、九个工作流后的预检。两轮业务验收、重装后对账、M1 导入演练和 A1 恢复与岗位签核分别记录，不由已有 8080 的通过结果推定。
+
+### Full workbench implementation authorization — 2026-10-28
+
+Owner requested a plan followed by implementation of all first-release UI components and backend integration, beyond the prototype. `docs/WORKBENCH_IMPLEMENTATION_PLAN.md` defines W0–W6 as the grouped current task. Extend erpnext_zh presentation only; keep hardware_erp approval guard and native transactional APIs. No independent ERP rebuild or expansion into deferred business modules. This supersedes the earlier prototype-only implementation restriction; C0, M1 and A1 release gates remain open and mandatory. No commit/push in this scope unless separately requested.
+
+### U2 first interactive prototype — 2026-10-28
+
+- Added isolated static prototype in `prototypes/u2/` (HTML/CSS/ES modules, synthetic in-memory data; no ERP connection). Workbench, purchase list and detail/new form are connected; remaining modules explicitly show navigation previews. Local preview: http://127.0.0.1:8092 . Refresh resets mock data.
+- IAB checks passed: list navigation, empty search/reset, required-field validation, supplier/item selection and save, independent manager approval, high-value return-for-edit → manager escalation → owner approval, unsaved-change confirmation and small-screen menu. Node syntax checks and git diff whitespace check passed. No backend/business regression claimed.
+- Reference and actual narrow-browser screenshots inspected; retained in prototype assets. Exact 1280×720/390×844 and full desktop visual acceptance remain pending; Chrome wide-view verification was interrupted. This is a reviewable first draft, not U2 final acceptance or U3 implementation. See prototype README for design comparisons and intentional deviations (U1-compliant synthetic names/statuses, additional filters, responsive drawer).
+- Existing C0 priority and U0/U1 remaining checks unchanged. No commit/push. Next UI action: owner review of layout/wording, then complete responsive/interaction QA and revise prototype before real integration.
+
+### U0/U1 v0.2 research and prototype input — 2026-10-28
+
+- Owner requested additional research and optimization of the two local U0/U1 drafts. Updated `docs/UI_U0_RESEARCH.md` and `docs/UI_CHINESE_TERMS.md` to v0.2; preserved original drafts in `docs/archive/*_v0.1.md`. No UI implementation, commit or push in this turn.
+- Added official 管家婆 sales/receipt help, current public 金蝶星辰 function naming and a version-qualified product notice; distinguished historical summaries from read source text. Old S5 PDF timed out and is not used for business conclusions. Fixed-version ERPNext v16.33.0 payment mapping and Purchase Order metadata plus repository Workflow code support the semantic review.
+- Corrected Rejected to cancellation semantics in the current R1 workflow, separated return-for-edit, removed invented available-stock/outstanding formulas, distinguished customer/supplier refund directions and conditional stock effects. Added prototype-only term policy, purchase field/action/role matrix, mock-data boundaries and error/unsaved states for U2's three connected pages.
+- U2 design inputs are ready for prototype work; U0/U1 full acceptance remains open for online page checks, remaining field/output coverage and business/finance review. Docker socket was absent during the read-only check; no runtime was started or changed. No new UI prototype exists in this change. Technical execution priority remains C0 before U3; research/prototype preparation remains allowed by the UI plan.
 
 ### Public repository synchronization — 2026-10-27
 
@@ -662,6 +793,17 @@ Do not start:
 during the current task.
 
 ## Next Actions
+
+### 当前 P0 执行队列（下方 P0.5 等为历史检查表）
+
+- [ ] Git 检查点：复核当前文件清单和跨组依赖，扫描敏感信息并运行现有验证；提交按所有者授权规则执行。
+- [x] W0/W1/W2：环境、权限后端、导航框架及基础浏览器验证。
+- [x] C0：全新隔离安装、双次迁移、实际停写后卸载重装、双轮回归及脱敏证据归档。
+- [x] W3/W5 技术复验：两种尺寸各 38 项、详情语义和岗位权限通过。
+- [ ] W4：岗位确认术语、真实异常流程与使用反馈。
+- [ ] M1：受控组织/身份/会计映射、完整主数据与期初导入、两次独立演练和失败恢复；合成六单两站/四表七行及中断续跑已通过；完整真实期初和岗位确认仍待输入。
+- [ ] A1/W6：合成批次已异站恢复并回读，合成匹配版本回退与十类正式 PDF 已复验；待真实环境容量、实际岗位 UAT、不可变RC与发布准入。Phase 1仍未开始。
+
 
 ## P0 — Current Phase
 

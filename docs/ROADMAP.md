@@ -6,13 +6,21 @@ This file describes phase goals and exit criteria, not daily task status. Daily 
 
 ## Phase 0 — Development and Deployable Release Preparation (Current)
 
+2026-11-23：交付路线由所有者确定（DEC-015）——为一家指定的五金工具公司按其需求自建，后期部署到 Web 域名供其使用。项目性质因此从一次性技术验证转为面向真实客户的定制系统，Phase 1 的门槛内容随之扩大：公网域名与 TLS、真实并发账号与岗位 UAT、生产备份与故障处置、终端用户手册与培训、客户数据导出与退出条款、ERPNext 升级与维护责任策略，全部成为需交付的工作项而非环境准备。同时新增两项 Phase 0 工作内容：前端形态按国内进销存习惯重做（DEC-016，含核心单据自定义高密度录入表单），以及财务口径待客户财务部确认后实施（DEC-017）。服务器选型仍未确定，不阻塞 Phase 0，但阻塞 Phase 1 启动。方向整理见 `docs/OWNER_DIRECTION_20261123.md`。
+
+2026-11-13：W3/W5 技术回归、M1 两轮基础与扩展合成期初、A1 合成异站恢复与双构建切回均取得实测记录。正式开账、岗位 UAT、类生产容量及 RC 准入仍为 Phase 1 前置条件，见 WORKBENCH_RELEASE_PLAN。
+
+2026-11-06：P0.10/C0 固定版本合成生命周期技术验证完成（11月4日执行，见 C0_ACCEPTANCE）。中文工作台仍在 W3–W5 语义与操作验收；M1 已启动但全量迁移、A1全站恢复/UAT/RC仍阻断发布。后续展示改动须运行受影响回归，不能沿用 C0 快照推定已通过。
+
+2026-10-28: owner authorized W0–W6 full native workbench implementation beyond U2 (DEC-013, WORKBENCH_IMPLEMENTATION_PLAN.md). Frontend shell and permission-aware read-only backend extend the existing presentation app; native transactions remain unchanged. C0/M1/A1 still block release.
+
 Planning addition (2026-10-27): the owner requested a plan for a fixed left-category/right-content workbench and Chinese ERP business terminology based on 管家婆/金蝶 usage. See `UI_CHINESE_WORKBENCH_PLAN.md` and `PRE_PHASE1_PLAN.md`. Research, glossary and prototype precede UI implementation; affected lifecycle checks and final UAT must precede Phase 1. This records planned work, not completed UI delivery or a replacement for the open C0/M1/A1 gates. Register the presentation scope amendment before implementation.
 
 **Goal:** complete, validate, and package the full approved first ERP release before deployment begins.
 
 Language scope directive (2026-10-06): the owner now requires Simplified Chinese system display names and active-user language. Technical identifiers and externally entered identity/content remain unchanged. This approves the bounded presentation package only; it does not accept P0.7 progression or freeze all P0.8 release requirements. See DEC-009.
 
-First-release scope frozen 2026-10-09 under owner-delegated authority: R1-scope-v1.1 in `docs/FIRST_RELEASE_SCOPE.md`. One company, two warehouses, CNY, Chinese UI and ten business PDFs, core trading and seven native reports. Existing bounded Chinese presentation app/patches remain included; The owner-approved bounded hardware_erp approval guard is an N2 dependency (DEC-012); all other business customization, external integrations, independent Business API/MCP/Agent remain deferred. P0.7 discovery and P0.8 scope gates are closed; P0.9 native configuration/SOP and bounded guard technical implementation closed 2026-10-12; P0.10 clean-install/lifecycle, P0.11 migration and P0.12 real UAT/recovery/RC gates remain open. See DEC-011.
+First-release scope frozen 2026-10-09 under owner-delegated authority: R1-scope-v1.1 in `docs/FIRST_RELEASE_SCOPE.md`. One company, two warehouses, CNY, Chinese UI and ten business PDFs, core trading and seven native reports. Existing bounded Chinese presentation app/patches remain included; The owner-approved hardware_erp approval guard is an N2 dependency (DEC-012). The November 22 scope adds trade-line reconciliation and customer price tiers (DEC-014). External integrations, independent Business API/MCP/Agent, and other business customization remain deferred. P0.7 discovery and P0.8 scope gates are closed; P0.9 native configuration/SOP and bounded guard technical implementation closed 2026-10-12; P0.10 fixed-version synthetic lifecycle verification is complete as recorded above; P0.11 migration and P0.12 real UAT/recovery/RC gates remain open. See DEC-011.
 
 Scope:
 
