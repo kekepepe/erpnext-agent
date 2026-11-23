@@ -2,14 +2,23 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0 - verify and prepare the checkpoint plan, then define the internal Business API contract for the staged frontend pilot
+current_task: P0 - validate the two-document W6 draft pilot and prepare the ERPNext adapter
 last_updated: 2026-11-23
-updated_by: MCode
+updated_by: Codex
 ---
 
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-23 检查点与出入库试点联调
+
+- **版本检查点已完成。** 按文件复点为 105 个（23 个修改、82 个未跟踪），归档为 8 个生成于本轮的提交，从 `f4ad41f` 到 `995da6f`。工作台、交易字段与资料导入因共用应用钩子和配置而合为一组。暂存快照通过差异空白检查；复核了凭据模式、邮箱、个人路径、合成迁移样例和两张 U2 图片。保留容器路径、示例邮箱及本机 disposable 测试默认值。真实期初文件、异常明细和日志留在本机受控目录。
+- **Business API 契约与合成后端已完成。** [契约](BUSINESS_API_W6.md) 定义两类单据的选项、草稿新建、读取及更新。演示服务 `scripts/phase0-pilot-api.py` 验证商品、往来单位、仓库和数量，处理并发重试、版本冲突和字段错误，草稿保存在本机进程内。
+- **前端两张试点表单已交付并通过合成联调。** Antigravity 在独立目录完成 HTML、CSS 和 JavaScript，Codex 集成到 `prototypes/w6/`，复核并修正草稿重试、跨计量单位汇总提示及无障碍标签。采购入库和销售出库共用录单结构，分别切换供应商和客户。支持中英文商品、规格型号、单位、仓库、数量、键盘增行、删行及草稿修订。启动命令为 `python3 scripts/phase0-pilot-api.py`。
+- **浏览器验收。** Chrome／Playwright 在 1280×720 和 390×844 下实测。桌面覆盖必填提示、键盘加行和删除、采购入库保存与读回、版本更新、保存回包丢失后的同键去重、修改后换键、版本冲突输入保留、销售出库和新建重置。窄屏覆盖表格内横向滚动和销售草稿保存。检查两张合成截图，交互无未预期页面异常。
+- **验证。** `compileall -q apps scripts`、`unittest discover -s scripts -p 'test_*.py'`（46 项，含 4 项 HTTP 测试）、`node --test scripts/test_phase0_form_display.js` 和 `./scripts/phase0-check.sh` 通过。ERPNext 健康检查证明现有服务可用；W6 API 测试使用独立本机合成服务。
+- **发布门槛。** 正式 ERPNext 适配器、真实岗位和仓库隔离、原生审批与库存对账仍待隔离站验证。客户岗位、财务口径、英文原单来源与目标单据及脱敏样本仍待确认。首发候选需与冻结 R1 对齐，正式 UAT、RC 审核和 Phase 1 部署仍未完成。
 
 ### 2026-11-23 所有者复核：渐进试点与英文原单录单顺序
 
@@ -327,9 +336,7 @@ Repository implementation and future observed runtime behaviour continue to outr
 
 - Repository: `kekepepe/erpnext-agent`.
 - Branch: `main`.
-- Latest verified and pushed main commit:
-  - `f908acc` — guarded Chinese workflow/timeline presentation (local HEAD and local `origin/main` matched at task start).
-  - P0.7/P0.8/N1 changes in this turn are uncommitted/unpushed; remote refs were not refreshed.
+- November features and evidence were captured in eight checkpoints from `f4ad41f` to `995da6f`. The subsequent pilot commit includes this handoff. The owner authorized pushing the batch to `origin/main`.
 - Repository visibility is intentionally **public** for the current Web GPT → GitHub → Codex collaboration workflow.
 - Public visibility is a collaboration requirement only. It is not permission to commit real company data.
 - Only code, synthetic data, sanitized examples, non-sensitive documentation, and validation evidence may be committed.
@@ -796,7 +803,9 @@ during the current task.
 
 ### 当前 P0 执行队列（下方 P0.5 等为历史检查表）
 
-- [ ] Git 检查点：复核当前文件清单和跨组依赖，扫描敏感信息并运行现有验证；提交按所有者授权规则执行。
+- [x] Git 检查点：归档 105 个既有文件，完成敏感信息复核及基线验证。
+- [x] W6 Business API v1 契约、本机合成接口与两张录单表单；桌面和窄屏浏览器联调通过。
+- [ ] W6 ERPNext 适配：在隔离站验证真实用户会话和原生草稿，检查仓库权限、草稿更新与过账边界；真实岗位和首发范围待确认。
 - [x] W0/W1/W2：环境、权限后端、导航框架及基础浏览器验证。
 - [x] C0：全新隔离安装、双次迁移、实际停写后卸载重装、双轮回归及脱敏证据归档。
 - [x] W3/W5 技术复验：两种尺寸各 38 项、详情语义和岗位权限通过。

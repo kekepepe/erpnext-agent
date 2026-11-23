@@ -30,6 +30,10 @@ python3 -m venv .venv
 docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml -f phase0/compose.workbench.yaml logs -f backend
 ```
 
+## W6 出入库录单试点
+
+运行 `python3 scripts/phase0-pilot-api.py` 并打开 <http://127.0.0.1:8093/>，体验采购入库和销售出库的中文表格录单。试点使用合成主数据，草稿保存在本机进程内，关闭服务即清空。接口及后续 ERPNext 适配验收见 [W6 Business API](docs/BUSINESS_API_W6.md)。
+
 ## 商品价格档位与订单核对
 
 在本机测试工作台迁移完成后，可以初始化零售价和五个人民币预设售价档位。重复执行会核对现有档位。

@@ -110,11 +110,9 @@ This file records durable decisions, not routine implementation notes. New entri
 The following are intentionally undecided pending evidence:
 
 - Exact staging/production rollout environment — delivery shape is now Web-domain deployment for one named client (DEC-015), but no server has been selected yet
-- Whether the delivery must remain architecturally reusable for a second client, or is a single-tenant customization (see DEC-015)
-- Frontend customization depth: full custom dense entry forms, native-form enhancement, or a staged pilot (see DEC-016)
 - Cost algorithm, gross-margin basis, discount allocation, freight treatment and rounding rules — pending the finance department's confirmation, not a developer decision (see DEC-017)
 - Any additional proven Must gap beyond the approved bounded approval guard
-- Business API surface and authentication model
+- Production rollout of the internal W6 Business API adapter and its authorization, pending isolated-site and role acceptance (see DEC-023)
 - First Agent pilot, model/provider, orchestration framework, and success metrics
 
 
@@ -223,3 +221,10 @@ Negative tests must exercise native REST/submit/cancel and normal Workflow route
 - **Triggers for revisiting the kernel itself:** after a real-order cycle, core business remains inexpressible in the current data model; the upstream upgrade path breaks at a repair cost above reimplementation; the client requires full data autonomy and accepts kernel maintenance; or funding and staffing appear for a rewrite with full revalidation.
 - **Revisit when:** A trigger above is met, a second client appears, or the owner restates the intent.
 - **Reference:** `docs/OWNER_DIRECTION_20261123.md` section 4.
+
+## DEC-023 — Same-origin Business API v1 for the W6 draft pilot (2026-11-23)
+
+- **Status:** Contract defined for the two-document pilot. The local reference implementation uses synthetic data and in-memory drafts.
+- **Decision:** Antigravity owns the pilot UI and Codex owns the Business API contract, demo server, integration and GitHub delivery. Both surfaces use the versioned same-origin contract in [BUSINESS_API_W6.md](BUSINESS_API_W6.md), covering options and draft create/read/update. ERPNext mapping belongs to the server adapter.
+- **ERPNext boundary:** Use the authenticated operator's native session and CSRF checks for writes. Apply native permissions and server-side role rules, enforce revisions and idempotency in the draft-save transaction, and preserve native approval and subsequent posting.
+- **Release boundary:** Trial inclusion remains subject to alignment with the frozen R1 scope. External integrations and Agent/MCP remain under their existing roadmap gates.

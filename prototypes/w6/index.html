@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五金进销存 · 出入库录单</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <h1>五金进销存 · 出入库录单</h1>
+        <div class="mode-tabs" role="group" aria-label="出入库模式切换">
+          <button type="button" class="tab-btn active" id="tabPurchase" aria-pressed="true" data-kind="purchase_receipt">采购入库</button>
+          <button type="button" class="tab-btn" id="tabSales" aria-pressed="false" data-kind="sales_delivery">销售出库</button>
+        </div>
+      </div>
+      <div class="draft-indicator" id="draftIndicator">
+        <span class="status-badge" id="statusBadge">新草稿</span>
+        <span class="doc-info" id="docInfo" hidden></span>
+      </div>
+    </header>
+
+    <div id="alertBanner" class="alert-banner hidden" role="status"></div>
+    <button type="button" class="btn btn-secondary hidden" id="retryOptionsBtn">重新加载录单选项</button>
+
+    <main class="main-content">
+      <form id="entryForm" autocomplete="off">
+        <fieldset class="header-fieldset">
+          <legend class="sr-only">单据基本信息</legend>
+          <div class="header-grid">
+            <div class="form-group">
+              <label for="companySelect">所属公司 <span class="req">*</span></label>
+              <select id="companySelect" name="companyId" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="partnerSelect" id="partnerLabel">供应商 <span class="req">*</span></label>
+              <select id="partnerSelect" name="partnerId" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="postingDateInput">单据日期 <span class="req">*</span></label>
+              <input type="date" id="postingDateInput" name="postingDate" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="grid-section">
+          <div class="grid-toolbar">
+            <span class="toolbar-title">商品明细</span>
+            <div class="toolbar-actions">
+              <button type="button" class="btn btn-secondary" id="addRowBtn">+ 添加行</button>
+            </div>
+          </div>
+
+          <p class="scroll-hint" id="scrollHint">左右滑动可查看仓库、数量和操作。</p>
+          <div class="table-wrapper" tabindex="0" role="region" aria-label="明细表格" aria-describedby="scrollHint">
+            <table class="dense-table" id="lineTable">
+              <thead>
+                <tr>
+                  <th class="col-seq">#</th>
+                  <th class="col-product">商品（中文名 / 英文名 / 编码） <span class="req">*</span></th>
+                  <th class="col-spec">规格 / 型号</th>
+                  <th class="col-uom">单位</th>
+                  <th class="col-warehouse">仓库 <span class="req">*</span></th>
+                  <th class="col-qty">数量 <span class="req">*</span></th>
+                  <th class="col-op">操作</th>
+                </tr>
+              </thead>
+              <tbody id="lineTbody">
+                <!-- 动态行生成 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="action-footer">
+          <div class="footer-left">
+            <button type="button" class="btn btn-secondary" id="newDraftBtn">新建草稿</button>
+            <span class="demo-note">合成演示 · 草稿在服务重启后清空</span>
+          </div>
+          <div class="footer-right">
+            <span class="total-summary" id="totalSummary">商品 0 行</span>
+            <button type="button" class="btn btn-primary" id="saveDraftBtn">保存草稿</button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay hidden" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">数据加载中...</div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
