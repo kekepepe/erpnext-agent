@@ -83,6 +83,8 @@ def parse_route(route: str | None) -> tuple[str, str | None] | None:
         return ("entry_options", None)
     if cleaned == "source-orders":
         return ("source_orders", None)
+    if cleaned == "price-quote":
+        return ("price_quote", None)
     if cleaned == "view-presets":
         return ("view_presets", None)
     if cleaned == "drafts":
@@ -760,6 +762,35 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
             pass
 
 
+def _handle_price_quote() -> tuple[int, dict, str, str]:
+    from hardware_erp.pricing_advisory import DEFAULT_HISTORY_WINDOW_DAYS, resolve_price_advisory
+
+    body = _read_json_body()
+    kind = body.get("kind")
+    if kind not in ("purchase_receipt", "sales_delivery", "purchase", "sales"):
+        raise ApiError(400, "INVALID_KIND", "请选择采购或销售方向。")
+    if not body.get("companyId") or not body.get("productId"):
+        raise ApiError(422, "VALIDATION_ERROR", "缺少公司或商品编号。")
+    try:
+        result = resolve_price_advisory(
+            kind=kind,
+            company_id=body["companyId"],
+            partner_id=body.get("partnerId"),
+            product_id=body["productId"],
+            posting_date=body.get("postingDate") or date.today().isoformat(),
+            quantity=body.get("quantity") or "1",
+            uom=body.get("uom"),
+            price_list=body.get("priceList"),
+            warehouse_id=body.get("warehouseId"),
+            priority_order=body.get("priorityOrder"),
+            history_window_days=body.get("historyWindowDays", DEFAULT_HISTORY_WINDOW_DAYS),
+            proposed_rate=body.get("proposedRate"),
+        )
+    except ValueError as err:
+        raise ApiError(422, "VALIDATION_ERROR", str(err)) from None
+    return 200, {"data": result}, "PriceQuote", body["productId"]
+
+
 def _handle_list_view_presets(kind: str | None) -> tuple[int, dict, str, str]:
     if "System Manager" not in set(frappe.get_roles()):
         raise ApiError(403, "FORBIDDEN", "仅系统管理员可查看岗位视图预设。")
@@ -808,6 +839,11 @@ def dispatch(**kwargs):
         if method == "GET" and action == "source_orders":
             operation = "source_orders"
             status, payload, doctype, doc_id = _handle_source_orders(operator, frappe.request.args.get("kind"))
+            return _json_response(status, payload)
+
+        if method == "POST" and action == "price_quote":
+            operation = "price_quote"
+            status, payload, doctype, doc_id = _handle_price_quote()
             return _json_response(status, payload)
 
         if method == "GET" and action == "view_presets":

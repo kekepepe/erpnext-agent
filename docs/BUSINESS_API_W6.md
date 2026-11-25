@@ -15,6 +15,7 @@
 |---|---|---|
 | GET `/entry-options?kind=purchase_receipt` | 获取当前用户可选的公司、往来单位、仓库、商品、录单能力及岗位视图预设（`viewPreset`）。销售出库传 `sales_delivery` | 200，选项对象 |
 | GET `/source-orders?kind=purchase_receipt` | 获取当前用户有权访问、已批准且未关闭的来源订单（`Purchase Order` / `Sales Order`）及剩余待收发明细行 | 200，`{orders}` |
+| POST `/price-quote` | 只读取价建议：按可配置优先级解析价格规则、往来专价、档位价、有效窗口内非退货历史成交价与默认价，并校验销售最低售价参考 | 200，取价建议对象 |
 | POST `/drafts` | 创建普通出入库草稿，请求头带 `Idempotency-Key`（行可附带 `sourceOrderId`、`sourceOrderItemId` 关联已批准来源单） | 201，草稿对象 |
 | GET `/drafts/{id}` | 回读可访问的草稿（按 `viewPreset.visibleFields` 过滤不可见字段） | 200，草稿对象 |
 | PUT `/drafts/{id}` | 更新草稿。发送完整表单、当前 `revision` 和 `Idempotency-Key`（服务端同步校验 `viewPreset` 锁定字段与操作） | 200，草稿对象 |

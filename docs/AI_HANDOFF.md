@@ -2,7 +2,7 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0 - 1A pricing source/history boundaries, or W4/finance/English-order work once client inputs arrive
+current_task: P0 - awaiting client inputs (Q4 roles/headcount, Q6 finance rules, Q7 English source-order samples) for W4 UAT, N-3/N-5, and 2B
 last_updated: 2026-11-25
 updated_by: Antigravity
 ---
@@ -10,6 +10,18 @@ updated_by: Antigravity
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-25 1A 报价取价建议引擎与最低售价提示验收
+
+- **只读取价建议引擎（1A 剩余项）。** 新增 `apps/hardware_erp/hardware_erp/pricing_advisory.py`，并在 `apps/hardware_erp/hardware_erp/business_api.py` 暴露只读接口 `POST /api/business/v1/price-quote`（同时提供白名单方法 `hardware_erp.pricing_advisory.get_price_advisory` 供原生表单复用）。
+- **透明来源、可配优先级与历史价边界。** 支持按可配置 `priorityOrder`（默认 `pricing_rule → party_price → tier_price → history_price → item_default`）依次解析原生 `Pricing Rule`、客户/供应商专价、通用档位价、指定有效窗口内（默认 180 天、可配 1–730 天）且仅限已提交非退货单据（`docstatus=1, is_return=0`）的历史成交价、以及商品默认价；返回 `selected`（含中文来源标签与参考单号）及全部候选 `candidates`，全程遵循原生读权限。
+- **最低售价参考提示。** 销售方向自动按库存计量单位折算（支持 Box 等替代单位换算）对比 `Item.custom_trade_minimum_sale`，同时支持传入人工改价 `proposedRate` 校验；低于参考价时返回明确中文提示（非阻断，待业务确认是否升级为硬拦截）。
+- **验证通过。**
+  - 本地镜像重建、迁移及健康检查：`./scripts/phase0-workbench-start.sh && ./scripts/phase0-check.sh` 通过。
+  - 1A 原生取价冲突（18081 隔离站 12 项）：`.venv/bin/python scripts/phase0-validate-trade-pricing.py --apply-fixtures` 12/12 通过。
+  - 1A 取价建议实站验收（8080）：`.venv/bin/python scripts/phase0-validate-pricing-advisory.py` 3/3 全通过（销售价格规则 / 往来专价 / 档位价 / 过期回退 / 盒装换算 / 低于最低售价 85 元提示；采购档位价无销售最低价告警；30 天窗口命中已批准销售订单历史价 88 元、2 天窗口回退专价 90 元、人工改价 80 元触发最低售价告警、修改价目表后历史已保存订单单价保持 88 元不变；测试数据与临时规则已清理还原）。
+  - 回归验证：`.venv/bin/python scripts/phase0-validate-w6-adapter.py`（10/10）、`.venv/bin/python -m compileall -q apps scripts`、`.venv/bin/python -m unittest discover -s scripts -p 'test_*.py'`（**61 项全过**，含新增 4 项 `test_pricing_advisory.py`）、`node --test scripts/test_phase0_form_display.js` 与 `git diff --check` 全通过。
+- **方向总纲当前状态。** 方向总纲第 11 节中**所有不依赖客户外部输入的工程项**（第 1 项 Git 归档、第 2 项单租户、第 3 项 Business API 与 ERPNext 适配、第 6 项 W6 两张录单表单与同源页、第 7 项 N-4 岗位视图预设机制、第 10 项 1A 取价与 2A 来源关联）**均已完成并通过本地实站验收**。后续推进（财务口径 Q6 / 2B、客户岗位矩阵 Q4、英文原单匹配 N-3 与多格式导入 N-5 依赖样本 Q7、旧数据迁移量级 Q5 与生产服务器 D-5）均依赖客户侧输入。本轮 1A 改动尚未提交。
 
 ### 2026-11-25 2A 单据来源关联与待收发剩余量验收
 
