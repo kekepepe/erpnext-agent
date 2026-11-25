@@ -2,14 +2,25 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0 - W4 role UAT, finance/source-order inputs, or next W6/1A/2A capabilities
-last_updated: 2026-11-24
+current_task: P0 - 1A pricing priority / 2A source linkage, or W4 role UAT once client inputs arrive
+last_updated: 2026-11-25
 updated_by: Antigravity
 ---
 
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-25 N-4 岗位视图预设机制（DEC-020）前后端落地与验收
+
+- **一份配置，前后端共用。** 新增 `apps/hardware_erp/hardware_erp/view_presets.py` 与迁移补丁 `patches/configure_view_presets.py`，在 MariaDB 建表 `hardware_erp_view_preset` 并按 `role × kind` 幂等初始化 R1 岗位预设（`R1库存经办` 可编辑保存，`R1库存复核`、`R1采购经理`、`R1销售经理`、`R1财务经办`、`R1财务复核`、`R1业务负责人` 只读并带具体锁定原因），配置以数据形式存储，新增或调整岗位无需改代码。
+- **后端强校验与字段剥离。** 在 `apps/hardware_erp/hardware_erp/business_api.py` 集成预设引擎：`GET /api/business/v1/entry-options` 返回 `viewPreset`（合并当前用户角色的可见字段、可编辑字段、必填字段、可执行操作及具体锁定原因，且 `saveDraft` 始终受原生权限兜底约束）；`POST/PUT /api/business/v1/drafts` 服务端独立校验同一份配置，拦截越权修改锁定字段（`403 PRESET_FIELD_LOCKED`）或未授权操作（`403 PRESET_ACTION_DENIED`）；`GET/POST/PUT` 响应按 `visibleFields` 剥离不可见字段防止接口泄露。同时新增仅限 `System Manager` 的 `GET/PUT /api/business/v1/view-presets` 配置管理接口（带参数校验与审计记录）。
+- **前端锁定呈现。** 更新 `prototypes/w6/{app.js,style.css}` 并同步至 `apps/erpnext_zh/erpnext_zh/public/w6/`：不可见字段保持页面结构不变并渲染「无权限查看 / 无权限」锁定占位；不可编辑字段置灰禁用并附具体锁定原因提示；无保存权限时自动禁用按钮并在顶部展示岗位锁定原因；兼容未返回 `viewPreset` 的独立合成演示服务。
+- **验证通过。**
+  - 本地镜像重建、迁移及健康检查：`./scripts/phase0-workbench-start.sh && ./scripts/phase0-check.sh` 通过。
+  - 实站 10 项全量验收：`.venv/bin/python scripts/phase0-validate-w6-adapter.py` 通过（新增第 10 项：验证 `entry-options` 返回 `viewPreset`、非管理员调用 `/view-presets` 返回 403、管理员临时锁定 `R1库存经办` 的 `postingDate` 后前端选项立即生效且后端 `PUT /drafts/{id}` 独立拒绝并返回 `403 PRESET_FIELD_LOCKED` 与配置文案，验收后自动还原预设）。
+  - 回归验证：`.venv/bin/python scripts/phase0-validate-workbench.py`（访客拒绝 + 九岗位全过）、`.venv/bin/python -m compileall -q apps scripts`、`.venv/bin/python -m unittest discover -s scripts -p 'test_*.py'`（**57 项全过**，含新增 4 项 `test_view_presets.py`）、`node --test scripts/test_phase0_form_display.js`、`node --check` 与 `git diff --check` 全通过。
+- **未闭合项与下一步。** 岗位视图预设机制已完成；具体客户岗位矩阵仍待 Q4（真实岗位清单与人数）提供后配置。下一步可继续推进不依赖客户输入的 **1A 取价优先级剩余项 / 2A 单据来源关联**，或在拿到客户输入后推进财务口径（Q6）与英文原单匹配（Q7）。本轮 N-4 改动尚未提交。
 
 ### 2026-11-24 W6 ERPNext 正式适配器与同源录单页完成验收
 

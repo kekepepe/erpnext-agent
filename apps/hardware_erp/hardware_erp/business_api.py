@@ -12,6 +12,13 @@ import frappe
 
 from hardware_erp.approval import MAKERS, P0_COMPANY
 from hardware_erp.business_api_setup import AUDIT_TABLE, IDEMPOTENCY_TABLE
+from hardware_erp.view_presets import (
+    check_write_against_preset,
+    filter_draft_by_preset,
+    list_presets,
+    resolve_effective_preset,
+    upsert_preset,
+)
 
 
 KINDS = {
@@ -64,6 +71,8 @@ def parse_route(route: str | None) -> tuple[str, str | None] | None:
     cleaned = (route or "").strip("/")
     if cleaned == "entry-options":
         return ("entry_options", None)
+    if cleaned == "view-presets":
+        return ("view_presets", None)
     if cleaned == "drafts":
         return ("drafts", None)
     if cleaned.startswith("drafts/"):
@@ -296,6 +305,9 @@ def _handle_entry_options(kind: str | None) -> tuple[int, dict, str, str]:
         for row in raw_products
     ]
 
+    can_save_native = _can_create_draft(doctype, companies)
+    view_preset = resolve_effective_preset(list_presets(kind), set(frappe.get_roles()), can_save_native)
+
     data = {
         "companies": companies,
         "partners": partners,
@@ -306,8 +318,9 @@ def _handle_entry_options(kind: str | None) -> tuple[int, dict, str, str]:
             "postingDate": date.today().isoformat(),
         },
         "capabilities": {
-            "saveDraft": _can_create_draft(doctype, companies),
+            "saveDraft": "saveDraft" in view_preset["actions"],
         },
+        "viewPreset": view_preset,
     }
     return 200, {"data": data}, doctype, ""
 
@@ -329,7 +342,11 @@ def _handle_get_draft(draft_id: str) -> tuple[int, dict, str, str]:
     doc, kind = _locate_draft(draft_id, for_update=False)
     if int(doc.docstatus) != 0 or int(doc.get("is_return") or 0) != 0:
         raise ApiError(404, "DRAFT_NOT_FOUND", "找不到草稿或无权访问。")
-    return 200, {"data": serialize_draft(doc, kind)}, doc.doctype, doc.name
+    can_save_native = bool(doc.has_permission("write")) and (
+        MAKERS[doc.doctype] in set(frappe.get_roles()) or doc.company == P0_COMPANY
+    )
+    view_preset = resolve_effective_preset(list_presets(kind), set(frappe.get_roles()), can_save_native)
+    return 200, {"data": filter_draft_by_preset(serialize_draft(doc, kind), view_preset)}, doc.doctype, doc.name
 
 
 def _read_json_body() -> dict:
@@ -508,6 +525,14 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
                 raise ApiError(403, "FORBIDDEN", "当前身份无权修改此草稿。")
             current_revision = max(int(doc.get("custom_w6_revision") or 0), 1)
 
+        # Enforce data-driven job-view preset on the server (same config as frontend).
+        can_save_native = True
+        view_preset = resolve_effective_preset(list_presets(kind), set(frappe.get_roles()), can_save_native)
+        existing_serialized = serialize_draft(doc, kind) if draft_id is not None else None
+        preset_violation = check_write_against_preset(view_preset, body, existing_draft=existing_serialized)
+        if preset_violation is not None:
+            raise ApiError(403, preset_violation[0], preset_violation[1])
+
         # Check user-scoped Company / Warehouse restrictions without leaking existence.
         allowed_companies = _user_restricted_values(operator, "Company")
         if allowed_companies is not None and body["companyId"] not in allowed_companies:
@@ -565,7 +590,7 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
         if int(doc.docstatus) != 0:
             raise ApiError(409, "DRAFT_NOT_EDITABLE", "录单接口仅允许保存草稿。")
 
-        response_body = {"data": serialize_draft(doc, kind)}
+        response_body = {"data": filter_draft_by_preset(serialize_draft(doc, kind), view_preset)}
         _insert_idempotency(operator, operation, target_id, key, digest, status, response_body)
         _record_audit(operator, operation, doctype, doc.name, status, "OK", commit=False)
         frappe.db.commit()
@@ -575,6 +600,27 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
             frappe.db.sql("SELECT RELEASE_LOCK(%s)", (lock_name,))
         except Exception:
             pass
+
+
+def _handle_list_view_presets(kind: str | None) -> tuple[int, dict, str, str]:
+    if "System Manager" not in set(frappe.get_roles()):
+        raise ApiError(403, "FORBIDDEN", "仅系统管理员可查看岗位视图预设。")
+    if kind is not None and kind not in KINDS:
+        raise ApiError(400, "INVALID_KIND", "请选择采购入库或销售出库。")
+    return 200, {"data": {"presets": list_presets(kind)}}, "ViewPreset", ""
+
+
+def _handle_upsert_view_preset(operator: str) -> tuple[int, dict, str, str]:
+    if "System Manager" not in set(frappe.get_roles()):
+        raise ApiError(403, "FORBIDDEN", "仅系统管理员可修改岗位视图预设。")
+    body = _read_json_body()
+    try:
+        saved = upsert_preset(body, operator)
+    except ValueError as err:
+        raise ApiError(422, "VALIDATION_ERROR", str(err)) from None
+    _record_audit(operator, "upsert_view_preset", "ViewPreset", f"{saved['role']}:{saved['kind']}", 200, "OK", commit=False)
+    frappe.db.commit()
+    return 200, {"data": saved}, "ViewPreset", f"{saved['role']}:{saved['kind']}"
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET", "POST", "PUT"])
@@ -599,6 +645,16 @@ def dispatch(**kwargs):
         if method == "GET" and action == "entry_options":
             operation = "entry_options"
             status, payload, doctype, doc_id = _handle_entry_options(frappe.request.args.get("kind"))
+            return _json_response(status, payload)
+
+        if method == "GET" and action == "view_presets":
+            operation = "list_view_presets"
+            status, payload, doctype, doc_id = _handle_list_view_presets(frappe.request.args.get("kind"))
+            return _json_response(status, payload)
+
+        if method == "PUT" and action == "view_presets":
+            operation = "upsert_view_preset"
+            status, payload, doctype, doc_id = _handle_upsert_view_preset(operator)
             return _json_response(status, payload)
 
         if method == "GET" and action == "draft" and draft_id:

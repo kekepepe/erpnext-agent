@@ -66,12 +66,79 @@
     el.loadingOverlay.classList.remove('hidden');
   }
 
+  function getPreset() {
+    const preset = state.options.viewPreset;
+    if (preset && Array.isArray(preset.visibleFields)) return preset;
+    const canSave = Boolean(state.options.capabilities?.saveDraft);
+    return {
+      visibleFields: ['companyId', 'partnerId', 'postingDate', 'productId', 'warehouseId', 'quantity', 'spec', 'uom'],
+      editableFields: canSave ? ['companyId', 'partnerId', 'postingDate', 'productId', 'warehouseId', 'quantity'] : [],
+      requiredFields: canSave ? ['companyId', 'partnerId', 'postingDate', 'productId', 'warehouseId', 'quantity'] : [],
+      actions: canSave ? ['saveDraft', 'addRow', 'removeRow', 'newDraft'] : [],
+      lockReasons: {}
+    };
+  }
+
+  function isFieldVisible(field) {
+    return getPreset().visibleFields.includes(field);
+  }
+
+  function isFieldEditable(field) {
+    return getPreset().editableFields.includes(field);
+  }
+
+  function isActionAllowed(action) {
+    return getPreset().actions.includes(action);
+  }
+
+  function getLockReason(key, fallback) {
+    return getPreset().lockReasons?.[key] || fallback || '当前岗位无权操作此项。';
+  }
+
+  function applyHeaderPreset() {
+    const headerControls = [
+      { field: 'companyId', node: el.companySelect },
+      { field: 'partnerId', node: el.partnerSelect },
+      { field: 'postingDate', node: el.postingDateInput }
+    ];
+    headerControls.forEach(({ field, node }) => {
+      const group = node.closest('.form-group');
+      let mask = group?.querySelector('.field-locked-mask');
+      if (!isFieldVisible(field)) {
+        node.hidden = true;
+        node.disabled = true;
+        if (!mask && group) {
+          mask = document.createElement('div');
+          mask.className = 'field-locked-mask';
+          group.appendChild(mask);
+        }
+        if (mask) {
+          const reason = getLockReason(field, '当前岗位无权查看此字段。');
+          mask.textContent = '无权限查看';
+          mask.title = reason;
+        }
+      } else {
+        node.hidden = false;
+        if (mask) mask.remove();
+        const editable = isFieldEditable(field);
+        node.disabled = !editable;
+        node.classList.toggle('field-locked', !editable);
+        node.title = editable ? '' : getLockReason(field, '当前岗位不可编辑此字段。');
+      }
+    });
+  }
+
   function hideLoading() {
     state.loading = false;
     el.form.inert = false;
     el.tabPurchase.disabled = el.tabSales.disabled = false;
-    el.addRowBtn.disabled = el.newDraftBtn.disabled = !state.optionsReady;
-    el.saveDraftBtn.disabled = !state.optionsReady || !state.options.capabilities?.saveDraft;
+    el.addRowBtn.disabled = !state.optionsReady || !isActionAllowed('addRow');
+    el.newDraftBtn.disabled = !state.optionsReady || !isActionAllowed('newDraft');
+    el.saveDraftBtn.disabled = !state.optionsReady || !state.options.capabilities?.saveDraft || !isActionAllowed('saveDraft');
+    el.saveDraftBtn.title = el.saveDraftBtn.disabled && state.optionsReady ? getLockReason('saveDraft', '当前岗位无权保存草稿。') : '';
+    el.addRowBtn.title = el.addRowBtn.disabled && state.optionsReady ? getLockReason('addRow', '当前岗位不可新增商品行。') : '';
+    el.newDraftBtn.title = el.newDraftBtn.disabled && state.optionsReady ? getLockReason('newDraft', '当前岗位不可新建草稿。') : '';
+    if (state.optionsReady) applyHeaderPreset();
     el.loadingOverlay.classList.add('hidden');
   }
 
@@ -149,6 +216,10 @@
         renderLines();
       }
       state.optionsReady = true;
+      applyHeaderPreset();
+      if (!isActionAllowed('saveDraft') || !state.options.capabilities?.saveDraft) {
+        showAlert(getLockReason('saveDraft', '当前岗位仅可查看，无权保存草稿。'), false);
+      }
     } catch {
       showAlert('录单选项加载失败，请重新加载。');
       el.retryOptionsBtn.classList.remove('hidden');
@@ -233,25 +304,37 @@
       // 产品选择
       const tdProd = document.createElement('td');
       tdProd.className = 'col-product';
-      const selectProd = document.createElement('select');
-      selectProd.className = 'table-select line-product';
-      selectProd.dataset.field = 'productId';
-      selectProd.dataset.index = idx;
-      selectProd.setAttribute('aria-label', `第 ${idx + 1} 行商品`);
+      if (!isFieldVisible('productId')) {
+        const mask = document.createElement('span');
+        mask.className = 'cell-locked-mask';
+        mask.textContent = '无权限';
+        mask.title = getLockReason('productId', '当前岗位无权查看商品。');
+        tdProd.appendChild(mask);
+      } else {
+        const selectProd = document.createElement('select');
+        selectProd.className = 'table-select line-product';
+        selectProd.dataset.field = 'productId';
+        selectProd.dataset.index = idx;
+        selectProd.setAttribute('aria-label', `第 ${idx + 1} 行商品`);
+        if (!isFieldEditable('productId')) {
+          selectProd.disabled = true;
+          selectProd.title = getLockReason('productId', '当前岗位不可编辑商品。');
+        }
 
-      const emptyProdOpt = document.createElement('option');
-      emptyProdOpt.value = '';
-      emptyProdOpt.textContent = '-- 请选择商品 --';
-      selectProd.appendChild(emptyProdOpt);
+        const emptyProdOpt = document.createElement('option');
+        emptyProdOpt.value = '';
+        emptyProdOpt.textContent = '-- 请选择商品 --';
+        selectProd.appendChild(emptyProdOpt);
 
-      products.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = formatProductLabel(p);
-        if (p.id === line.productId) opt.selected = true;
-        selectProd.appendChild(opt);
-      });
-      tdProd.appendChild(selectProd);
+        products.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = formatProductLabel(p);
+          if (p.id === line.productId) opt.selected = true;
+          selectProd.appendChild(opt);
+        });
+        tdProd.appendChild(selectProd);
+      }
       tr.appendChild(tdProd);
 
       // 查询当前选中的商品信息
@@ -260,60 +343,100 @@
       // 规格/型号 (只读)
       const tdSpec = document.createElement('td');
       tdSpec.className = 'col-spec';
-      const spanSpec = document.createElement('span');
-      spanSpec.className = 'read-only-cell line-spec';
-      const specText = [currentProduct?.specification, currentProduct?.model].filter(Boolean).join(' / ') || '-';
-      spanSpec.textContent = specText;
-      spanSpec.title = specText;
-      tdSpec.appendChild(spanSpec);
+      if (!isFieldVisible('spec')) {
+        const mask = document.createElement('span');
+        mask.className = 'cell-locked-mask';
+        mask.textContent = '无权限';
+        mask.title = getLockReason('spec', '当前岗位无权查看规格型号。');
+        tdSpec.appendChild(mask);
+      } else {
+        const spanSpec = document.createElement('span');
+        spanSpec.className = 'read-only-cell line-spec';
+        const specText = [currentProduct?.specification, currentProduct?.model].filter(Boolean).join(' / ') || '-';
+        spanSpec.textContent = specText;
+        spanSpec.title = specText;
+        tdSpec.appendChild(spanSpec);
+      }
       tr.appendChild(tdSpec);
 
       // 单位 (只读)
       const tdUom = document.createElement('td');
       tdUom.className = 'col-uom text-center';
-      const spanUom = document.createElement('span');
-      spanUom.className = 'read-only-cell line-uom';
-      spanUom.textContent = currentProduct?.uom || '-';
-      tdUom.appendChild(spanUom);
+      if (!isFieldVisible('uom')) {
+        const mask = document.createElement('span');
+        mask.className = 'cell-locked-mask';
+        mask.textContent = '无权限';
+        mask.title = getLockReason('uom', '当前岗位无权查看单位。');
+        tdUom.appendChild(mask);
+      } else {
+        const spanUom = document.createElement('span');
+        spanUom.className = 'read-only-cell line-uom';
+        spanUom.textContent = currentProduct?.uom || '-';
+        tdUom.appendChild(spanUom);
+      }
       tr.appendChild(tdUom);
 
       // 仓库选择
       const tdWh = document.createElement('td');
       tdWh.className = 'col-warehouse';
-      const selectWh = document.createElement('select');
-      selectWh.className = 'table-select line-warehouse';
-      selectWh.dataset.field = 'warehouseId';
-      selectWh.dataset.index = idx;
-      selectWh.setAttribute('aria-label', `第 ${idx + 1} 行仓库`);
+      if (!isFieldVisible('warehouseId')) {
+        const mask = document.createElement('span');
+        mask.className = 'cell-locked-mask';
+        mask.textContent = '无权限';
+        mask.title = getLockReason('warehouseId', '当前岗位无权查看仓库。');
+        tdWh.appendChild(mask);
+      } else {
+        const selectWh = document.createElement('select');
+        selectWh.className = 'table-select line-warehouse';
+        selectWh.dataset.field = 'warehouseId';
+        selectWh.dataset.index = idx;
+        selectWh.setAttribute('aria-label', `第 ${idx + 1} 行仓库`);
+        if (!isFieldEditable('warehouseId')) {
+          selectWh.disabled = true;
+          selectWh.title = getLockReason('warehouseId', '当前岗位不可编辑仓库。');
+        }
 
-      const emptyWhOpt = document.createElement('option');
-      emptyWhOpt.value = '';
-      emptyWhOpt.textContent = '-- 选择仓库 --';
-      selectWh.appendChild(emptyWhOpt);
+        const emptyWhOpt = document.createElement('option');
+        emptyWhOpt.value = '';
+        emptyWhOpt.textContent = '-- 选择仓库 --';
+        selectWh.appendChild(emptyWhOpt);
 
-      warehouses.forEach(w => {
-        const opt = document.createElement('option');
-        opt.value = w.id;
-        opt.textContent = w.label;
-        if (w.id === line.warehouseId) opt.selected = true;
-        selectWh.appendChild(opt);
-      });
-      tdWh.appendChild(selectWh);
+        warehouses.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.id;
+          opt.textContent = w.label;
+          if (w.id === line.warehouseId) opt.selected = true;
+          selectWh.appendChild(opt);
+        });
+        tdWh.appendChild(selectWh);
+      }
       tr.appendChild(tdWh);
 
       // 数量输入
       const tdQty = document.createElement('td');
       tdQty.className = 'col-qty';
-      const inputQty = document.createElement('input');
-      inputQty.type = 'text';
-      inputQty.inputMode = 'decimal';
-      inputQty.className = 'table-input text-right line-quantity';
-      inputQty.dataset.field = 'quantity';
-      inputQty.dataset.index = idx;
-      inputQty.setAttribute('aria-label', `第 ${idx + 1} 行数量`);
-      inputQty.placeholder = '0.00';
-      inputQty.value = line.quantity || '';
-      tdQty.appendChild(inputQty);
+      if (!isFieldVisible('quantity')) {
+        const mask = document.createElement('span');
+        mask.className = 'cell-locked-mask';
+        mask.textContent = '无权限';
+        mask.title = getLockReason('quantity', '当前岗位无权查看数量。');
+        tdQty.appendChild(mask);
+      } else {
+        const inputQty = document.createElement('input');
+        inputQty.type = 'text';
+        inputQty.inputMode = 'decimal';
+        inputQty.className = 'table-input text-right line-quantity';
+        inputQty.dataset.field = 'quantity';
+        inputQty.dataset.index = idx;
+        inputQty.setAttribute('aria-label', `第 ${idx + 1} 行数量`);
+        inputQty.placeholder = '0.00';
+        inputQty.value = line.quantity || '';
+        if (!isFieldEditable('quantity')) {
+          inputQty.disabled = true;
+          inputQty.title = getLockReason('quantity', '当前岗位不可编辑数量。');
+        }
+        tdQty.appendChild(inputQty);
+      }
       tr.appendChild(tdQty);
 
       // 操作
@@ -324,7 +447,12 @@
       delBtn.className = 'btn-danger-link';
       delBtn.textContent = '删除';
       delBtn.setAttribute('aria-label', `删除第 ${idx + 1} 行`);
-      delBtn.addEventListener('click', () => removeRow(idx));
+      if (!isActionAllowed('removeRow')) {
+        delBtn.disabled = true;
+        delBtn.title = getLockReason('removeRow', '当前岗位不可删除商品行。');
+      } else {
+        delBtn.addEventListener('click', () => removeRow(idx));
+      }
       tdOp.appendChild(delBtn);
       tr.appendChild(tdOp);
 

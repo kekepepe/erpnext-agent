@@ -4,3 +4,4 @@
 hardware_erp.patches.configure_trade_forms
 hardware_erp.patches.configure_data_tools
 hardware_erp.patches.configure_business_api
+hardware_erp.patches.configure_view_presets

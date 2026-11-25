@@ -61,5 +61,9 @@ def ensure_custom_fields():
 
 
 def configure():
+    from hardware_erp.view_presets import ensure_preset_table, seed_default_presets
+
     ensure_custom_fields()
     ensure_tables()
+    ensure_preset_table()
+    seed_default_presets()

@@ -246,6 +246,57 @@ def main():
         assert 'meta name="csrf-token"' in page_html and "/assets/erpnext_zh/w6/app.js" in page_html
         print("PASS 9: /w6-entry hosted page renders with CSRF token")
 
+        # 10. DEC-020 job-view presets: same config drives frontend options & backend enforcement
+        status, stock_opts = raw_request(stock, "GET", "/entry-options?kind=purchase_receipt")
+        assert status == 200 and "viewPreset" in stock_opts["data"], stock_opts
+        assert "postingDate" in stock_opts["data"]["viewPreset"]["editableFields"]
+
+        status, mgr_opts = raw_request(stock_mgr, "GET", "/entry-options?kind=purchase_receipt")
+        assert status == 200 and mgr_opts["data"]["viewPreset"]["actions"] == []
+        assert "R1库存复核" in mgr_opts["data"]["viewPreset"]["lockReasons"].get("saveDraft", "")
+
+        # Non-admin denied on preset management API
+        status, denied_presets = raw_request(stock, "GET", "/view-presets")
+        assert status == 403, f"Expected 403 for non-admin view-presets GET, got {status}: {denied_presets}"
+
+        # Admin lists presets and temporarily locks postingDate for R1库存经办
+        status, preset_list = raw_request(admin, "GET", "/view-presets?kind=purchase_receipt")
+        assert status == 200 and preset_list["data"]["presets"], (status, preset_list)
+        original_stock_preset = next(p for p in preset_list["data"]["presets"] if p["role"] == "R1库存经办")
+
+        locked_preset = {
+            **original_stock_preset,
+            "editableFields": [f for f in original_stock_preset["editableFields"] if f != "postingDate"],
+            "lockReasons": {**original_stock_preset.get("lockReasons", {}), "postingDate": "测试锁定：不可修改单据日期。"},
+        }
+        try:
+            status, saved_preset = raw_request(admin, "PUT", "/view-presets", locked_preset)
+            assert status == 200 and "postingDate" not in saved_preset["data"]["editableFields"], (status, saved_preset)
+
+            # Frontend options immediately reflect locked postingDate
+            status, locked_opts = raw_request(stock, "GET", "/entry-options?kind=purchase_receipt")
+            assert status == 200 and "postingDate" not in locked_opts["data"]["viewPreset"]["editableFields"]
+            assert locked_opts["data"]["viewPreset"]["lockReasons"]["postingDate"] == "测试锁定：不可修改单据日期。"
+
+            # Backend independently rejects PUT modifying locked postingDate
+            pr_doc_id = next(doc_id for dt, doc_id in created_docs if dt == "Purchase Receipt")
+            status, current_pr = raw_request(stock, "GET", f"/drafts/{pr_doc_id}")
+            assert status == 200, current_pr
+            tamper_payload = {
+                "kind": "purchase_receipt",
+                "companyId": current_pr["data"]["companyId"],
+                "partnerId": current_pr["data"]["partnerId"],
+                "postingDate": "2026-11-22",
+                "lines": current_pr["data"]["lines"],
+                "revision": current_pr["data"]["revision"],
+            }
+            status, tamper_err = raw_request(stock, "PUT", f"/drafts/{pr_doc_id}", tamper_payload, key=f"lock-{uuid4().hex}")
+            assert status == 403 and tamper_err["error"]["code"] == "PRESET_FIELD_LOCKED", (status, tamper_err)
+            assert tamper_err["error"]["message"] == "测试锁定：不可修改单据日期。"
+            print("PASS 10: DEC-020 job-view preset config drives both entry-options and server-side 403 lock")
+        finally:
+            raw_request(admin, "PUT", "/view-presets", original_stock_preset)
+
     finally:
         # Restore aux_wh User Permission if temporarily removed
         if temp_wh_perm_deleted and removed_perm_payload:

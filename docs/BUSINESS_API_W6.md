@@ -13,10 +13,12 @@
 
 | 方法与路径 | 用途 | 成功响应 |
 |---|---|---|
-| GET `/entry-options?kind=purchase_receipt` | 获取当前用户可选的公司、往来单位、仓库、商品和录单能力。销售出库传 `sales_delivery` | 200，选项对象 |
+| GET `/entry-options?kind=purchase_receipt` | 获取当前用户可选的公司、往来单位、仓库、商品、录单能力及岗位视图预设（`viewPreset`）。销售出库传 `sales_delivery` | 200，选项对象 |
 | POST `/drafts` | 创建普通出入库草稿，请求头带 `Idempotency-Key` | 201，草稿对象 |
-| GET `/drafts/{id}` | 回读可访问的草稿 | 200，草稿对象 |
-| PUT `/drafts/{id}` | 更新草稿。发送完整表单、当前 `revision` 和 `Idempotency-Key` | 200，草稿对象 |
+| GET `/drafts/{id}` | 回读可访问的草稿（按 `viewPreset.visibleFields` 过滤不可见字段） | 200，草稿对象 |
+| PUT `/drafts/{id}` | 更新草稿。发送完整表单、当前 `revision` 和 `Idempotency-Key`（服务端同步校验 `viewPreset` 锁定字段与操作） | 200，草稿对象 |
+| GET `/view-presets` | 仅 `System Manager`：查询所有或指定 `kind` 的岗位视图预设配置 | 200，`{presets}` |
+| PUT `/view-presets` | 仅 `System Manager`：新增或更新 `role × kind` 岗位视图预设配置并写审计 | 200，预设对象 |
 
 成功响应包装为 `{"data": ...}`。选项对象包含：
 

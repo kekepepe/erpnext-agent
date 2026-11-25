@@ -183,9 +183,9 @@ Negative tests must exercise native REST/submit/cancel and normal Workflow route
 - **Blocker:** Confirm whether customers or suppliers send the originals and which ERP order type staff must enter. Obtain sanitized samples from 3–5 corresponding sources to validate parsing, matching and the alias schema. See `docs/OWNER_DIRECTION_20261123.md` section 7.
 - **Revisit when:** Source-order samples are available, or the client reports that orders also arrive as scanned images, which would add OCR to the scope.
 
-## DEC-020 — Job-view presets: one configuration drives both the frontend and the backend (2026-11-23)
+## DEC-020 — Job-view presets: one configuration drives both the frontend and the backend (2026-11-23; mechanism implemented 2026-11-25)
 
-- **Status:** Accepted as a mechanism on 2026-11-23. The preset set and its granularity depend on the confirmed job list and headcount.
+- **Status:** Accepted and mechanism implemented in `hardware_erp.view_presets` (`hardware_erp_view_preset` table + `/api/business/v1/view-presets` admin API + frontend/backend enforcement on W6 entry); final preset set and granularity still depend on the client's confirmed job list and headcount.
 - **Authority:** Owner request of 2026-11-23.
 - **Decision:** Different job levels see different content. The interface structure stays the same for everyone; content a role must not see is locked in place and shown as no permission. For a given role and document type, one configuration defines the visible field set, the editable field set, the permitted operations, role-specific required fields and row-visibility conditions.
 - **Architectural constraints:**

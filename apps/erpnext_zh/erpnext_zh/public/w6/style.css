@@ -519,3 +519,30 @@ button:disabled {
   align-self: flex-start;
   margin-bottom: 8px;
 }
+
+/* 岗位视图预设锁定样式（DEC-020） */
+.field-locked {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.field-locked-mask,
+.cell-locked-mask {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 12px;
+  cursor: not-allowed;
+}
+
+.field-locked-mask {
+  height: 30px;
+  width: 100%;
+  justify-content: flex-start;
+}
