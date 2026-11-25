@@ -28,6 +28,11 @@ KINDS = {
         "partner_field": "supplier",
         "partner_name_field": "supplier_name",
         "item_flag": "is_purchase_item",
+        "source_doctype": "Purchase Order",
+        "source_ref_field": "purchase_order",
+        "source_item_ref_field": "purchase_order_item",
+        "fulfilled_qty_field": "received_qty",
+        "per_fulfilled_field": "per_received",
     },
     "sales_delivery": {
         "doctype": "Delivery Note",
@@ -35,6 +40,11 @@ KINDS = {
         "partner_field": "customer",
         "partner_name_field": "customer_name",
         "item_flag": "is_sales_item",
+        "source_doctype": "Sales Order",
+        "source_ref_field": "against_sales_order",
+        "source_item_ref_field": "so_detail",
+        "fulfilled_qty_field": "delivered_qty",
+        "per_fulfilled_field": "per_delivered",
     },
 }
 DOCTYPE_TO_KIND = {spec["doctype"]: kind for kind, spec in KINDS.items()}
@@ -71,6 +81,8 @@ def parse_route(route: str | None) -> tuple[str, str | None] | None:
     cleaned = (route or "").strip("/")
     if cleaned == "entry-options":
         return ("entry_options", None)
+    if cleaned == "source-orders":
+        return ("source_orders", None)
     if cleaned == "view-presets":
         return ("view_presets", None)
     if cleaned == "drafts":
@@ -125,8 +137,15 @@ def validate_payload_shape(body, updating: bool) -> None:
             if not isinstance(line, dict):
                 issue(path, "商品行格式无效。")
                 continue
-            for extra in sorted(line.keys() - {"productId", "warehouseId", "quantity"}):
+            for extra in sorted(line.keys() - {"productId", "warehouseId", "quantity", "sourceOrderId", "sourceOrderItemId"}):
                 issue(f"{path}.{extra}", "此字段不在录单范围内。")
+            src_order = line.get("sourceOrderId")
+            src_item = line.get("sourceOrderItemId")
+            if src_order is not None or src_item is not None:
+                if not isinstance(src_order, str) or not src_order.strip():
+                    issue(f"{path}.sourceOrderId", "缺少有效的来源订单号。")
+                if not isinstance(src_item, str) or not src_item.strip():
+                    issue(f"{path}.sourceOrderItemId", "缺少有效的来源订单行标识。")
             if not isinstance(line.get("productId"), str) or not line.get("productId"):
                 issue(f"{path}.productId", "请选择有效选项。")
             if not isinstance(line.get("warehouseId"), str) or not line.get("warehouseId"):
@@ -145,20 +164,27 @@ def validate_payload_shape(body, updating: bool) -> None:
 
 def serialize_draft(doc, kind: str) -> dict:
     spec = KINDS[kind]
+    lines = []
+    for row in (doc.get("items") or []):
+        entry = {
+            "productId": row.item_code,
+            "warehouseId": row.warehouse,
+            "quantity": format_quantity(row.qty),
+        }
+        src_order = row.get(spec["source_ref_field"])
+        src_item = row.get(spec["source_item_ref_field"])
+        if src_order:
+            entry["sourceOrderId"] = src_order
+        if src_item:
+            entry["sourceOrderItemId"] = src_item
+        lines.append(entry)
     return {
         "id": doc.name,
         "kind": kind,
         "companyId": doc.company,
         "partnerId": doc.get(spec["partner_field"]),
         "postingDate": str(doc.posting_date),
-        "lines": [
-            {
-                "productId": row.item_code,
-                "warehouseId": row.warehouse,
-                "quantity": format_quantity(row.qty),
-            }
-            for row in (doc.get("items") or [])
-        ],
+        "lines": lines,
         "revision": max(int(doc.get("custom_w6_revision") or 0), 1),
         "status": "draft",
     }
@@ -336,6 +362,129 @@ def _locate_draft(draft_id: str, for_update: bool = False):
                 raise ApiError(404, "DRAFT_NOT_FOUND", "找不到草稿或无权访问。")
             return doc, kind
     raise ApiError(404, "DRAFT_NOT_FOUND", "找不到草稿或无权访问。")
+
+
+def _handle_source_orders(operator: str, kind: str | None) -> tuple[int, dict, str, str]:
+    if not isinstance(kind, str) or kind not in KINDS:
+        raise ApiError(400, "INVALID_KIND", "请选择采购入库或销售出库。")
+    spec = KINDS[kind]
+    doctype = spec["doctype"]
+    source_doctype = spec["source_doctype"]
+    if not frappe.has_permission(doctype, "read") or not frappe.has_permission(source_doctype, "read"):
+        raise ApiError(403, "FORBIDDEN", "当前身份无权查看来源订单。")
+
+    allowed_warehouses = _user_restricted_values(operator, "Warehouse")
+    raw_orders = frappe.get_list(
+        source_doctype,
+        filters={
+            "docstatus": 1,
+            "status": ["not in", ["Closed", "Completed", "Cancelled"]],
+        },
+        fields=["name", "company", spec["partner_field"], "transaction_date", "status"],
+        order_by="transaction_date desc, name desc",
+        limit_page_length=100,
+    )
+
+    fulfilled_field = spec["fulfilled_qty_field"]
+    orders = []
+    for header in raw_orders:
+        doc = frappe.get_doc(source_doctype, header["name"])
+        if not doc.has_permission("read"):
+            continue
+        open_lines = []
+        for row in (doc.get("items") or []):
+            ordered = Decimal(str(row.qty or 0))
+            fulfilled = Decimal(str(row.get(fulfilled_field) or 0))
+            remaining = ordered - fulfilled
+            if remaining <= 0:
+                continue
+            wh = row.get("warehouse") or ""
+            if allowed_warehouses is not None and wh and wh not in allowed_warehouses:
+                continue
+            open_lines.append({
+                "sourceOrderId": doc.name,
+                "sourceOrderItemId": row.name,
+                "productId": row.item_code,
+                "warehouseId": wh,
+                "orderedQty": format_quantity(ordered),
+                "fulfilledQty": format_quantity(fulfilled),
+                "remainingQty": format_quantity(remaining),
+            })
+        if open_lines:
+            orders.append({
+                "id": doc.name,
+                "companyId": doc.company,
+                "partnerId": doc.get(spec["partner_field"]),
+                "transactionDate": str(doc.transaction_date),
+                "status": doc.status,
+                "lines": open_lines,
+            })
+
+    return 200, {"data": {"orders": orders}}, source_doctype, ""
+
+
+def _validate_source_links(body: dict, spec: dict) -> dict[tuple[str, str], dict]:
+    """Validate optional sourceOrderId/sourceOrderItemId links and return source row metadata."""
+    linked_lines = [
+        (idx, line) for idx, line in enumerate(body["lines"]) if line.get("sourceOrderId")
+    ]
+    if not linked_lines:
+        return {}
+
+    source_doctype = spec["source_doctype"]
+    if not frappe.has_permission(source_doctype, "read"):
+        raise ApiError(403, "FORBIDDEN", "当前身份无权关联来源订单。")
+
+    issues: list[dict] = []
+    loaded_orders: dict[str, object] = {}
+    row_totals: dict[tuple[str, str], Decimal] = {}
+    source_meta: dict[tuple[str, str], dict] = {}
+    fulfilled_field = spec["fulfilled_qty_field"]
+
+    for idx, line in linked_lines:
+        src_id = line["sourceOrderId"]
+        src_item_id = line["sourceOrderItemId"]
+        if src_id not in loaded_orders:
+            if not frappe.db.exists(source_doctype, src_id):
+                issues.append({"path": f"lines.{idx}.sourceOrderId", "message": "来源订单不存在。"})
+                continue
+            src_doc = frappe.get_doc(source_doctype, src_id)
+            if not src_doc.has_permission("read"):
+                raise ApiError(403, "FORBIDDEN", "无权访问所选来源订单。")
+            loaded_orders[src_id] = src_doc
+        src_doc = loaded_orders[src_id]
+
+        if int(src_doc.docstatus) != 1 or src_doc.status in ("Closed", "Completed", "Cancelled"):
+            issues.append({"path": f"lines.{idx}.sourceOrderId", "message": "来源订单未批准或已关闭，不能生成后续单据。"})
+            continue
+        if src_doc.company != body["companyId"] or src_doc.get(spec["partner_field"]) != body["partnerId"]:
+            issues.append({"path": f"lines.{idx}.sourceOrderId", "message": "来源订单的公司或往来单位与当前单据不一致。"})
+            continue
+
+        matched_row = next((r for r in (src_doc.get("items") or []) if r.name == src_item_id), None)
+        if matched_row is None:
+            issues.append({"path": f"lines.{idx}.sourceOrderItemId", "message": "找不到对应的来源订单商品行。"})
+            continue
+        if matched_row.item_code != line["productId"]:
+            issues.append({"path": f"lines.{idx}.productId", "message": "商品与来源订单行不一致。"})
+            continue
+
+        remaining = Decimal(str(matched_row.qty or 0)) - Decimal(str(matched_row.get(fulfilled_field) or 0))
+        key = (src_id, src_item_id)
+        row_totals[key] = row_totals.get(key, Decimal("0")) + Decimal(line["quantity"])
+        if remaining <= 0 or row_totals[key] > remaining:
+            issues.append({"path": f"lines.{idx}.quantity", "message": f"数量超过来源订单剩余待收发数量（剩余 {format_quantity(max(remaining, Decimal('0')))}）。"})
+            continue
+
+        source_meta[key] = {
+            "rate": matched_row.rate,
+            "uom": matched_row.uom,
+            "conversion_factor": matched_row.conversion_factor,
+        }
+
+    if issues:
+        raise ApiError(422, "VALIDATION_ERROR", "来源订单关联校验未通过。", issues)
+    return source_meta
 
 
 def _handle_get_draft(draft_id: str) -> tuple[int, dict, str, str]:
@@ -545,9 +694,29 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
                     raise ApiError(403, "FORBIDDEN", "所选仓库超出当前岗位权限范围。")
 
         _validate_references(body, spec)
+        source_meta = _validate_source_links(body, spec)
 
         if draft_id is not None and body["revision"] != current_revision:
             raise ApiError(409, "STALE_REVISION", "草稿已更新，请核对最新版本后重试。")
+
+        def _build_item_row(line: dict) -> dict:
+            row_data = {
+                "item_code": line["productId"],
+                "warehouse": line["warehouseId"],
+                "qty": float(Decimal(line["quantity"])),
+            }
+            if line.get("sourceOrderId") and line.get("sourceOrderItemId"):
+                row_data[spec["source_ref_field"]] = line["sourceOrderId"]
+                row_data[spec["source_item_ref_field"]] = line["sourceOrderItemId"]
+                meta = source_meta.get((line["sourceOrderId"], line["sourceOrderItemId"]))
+                if meta:
+                    if meta.get("rate") is not None:
+                        row_data["rate"] = meta["rate"]
+                    if meta.get("uom"):
+                        row_data["uom"] = meta["uom"]
+                    if meta.get("conversion_factor"):
+                        row_data["conversion_factor"] = meta["conversion_factor"]
+            return row_data
 
         new_revision = 1 if draft_id is None else current_revision + 1
         if draft_id is None:
@@ -559,14 +728,7 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
                 "set_posting_time": 1,
                 "is_return": 0,
                 "custom_w6_revision": new_revision,
-                "items": [
-                    {
-                        "item_code": line["productId"],
-                        "warehouse": line["warehouseId"],
-                        "qty": float(Decimal(line["quantity"])),
-                    }
-                    for line in body["lines"]
-                ],
+                "items": [_build_item_row(line) for line in body["lines"]],
             })
             doc.insert()
             status = 201
@@ -579,11 +741,7 @@ def _handle_save_draft(operator: str, draft_id: str | None) -> tuple[int, dict, 
             doc.custom_w6_revision = new_revision
             doc.set("items", [])
             for line in body["lines"]:
-                doc.append("items", {
-                    "item_code": line["productId"],
-                    "warehouse": line["warehouseId"],
-                    "qty": float(Decimal(line["quantity"])),
-                })
+                doc.append("items", _build_item_row(line))
             doc.save()
             status = 200
 
@@ -645,6 +803,11 @@ def dispatch(**kwargs):
         if method == "GET" and action == "entry_options":
             operation = "entry_options"
             status, payload, doctype, doc_id = _handle_entry_options(frappe.request.args.get("kind"))
+            return _json_response(status, payload)
+
+        if method == "GET" and action == "source_orders":
+            operation = "source_orders"
+            status, payload, doctype, doc_id = _handle_source_orders(operator, frappe.request.args.get("kind"))
             return _json_response(status, payload)
 
         if method == "GET" and action == "view_presets":

@@ -327,6 +327,10 @@ def filter_draft_by_preset(draft: dict, preset: dict) -> dict:
         for field in ("productId", "warehouseId", "quantity"):
             if field in visible:
                 row[field] = line.get(field)
+        if line.get("sourceOrderId"):
+            row["sourceOrderId"] = line["sourceOrderId"]
+        if line.get("sourceOrderItemId"):
+            row["sourceOrderItemId"] = line["sourceOrderItemId"]
         lines.append(row)
     filtered["lines"] = lines
     return filtered

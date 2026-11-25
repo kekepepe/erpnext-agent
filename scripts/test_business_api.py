@@ -49,6 +49,8 @@ class BusinessApiUnitTests(unittest.TestCase):
     def test_parse_route_handles_valid_and_invalid_paths(self):
         self.assertEqual(api.parse_route("entry-options"), ("entry_options", None))
         self.assertEqual(api.parse_route("/entry-options/"), ("entry_options", None))
+        self.assertEqual(api.parse_route("source-orders"), ("source_orders", None))
+        self.assertEqual(api.parse_route("view-presets"), ("view_presets", None))
         self.assertEqual(api.parse_route("drafts"), ("drafts", None))
         self.assertEqual(api.parse_route("drafts/MAT-PRE-2026-00001"), ("draft", "MAT-PRE-2026-00001"))
         self.assertIsNone(api.parse_route("drafts/a/b"))
@@ -72,10 +74,31 @@ class BusinessApiUnitTests(unittest.TestCase):
             "companyId": "R1合成发布验证公司",
             "partnerId": "R1合成供应商",
             "postingDate": "2026-11-24",
-            "lines": [{"productId": "R1-DEMO-SCREW", "warehouseId": "R1测试主仓 - R1D", "quantity": "12.5"}],
+            "lines": [{
+                "productId": "R1-DEMO-SCREW",
+                "warehouseId": "R1测试主仓 - R1D",
+                "quantity": "12.5",
+                "sourceOrderId": "PUR-ORD-2026-00001",
+                "sourceOrderItemId": "row-001",
+            }],
         }
         api.validate_payload_shape(body, updating=False)
         api.validate_payload_shape({**body, "revision": 1}, updating=True)
+
+        # Providing only sourceOrderId without sourceOrderItemId must fail 422
+        partial_link = {
+            **body,
+            "lines": [{
+                "productId": "R1-DEMO-SCREW",
+                "warehouseId": "R1测试主仓 - R1D",
+                "quantity": "1",
+                "sourceOrderId": "PUR-ORD-2026-00001",
+            }],
+        }
+        with self.assertRaises(api.ApiError) as ctx:
+            api.validate_payload_shape(partial_link, updating=False)
+        self.assertEqual(ctx.exception.status, 422)
+        self.assertEqual([i["path"] for i in ctx.exception.error["issues"]], ["lines.0.sourceOrderItemId"])
 
     def test_validate_payload_shape_rejects_extra_fields_and_bad_quantities(self):
         bad = {
@@ -99,7 +122,14 @@ class BusinessApiUnitTests(unittest.TestCase):
         )
 
     def test_serialize_draft_maps_purchase_and_sales_fields(self):
-        row = types.SimpleNamespace(item_code="R1-DEMO-SCREW", warehouse="R1测试主仓 - R1D", qty=5.0)
+        row = types.SimpleNamespace(
+            item_code="R1-DEMO-SCREW",
+            warehouse="R1测试主仓 - R1D",
+            qty=5.0,
+            purchase_order="PUR-ORD-2026-00001",
+            purchase_order_item="row-001",
+            get=lambda k, d=None: getattr(row, k, d),
+        )
         pr = types.SimpleNamespace(
             name="MAT-PRE-2026-00001",
             company="R1合成发布验证公司",
@@ -118,7 +148,13 @@ class BusinessApiUnitTests(unittest.TestCase):
                 "companyId": "R1合成发布验证公司",
                 "partnerId": "R1合成供应商",
                 "postingDate": "2026-11-24",
-                "lines": [{"productId": "R1-DEMO-SCREW", "warehouseId": "R1测试主仓 - R1D", "quantity": "5"}],
+                "lines": [{
+                    "productId": "R1-DEMO-SCREW",
+                    "warehouseId": "R1测试主仓 - R1D",
+                    "quantity": "5",
+                    "sourceOrderId": "PUR-ORD-2026-00001",
+                    "sourceOrderItemId": "row-001",
+                }],
                 "revision": 2,
                 "status": "draft",
             },

@@ -2,7 +2,7 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0 - 1A pricing priority / 2A source linkage, or W4 role UAT once client inputs arrive
+current_task: P0 - 1A pricing source/history boundaries, or W4/finance/English-order work once client inputs arrive
 last_updated: 2026-11-25
 updated_by: Antigravity
 ---
@@ -10,6 +10,17 @@ updated_by: Antigravity
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-25 2A 单据来源关联与待收发剩余量验收
+
+- **来源订单查询与关联校验（L3 Business API v1）。** 在 `apps/hardware_erp/hardware_erp/business_api.py` 新增 `GET /api/business/v1/source-orders?kind=purchase_receipt|sales_delivery`，仅返回当前用户有权限访问、已批准（`docstatus=1`）、未关闭/未完成且存在剩余待收发数量（`qty - received_qty` / `qty - delivered_qty > 0`）的 `Purchase Order` / `Sales Order`，并按仓库 `User Permission` 过滤明细行。
+- **草稿原生来源绑定。** `POST/PUT /api/business/v1/drafts` 支持行级可选字段 `sourceOrderId`、`sourceOrderItemId`，服务端校验来源订单权限、审批状态、未关闭状态、公司/往来方一致性、商品一致性及累计数量不超剩余待收发量，写入原生 `purchase_order` / `purchase_order_item` 或 `against_sales_order` / `so_detail`（并带出原单单价与单位），保持 ERPNext 原生追溯链。
+- **前端引入入口。** 在 `apps/erpnext_zh/erpnext_zh/www/w6-entry.html`、`prototypes/w6/{index.html,app.js,style.css}` 及 `apps/erpnext_zh/erpnext_zh/public/w6/` 新增「按已批准订单引入」选择器，选中已批准订单后自动带出公司、往来方及剩余待收发明细行；修改商品时自动清除旧来源关联，未启用该接口的合成演示服务自动隐藏该栏。
+- **验证通过。**
+  - 本地镜像重建、迁移及健康检查：`./scripts/phase0-workbench-start.sh && ./scripts/phase0-check.sh` 通过。
+  - 2A 实站 7 项验收：`.venv/bin/python scripts/phase0-validate-source-linkage.py` 全过，覆盖 Quotation → Sales Order 原生映射追溯、越权角色（销售访问采购来源单）403、未批准草稿 PO 隐藏且关联拒写 422、已批准 PO（数量 10）列出剩余量 10、超量入库（11）拒写 422、分批入库（4）写入原生 `purchase_order` 关联且批准后剩余量更新为 6、关闭 PO 后隐藏且关联拒写 422，以及按 R1 撤销审批流逆向清理还原。
+  - 全量回归：`.venv/bin/python scripts/phase0-validate-w6-adapter.py`（10/10）、`.venv/bin/python scripts/phase0-validate-workbench.py`（访客拒绝 + 九岗位全过）、`.venv/bin/python -m compileall -q apps scripts`、`.venv/bin/python -m unittest discover -s scripts -p 'test_*.py'`（57 项全过）、`node --test scripts/test_phase0_form_display.js`、`node --check` 与 `git diff --check` 全通过。
+- **未闭合项与下一步。** 本轮 2A 改动尚未提交。下一步可提交本轮改动，继续推进 **1A 取价来源提示与历史价边界**，或在客户侧提供 Q4（真实岗位与人数）、Q6（财务口径确认会）、Q7（英文原单脱敏样本）后推进对应正式交付项。
 
 ### 2026-11-25 N-4 岗位视图预设机制（DEC-020）前后端落地与验收
 

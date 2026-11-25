@@ -26,6 +26,7 @@
       lines: [] // [{ productId, warehouseId, quantity, ...read-only info }]
     },
     pendingSave: null,
+    sourceOrders: [],
     optionsReady: false,
     isDirty: false,
     loading: false
@@ -50,7 +51,10 @@
     retryOptionsBtn: document.getElementById('retryOptionsBtn'),
     totalSummary: document.getElementById('totalSummary'),
     loadingOverlay: document.getElementById('loadingOverlay'),
-    loadingText: document.getElementById('loadingText')
+    loadingText: document.getElementById('loadingText'),
+    sourceOrderBar: document.getElementById('sourceOrderBar'),
+    sourceOrderSelect: document.getElementById('sourceOrderSelect'),
+    applySourceOrderBtn: document.getElementById('applySourceOrderBtn')
   };
 
   function markDirty() {
@@ -220,12 +224,70 @@
       if (!isActionAllowed('saveDraft') || !state.options.capabilities?.saveDraft) {
         showAlert(getLockReason('saveDraft', '当前岗位仅可查看，无权保存草稿。'), false);
       }
+      loadSourceOrders(kind);
     } catch {
       showAlert('录单选项加载失败，请重新加载。');
       el.retryOptionsBtn.classList.remove('hidden');
     } finally {
       hideLoading();
     }
+  }
+
+  async function loadSourceOrders(kind) {
+    state.sourceOrders = [];
+    if (!el.sourceOrderBar || !el.sourceOrderSelect) return;
+    el.sourceOrderBar.classList.add('hidden');
+    if (!isActionAllowed('saveDraft') || !state.options.capabilities?.saveDraft) return;
+    try {
+      const res = await fetch(`${API_PREFIX}/source-orders?kind=${encodeURIComponent(kind)}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) return;
+      const json = await res.json();
+      const orders = json?.data?.orders || [];
+      if (orders.length === 0) return;
+      state.sourceOrders = orders;
+      el.sourceOrderSelect.replaceChildren();
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = `-- 按已批准${kind === 'purchase_receipt' ? '采购订单' : '销售订单'}引入 (${orders.length}) --`;
+      el.sourceOrderSelect.appendChild(placeholder);
+      orders.forEach(order => {
+        const opt = document.createElement('option');
+        opt.value = order.id;
+        opt.textContent = `${order.id} · ${order.partnerId} (${order.lines.length}行待办)`;
+        el.sourceOrderSelect.appendChild(opt);
+      });
+      el.sourceOrderBar.classList.remove('hidden');
+    } catch {
+      // Optional capability; ignore when running against synthetic pilot server.
+    }
+  }
+
+  function applySelectedSourceOrder() {
+    if (!el.sourceOrderSelect || !el.sourceOrderSelect.value) return;
+    const order = state.sourceOrders.find(o => o.id === el.sourceOrderSelect.value);
+    if (!order) return;
+    if (state.isDirty && !window.confirm('引入来源订单将替换当前明细行，确定继续吗？')) return;
+    state.draft.companyId = order.companyId;
+    state.draft.partnerId = order.partnerId;
+    el.companySelect.value = order.companyId;
+    el.partnerSelect.value = order.partnerId;
+    state.draft.lines = order.lines.map(line => ({
+      productId: line.productId,
+      warehouseId: line.warehouseId || state.options.warehouses?.[0]?.id || '',
+      quantity: String(line.remainingQty),
+      sourceOrderId: line.sourceOrderId,
+      sourceOrderItemId: line.sourceOrderItemId
+    }));
+    renderLines();
+    markDirty();
+    showAlert(`已引入来源订单 ${order.id} 的剩余待收发明细（共 ${order.lines.length} 行）。`, true);
+  }
+
+  if (el.applySourceOrderBtn) {
+    el.applySourceOrderBtn.addEventListener('click', applySelectedSourceOrder);
   }
 
   function renderSelectOptions(selectEl, list, placeholder) {
@@ -473,6 +535,9 @@
     target.classList.remove('input-error');
 
     if (field === 'productId') {
+      // 更改商品时清除原来源订单行关联
+      delete state.draft.lines[index].sourceOrderId;
+      delete state.draft.lines[index].sourceOrderItemId;
       // 联动商品只读字段
       const prod = state.options.products.find(p => p.id === target.value);
       const row = target.closest('tr');
@@ -692,11 +757,18 @@
       companyId: el.companySelect.value,
       partnerId: el.partnerSelect.value,
       postingDate: el.postingDateInput.value,
-      lines: inputRows.map(({ line: l }) => ({
-        productId: l.productId,
-        warehouseId: l.warehouseId,
-        quantity: String(l.quantity)
-      }))
+      lines: inputRows.map(({ line: l }) => {
+        const entry = {
+          productId: l.productId,
+          warehouseId: l.warehouseId,
+          quantity: String(l.quantity)
+        };
+        if (l.sourceOrderId && l.sourceOrderItemId) {
+          entry.sourceOrderId = l.sourceOrderId;
+          entry.sourceOrderItemId = l.sourceOrderItemId;
+        }
+        return entry;
+      })
     };
 
     const isUpdate = Boolean(state.draft.id);
