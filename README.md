@@ -30,9 +30,10 @@ python3 -m venv .venv
 docker compose -f phase0/compose.yaml -f phase0/compose.zh.yaml -f phase0/compose.workbench.yaml logs -f backend
 ```
 
-## W6 出入库录单试点
+## W6 出入库录单试点与 ERPNext 适配
 
-运行 `python3 scripts/phase0-pilot-api.py` 并打开 <http://127.0.0.1:8093/>，体验采购入库和销售出库的中文表格录单。试点使用合成主数据，草稿保存在本机进程内，关闭服务即清空。接口及后续 ERPNext 适配验收见 [W6 Business API](docs/BUSINESS_API_W6.md)。
+- **ERPNext 同源录单**：启动工作台后，使用已登录系统账号打开 <http://localhost:8080/w6-entry>，通过 `/api/business/v1` 读写原生 `Purchase Receipt` / `Delivery Note` 草稿，遵循原生角色、公司/仓库权限及审批守卫。运行 `.venv/bin/python scripts/phase0-validate-w6-adapter.py` 可复验实站权限、仓库越权、并发幂等与零过账边界。
+- **独立合成演示**：运行 `python3 scripts/phase0-pilot-api.py` 并打开 <http://127.0.0.1:8093/>，使用合成主数据体验，草稿保存在本机进程内，关闭服务即清空。接口及验收说明见 [W6 Business API](docs/BUSINESS_API_W6.md)。
 
 ## 商品价格档位与订单核对
 

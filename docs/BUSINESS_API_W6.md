@@ -2,9 +2,10 @@
 
 按 DEC-016、DEC-020、DEC-022，先用采购入库和销售出库验证中文表格录单。契约涵盖基础选项、创建草稿、回读和更新草稿。本机演示服务使用合成数据，草稿保存在进程内，重启后清空。正式数据、库存过账、审批、金额、取价、原单匹配和结算留待各自的验收范围明确后实现。
 
-## 本地联调
+## 本地联调与 ERPNext 适配入口
 
-在仓库根目录运行 `python3 scripts/phase0-pilot-api.py`，打开 <http://127.0.0.1:8093/>。端口被占用时用 `--port` 指定其他端口。页面与 API 同源，服务绑定本机回环地址。运行 `python3 -m unittest discover -s scripts -p 'test_pilot_api.py'` 可重跑 HTTP 契约测试。
+- **合成演示服务**：在仓库根目录运行 `python3 scripts/phase0-pilot-api.py`，打开 <http://127.0.0.1:8093/>。端口被占用时用 `--port` 指定其他端口。运行 `python3 -m unittest discover -s scripts -p 'test_pilot_api.py'` 可重跑合成契约测试。
+- **ERPNext 正式适配**：启动本地中文工作台（`./scripts/phase0-workbench-start.sh`）后，登录系统账号打开 <http://localhost:8080/w6-entry>，页面通过同源 `/api/business/v1` 调用 `hardware_erp.business_api.dispatch`，写入附带 `X-Frappe-CSRF-Token`。运行 `.venv/bin/python scripts/phase0-validate-w6-adapter.py` 可重跑实站权限、仓库隔离、并发幂等、版本冲突与零过账验收；运行 `.venv/bin/python -m unittest scripts/test_business_api.py` 可跑离线单测。
 
 ## 请求与返回
 

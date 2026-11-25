@@ -113,7 +113,13 @@
         headers: { 'Accept': 'application/json' }
       });
       if (!res.ok) {
-        throw new Error(`加载基础选项失败: HTTP ${res.status}`);
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error?.message || `加载基础选项失败: HTTP ${res.status}`;
+        showAlert(errMsg);
+        if (res.status !== 401 && res.status !== 403) {
+          el.retryOptionsBtn.classList.remove('hidden');
+        }
+        return;
       }
       const json = await res.json();
       state.options = json.data || {};
@@ -583,13 +589,17 @@
     showLoading(isUpdate ? '正在更新草稿...' : '正在保存新草稿...');
 
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Idempotency-Key': state.pendingSave.key
+      };
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || window.frappe?.csrf_token;
+      if (csrfToken) headers['X-Frappe-CSRF-Token'] = csrfToken;
+
       const res = await fetch(url, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Idempotency-Key': state.pendingSave.key
-        },
+        headers,
         body
       });
 

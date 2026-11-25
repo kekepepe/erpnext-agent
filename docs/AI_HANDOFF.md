@@ -2,14 +2,26 @@
 project: ERPNext-agent
 status: active
 current_phase: Phase 0
-current_task: P0 - validate the two-document W6 draft pilot and prepare the ERPNext adapter
-last_updated: 2026-11-23
-updated_by: Codex
+current_task: P0 - W4 role UAT, finance/source-order inputs, or next W6/1A/2A capabilities
+last_updated: 2026-11-24
+updated_by: Antigravity
 ---
 
 # AI Project Handoff
 
 ## Current Objective
+
+### 2026-11-24 W6 ERPNext 正式适配器与同源录单页完成验收
+
+- **ERPNext Business API v1 适配器已完成。** 在 `apps/hardware_erp/hardware_erp/business_api.py` 与 `business_api_setup.py` 实现 `/api/business/v1` 同源适配层，并在 `phase0/runtime/frappe.conf.template` 配置 NGINX 路由映射至 `hardware_erp.business_api.dispatch`，不修改 ERPNext/Frappe Core。支持 `GET /entry-options`、`POST /drafts`、`GET /drafts/{id}`、`PUT /drafts/{id}`，内部映射原生 `Purchase Receipt` 与 `Delivery Note` 草稿。
+- **权限、版本、幂等与审计。** 接入 Frappe 原生登录会话与 `X-Frappe-CSRF-Token` 校验，复用原生角色权限、公司/仓库 `User Permission` 及 `hardware_erp.approval` 审批守卫。在 `Purchase Receipt` / `Delivery Note` 增加隐藏只读字段 `custom_w6_revision`（由 `patches/configure_business_api.py` 与 `after_install` 维护），并建内部表 `hardware_erp_business_idempotency` 与 `hardware_erp_business_audit`。同键并发通过 MariaDB `GET_LOCK` 串行化并刷新 InnoDB 读快照，实测解决并发创建时 `tabSeries` 死锁竞争；同键重试返回原结果，同键异内容或版本过期返回 409，越权访问草稿返回 404 不泄露存在性，仓库越权返回 403。
+- **ERPNext 同源录单页。** 新增 `apps/erpnext_zh/erpnext_zh/www/w6-entry.py`、`w6-entry.html` 与 `public/w6/{app.js,style.css}`（入口 `http://localhost:8080/w6-entry`），同步更新 `prototypes/w6/app.js` 支持 `X-Frappe-CSRF-Token` 与 401/403 提示，保留 `scripts/phase0-pilot-api.py` 合成演示兼容。
+- **验证通过。**
+  - 本地镜像重建与迁移：`./scripts/phase0-workbench-start.sh` 与 `./scripts/phase0-check.sh` 通过（`erpnext 16.33.0`、`frappe 16.31.0`、`erpnext_zh 0.1.1`、`hardware_erp 0.1.0`）。
+  - 实站适配验收：`.venv/bin/python scripts/phase0-validate-w6-adapter.py` 全部 9 项通过，覆盖未登录 401、缺 CSRF 拒写、销售角色 403、库存复核只读（`saveDraft=False` 且写 403）、`Piece` 小数原生校验 422、采购入库与销售出库并发创建去重（201）、零库存流水与零总账验证、同键冲突 409、版本更新 1→2 与同键重放、过期版本 409 保留、跨角色读 404、临时撤销分仓 `User Permission` 后隐藏且写 403、以及 `/w6-entry` 页面 CSRF 渲染；测试草稿与临时权限已清理还原。
+  - 审计核查：`hardware_erp_business_audit` 已记录 24 条操作审计（仅含操作者、时间、操作、单据类型/ID、HTTP 状态和结果码，不含业务载荷）。
+  - 回归验证：`.venv/bin/python scripts/phase0-validate-workbench.py`（访客拒绝 + 九岗位全过）、`.venv/bin/python -m compileall -q apps scripts`、`.venv/bin/python -m unittest discover -s scripts -p 'test_*.py'`（53 项，含新增 7 项 `test_business_api.py`）、`node --test scripts/test_phase0_form_display.js`、`node --check` 与 `git diff --check` 均通过。
+- **未闭合项与下一步。** 本轮已在本机可丢弃 R1 站完成适配器技术验收；真实客户岗位清单与人数、财务口径、英文原单脱敏样本、首发范围与冻结 R1 对齐、扫码/批量录入扩展及正式 UAT 仍待后续推进。本轮未提交或推送。
 
 ### 2026-11-23 检查点与出入库试点联调
 
@@ -805,7 +817,7 @@ during the current task.
 
 - [x] Git 检查点：归档 105 个既有文件，完成敏感信息复核及基线验证。
 - [x] W6 Business API v1 契约、本机合成接口与两张录单表单；桌面和窄屏浏览器联调通过。
-- [ ] W6 ERPNext 适配：在隔离站验证真实用户会话和原生草稿，检查仓库权限、草稿更新与过账边界；真实岗位和首发范围待确认。
+- [x] W6 ERPNext 适配：完成 `/api/business/v1` 正式适配器与 `/w6-entry` 同源录单页，已在本地可丢弃 R1 站通过 9 项会话/CSRF/角色/仓库越权/并发幂等/版本冲突/零过账验证与九岗位回归；真实岗位和首发范围待确认。
 - [x] W0/W1/W2：环境、权限后端、导航框架及基础浏览器验证。
 - [x] C0：全新隔离安装、双次迁移、实际停写后卸载重装、双轮回归及脱敏证据归档。
 - [x] W3/W5 技术复验：两种尺寸各 38 项、详情语义和岗位权限通过。

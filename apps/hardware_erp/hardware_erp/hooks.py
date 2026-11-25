@@ -24,7 +24,11 @@ doc_events = {
 }
 
 
-after_install = ["hardware_erp.trade_fields.after_install", "hardware_erp.data_import.configure"]
+after_install = [
+    "hardware_erp.trade_fields.after_install",
+    "hardware_erp.data_import.configure",
+    "hardware_erp.business_api_setup.configure",
+]
 
 for _doctype in _trade_documents:
     _events = doc_events.setdefault(_doctype, {})

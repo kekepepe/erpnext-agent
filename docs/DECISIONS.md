@@ -222,9 +222,9 @@ Negative tests must exercise native REST/submit/cancel and normal Workflow route
 - **Revisit when:** A trigger above is met, a second client appears, or the owner restates the intent.
 - **Reference:** `docs/OWNER_DIRECTION_20261123.md` section 4.
 
-## DEC-023 — Same-origin Business API v1 for the W6 draft pilot (2026-11-23)
+## DEC-023 — Same-origin Business API v1 for the W6 draft pilot (2026-11-23; ERPNext adapter validated 2026-11-24)
 
-- **Status:** Contract defined for the two-document pilot. The local reference implementation uses synthetic data and in-memory drafts.
+- **Status:** Contract defined and ERPNext adapter implemented in `hardware_erp.business_api` with hosted entry page `/w6-entry` in `erpnext_zh`; validated against local disposable R1 roles, warehouse permissions, concurrency, idempotency and zero-posting boundaries. Local synthetic demo server remains available for offline rehearsal.
 - **Decision:** Antigravity owns the pilot UI and Codex owns the Business API contract, demo server, integration and GitHub delivery. Both surfaces use the versioned same-origin contract in [BUSINESS_API_W6.md](BUSINESS_API_W6.md), covering options and draft create/read/update. ERPNext mapping belongs to the server adapter.
 - **ERPNext boundary:** Use the authenticated operator's native session and CSRF checks for writes. Apply native permissions and server-side role rules, enforce revisions and idempotency in the draft-save transaction, and preserve native approval and subsequent posting.
 - **Release boundary:** Trial inclusion remains subject to alignment with the frozen R1 scope. External integrations and Agent/MCP remain under their existing roadmap gates.
